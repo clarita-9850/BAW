@@ -1,0 +1,135 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: cmips-mvp
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cmips_mvp
+    username: cmips_user
+    password: cmips_password
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI:http://keycloak:8080/realms/cmips}
+
+keycloak:
+  realm: ${KEYCLOAK_REALM:cmips}
+  auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL:http://keycloak:8080/}
+  # Use cmips-frontend for admin operations (service account with roles assigned)
+  resource: ${KEYCLOAK_CLIENT_ID:cmips-frontend}
+  credentials:
+    secret: ${KEYCLOAK_CLIENT_SECRET:UnpJullDQX23tenZ4IsTuGkY8QzBlcFd}
+  policy-enforcer-config:
+    enforcement-mode: ENFORCING  # Changed to ENFORCING for strict authorization
+    user-managed-access: {}
+    paths:
+      - name: Timesheet Resource
+        path: /api/timesheets/*
+        methods:
+          - name: create
+            method: POST
+            scopes:
+              - create
+          - name: read
+            method: GET
+            scopes:
+              - read
+          - name: update
+            method: PUT
+            scopes:
+              - update
+          - name: delete
+            method: DELETE
+            scopes:
+              - delete
+          - name: submit
+            method: POST
+            path: /api/timesheets/*/submit
+            scopes:
+              - submit
+          - name: approve
+            method: POST
+            path: /api/timesheets/*/approve
+            scopes:
+              - approve
+          - name: reject
+            method: POST
+            path: /api/timesheets/*/reject
+            scopes:
+              - reject
+      - name: EVV Resource
+        path: /api/evv/*
+        methods:
+          - name: create
+            method: POST
+            scopes:
+              - create
+          - name: read
+            method: GET
+            scopes:
+              - read
+          - name: update
+            method: PUT
+            scopes:
+              - update
+          - name: delete
+            method: DELETE
+            scopes:
+              - delete
+      - name: Provider-Recipient Resource
+        path: /api/provider-recipient/*
+        methods:
+          - name: create
+            method: POST
+            scopes:
+              - create
+          - name: read
+            method: GET
+            scopes:
+              - read
+          - name: update
+            method: PUT
+            scopes:
+              - update
+          - name: delete
+            method: DELETE
+            scopes:
+              - delete
+
+logging:
+  level:
+    org.keycloak: DEBUG
+    org.springframework.security: DEBUG
+
+  # Kafka Configuration (Spring Boot auto-config)
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      properties:
+        linger.ms: 10
+        batch.size: 16384
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      group-id: cmips-task-consumer
+      auto-offset-reset: earliest
+      properties:
+        spring.json.trusted.packages: "com.cmips.event"

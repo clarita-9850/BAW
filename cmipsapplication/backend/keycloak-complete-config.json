@@ -1,0 +1,528 @@
+{
+  "realm": "cmips",
+  "enabled": true,
+  "displayName": "CMIPS Security - Complete Authorization Setup",
+  "clients": [
+    {
+      "clientId": "cmips-backend",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "X6282J5tQzu2tzqLcglKmjhwfidB0vh9",
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "publicClient": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "saml.assertion.signature": "false",
+        "saml.force.post.binding": "false",
+        "saml.multivalued.roles": "false",
+        "saml.encrypt": "false",
+        "saml.server.signature": "false",
+        "saml.server.signature.keyinfo.ext": "false",
+        "exclude.session.state.from.auth.response": "false",
+        "saml_force_name_id_format": "false",
+        "saml.client.signature": "false",
+        "tls.client.certificate.bound.access.tokens": "false",
+        "saml.authnstatement": "false",
+        "display.on.consent.screen": "false",
+        "saml.onetimeuse.condition": "false"
+      },
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": true,
+        "policyEnforcementMode": "ENFORCING",
+        "resources": [
+          {
+            "name": "Timesheet Resource",
+            "type": "Timesheet",
+            "ownerManagedAccess": false,
+            "uris": [
+              "/api/timesheets/*",
+              "/api/timesheets",
+              "/api/timesheets/*/submit",
+              "/api/timesheets/*/approve", 
+              "/api/timesheets/*/reject"
+            ],
+            "scopes": [
+              {
+                "name": "create",
+                "displayName": "Create Timesheet"
+              },
+              {
+                "name": "read",
+                "displayName": "Read Timesheet"
+              },
+              {
+                "name": "update", 
+                "displayName": "Update Timesheet"
+              },
+              {
+                "name": "delete",
+                "displayName": "Delete Timesheet"
+              },
+              {
+                "name": "submit",
+                "displayName": "Submit Timesheet"
+              },
+              {
+                "name": "approve",
+                "displayName": "Approve Timesheet"
+              },
+              {
+                "name": "reject",
+                "displayName": "Reject Timesheet"
+              },
+              {
+                "name": "timesheet:employee_id",
+                "displayName": "View Employee ID"
+              },
+              {
+                "name": "timesheet:employee_name",
+                "displayName": "View Employee Name"
+              },
+              {
+                "name": "timesheet:department",
+                "displayName": "View Department"
+              },
+              {
+                "name": "timesheet:location",
+                "displayName": "View Location"
+              },
+              {
+                "name": "timesheet:regular_hours",
+                "displayName": "View Regular Hours"
+              },
+              {
+                "name": "timesheet:overtime_hours",
+                "displayName": "View Overtime Hours"
+              },
+              {
+                "name": "timesheet:holiday_hours",
+                "displayName": "View Holiday Hours"
+              },
+              {
+                "name": "timesheet:sick_hours",
+                "displayName": "View Sick Hours"
+              },
+              {
+                "name": "timesheet:vacation_hours",
+                "displayName": "View Vacation Hours"
+              },
+              {
+                "name": "timesheet:comments",
+                "displayName": "View Comments"
+              },
+              {
+                "name": "timesheet:supervisor_comments",
+                "displayName": "View Supervisor Comments"
+              },
+              {
+                "name": "timesheet:approval_info",
+                "displayName": "View Approval Information"
+              }
+            ]
+          },
+          {
+            "name": "EVV Resource",
+            "type": "EVV",
+            "ownerManagedAccess": false,
+            "uris": [
+              "/api/evv/*",
+              "/api/evv"
+            ],
+            "scopes": [
+              {
+                "name": "create",
+                "displayName": "Create EVV Record"
+              },
+              {
+                "name": "read",
+                "displayName": "Read EVV Record"
+              },
+              {
+                "name": "update",
+                "displayName": "Update EVV Record"
+              },
+              {
+                "name": "delete",
+                "displayName": "Delete EVV Record"
+              }
+            ]
+          },
+          {
+            "name": "Provider-Recipient Resource",
+            "type": "ProviderRecipient",
+            "ownerManagedAccess": false,
+            "uris": [
+              "/api/provider-recipient/*",
+              "/api/provider-recipient"
+            ],
+            "scopes": [
+              {
+                "name": "create",
+                "displayName": "Create Provider-Recipient Relationship"
+              },
+              {
+                "name": "read",
+                "displayName": "Read Provider-Recipient Relationship"
+              },
+              {
+                "name": "update",
+                "displayName": "Update Provider-Recipient Relationship"
+              },
+              {
+                "name": "delete",
+                "displayName": "Delete Provider-Recipient Relationship"
+              }
+            ]
+          }
+        ],
+        "policies": [
+          {
+            "name": "Provider Policy",
+            "type": "role",
+            "logic": "POSITIVE",
+            "roles": [
+              {
+                "id": "PROVIDER"
+              }
+            ]
+          },
+          {
+            "name": "Recipient Policy", 
+            "type": "role",
+            "logic": "POSITIVE",
+            "roles": [
+              {
+                "id": "RECIPIENT"
+              }
+            ]
+          },
+          {
+            "name": "Case Worker Policy",
+            "type": "role", 
+            "logic": "POSITIVE",
+            "roles": [
+              {
+                "id": "CASE_WORKER"
+              }
+            ]
+          },
+          {
+            "name": "Provider or Case Worker Policy",
+            "type": "aggregate",
+            "logic": "POSITIVE",
+            "policies": [
+              {
+                "name": "Provider Policy"
+              },
+              {
+                "name": "Case Worker Policy"
+              }
+            ],
+            "decisionStrategy": "AFFIRMATIVE"
+          },
+          {
+            "name": "Recipient or Case Worker Policy",
+            "type": "aggregate",
+            "logic": "POSITIVE", 
+            "policies": [
+              {
+                "name": "Recipient Policy"
+              },
+              {
+                "name": "Case Worker Policy"
+              }
+            ],
+            "decisionStrategy": "AFFIRMATIVE"
+          }
+        ],
+        "permissions": [
+          {
+            "name": "Timesheet Create Permission",
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "resources": [
+              {
+                "name": "Timesheet Resource"
+              }
+            ],
+            "scopes": [
+              {
+                "name": "create"
+              }
+            ],
+            "policies": [
+              {
+                "name": "Provider Policy"
+              }
+            ]
+          },
+          {
+            "name": "Timesheet Read Permission",
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "resources": [
+              {
+                "name": "Timesheet Resource"
+              }
+            ],
+            "scopes": [
+              {
+                "name": "read"
+              }
+            ],
+            "policies": [
+              {
+                "name": "Provider or Case Worker Policy"
+              },
+              {
+                "name": "Recipient or Case Worker Policy"
+              }
+            ]
+          },
+          {
+            "name": "Timesheet Submit Permission",
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "resources": [
+              {
+                "name": "Timesheet Resource"
+              }
+            ],
+            "scopes": [
+              {
+                "name": "submit"
+              }
+            ],
+            "policies": [
+              {
+                "name": "Provider Policy"
+              }
+            ]
+          },
+          {
+            "name": "Timesheet Approve Permission",
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "resources": [
+              {
+                "name": "Timesheet Resource"
+              }
+            ],
+            "scopes": [
+              {
+                "name": "approve"
+              }
+            ],
+            "policies": [
+              {
+                "name": "Recipient or Case Worker Policy"
+              }
+            ]
+          },
+          {
+            "name": "Timesheet Reject Permission",
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "resources": [
+              {
+                "name": "Timesheet Resource"
+              }
+            ],
+            "scopes": [
+              {
+                "name": "reject"
+              }
+            ],
+            "policies": [
+              {
+                "name": "Case Worker Policy"
+              }
+            ]
+          },
+          {
+            "name": "Basic Field Access Permission",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "scopes": [
+              {
+                "name": "timesheet:employee_id"
+              },
+              {
+                "name": "timesheet:employee_name"
+              },
+              {
+                "name": "timesheet:regular_hours"
+              },
+              {
+                "name": "timesheet:overtime_hours"
+              }
+            ],
+            "policies": [
+              {
+                "name": "Provider or Case Worker Policy"
+              },
+              {
+                "name": "Recipient or Case Worker Policy"
+              }
+            ]
+          },
+          {
+            "name": "Extended Field Access Permission",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "scopes": [
+              {
+                "name": "timesheet:department"
+              },
+              {
+                "name": "timesheet:location"
+              },
+              {
+                "name": "timesheet:holiday_hours"
+              },
+              {
+                "name": "timesheet:sick_hours"
+              },
+              {
+                "name": "timesheet:vacation_hours"
+              },
+              {
+                "name": "timesheet:comments"
+              }
+            ],
+            "policies": [
+              {
+                "name": "Case Worker Policy"
+              }
+            ]
+          },
+          {
+            "name": "Supervisor Field Access Permission",
+            "type": "scope",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "scopes": [
+              {
+                "name": "timesheet:supervisor_comments"
+              },
+              {
+                "name": "timesheet:approval_info"
+              }
+            ],
+            "policies": [
+              {
+                "name": "Recipient or Case Worker Policy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "clientId": "cmips-frontend",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "your-secret-key",
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "publicClient": false,
+      "protocol": "openid-connect"
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "CASE_WORKER",
+        "description": "Case Worker Role - Full access to all timesheet operations and fields"
+      },
+      {
+        "name": "RECIPIENT", 
+        "description": "Recipient Role - Can approve timesheets and view limited fields"
+      },
+      {
+        "name": "PROVIDER",
+        "description": "Provider Role - Can create, submit timesheets and view basic fields"
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "caseworker1",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Case",
+      "lastName": "Worker",
+      "email": "caseworker1@cmips.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["CASE_WORKER"]
+    },
+    {
+      "username": "recipient1", 
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Recipient",
+      "lastName": "User",
+      "email": "recipient1@cmips.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["RECIPIENT"]
+    },
+    {
+      "username": "provider1",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Provider",
+      "lastName": "User", 
+      "email": "provider1@cmips.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["PROVIDER"]
+    },
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "User",
+      "email": "admin@cmips.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["CASE_WORKER"]
+    }
+  ]
+}

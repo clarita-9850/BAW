@@ -1,0 +1,74 @@
+{
+  "realm": "cmips",
+  "enabled": true,
+  "displayName": "CMIPS Security",
+  "clients": [
+    {
+      "clientId": "cmips-frontend",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "your-secret-key",
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "publicClient": false,
+      "protocol": "openid-connect"
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "CASE_WORKER",
+        "description": "Case Worker Role"
+      },
+      {
+        "name": "RECIPIENT", 
+        "description": "Recipient Role"
+      },
+      {
+        "name": "PROVIDER",
+        "description": "Provider Role"
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "caseworker1",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["CASE_WORKER"]
+    },
+    {
+      "username": "recipient1", 
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["RECIPIENT"]
+    },
+    {
+      "username": "provider1",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["PROVIDER"]
+    }
+  ]
+}

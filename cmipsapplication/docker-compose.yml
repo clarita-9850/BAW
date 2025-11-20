@@ -1,0 +1,122 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: cmips-postgres
+    environment:
+      POSTGRES_DB: cmips_mvp
+      POSTGRES_USER: cmips_user
+      POSTGRES_PASSWORD: cmips_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cmips-network
+
+  # Zookeeper for Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: cmips-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - cmips-network
+
+  # Kafka Message Broker
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: cmips-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    networks:
+      - cmips-network
+
+  # Keycloak Identity and Access Management
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.0
+    container_name: cmips-keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin123
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/cmips_mvp
+      KC_DB_USERNAME: cmips_user
+      KC_DB_PASSWORD: cmips_password
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HTTP_ENABLED: true
+    ports:
+      - "8080:8080"
+      - "8180:8080"
+    depends_on:
+      - postgres
+    command: start-dev
+    networks:
+      - cmips-network
+
+  # CMIPS Backend Application
+  cmips-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cmips-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/cmips_mvp
+      SPRING_DATASOURCE_USERNAME: cmips_user
+      SPRING_DATASOURCE_PASSWORD: cmips_password
+      # Trailing slash required for AuthController token URL concat
+      KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080/
+      KEYCLOAK_REALM: cmips
+      KEYCLOAK_CLIENT_ID: cmips-frontend
+      KEYCLOAK_CLIENT_SECRET: UnpJullDQX23tenZ4IsTuGkY8QzBlcFd
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9093
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/cmips
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+      - keycloak
+    networks:
+      - cmips-network
+
+  # CMIPS Frontend Application
+  cmips-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cmips-frontend
+    environment:
+      REACT_APP_API_URL: http://localhost:8081/api
+      REACT_APP_KEYCLOAK_URL: http://localhost:8080
+      REACT_APP_KEYCLOAK_REALM: cmips
+      REACT_APP_KEYCLOAK_CLIENT_ID: cmips-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - cmips-backend
+    networks:
+      - cmips-network
+
+volumes:
+  postgres_data:
+
+networks:
+  cmips-network:
+    driver: bridge
