@@ -1,9 +1,0 @@
-2025-10-28 11:16:14,827 INFO  [org.infinispan.CONTAINER] (ForkJoinPool.commonPool-worker-1) ISPN000556: Starting user marshaller 'org.infinispan.jboss.marshalling.core.JBossUserMarshaller'
-2025-10-28 11:16:15,212 INFO  [org.keycloak.connections.infinispan.DefaultInfinispanConnectionProviderFactory] (main) Node name: node_622303, Site name: null
-2025-10-28 11:16:15,333 INFO  [org.keycloak.broker.provider.AbstractIdentityProviderMapper] (main) Registering class org.keycloak.broker.provider.mappersync.ConfigSyncEventListener
-2025-10-28 11:16:15,653 INFO  [io.quarkus] (main) Keycloak 25.0.0 on JVM (powered by Quarkus 3.8.5) started in 2.350s. Listening on: http://0.0.0.0:8180. Management interface listening on http://0.0.0.0:9000.
-2025-10-28 11:16:15,653 INFO  [io.quarkus] (main) Profile dev activated. 
-2025-10-28 11:16:15,653 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, jdbc-h2, keycloak, logging-gelf, narayana-jta, reactive-routes, resteasy-reactive, resteasy-reactive-jackson, smallrye-context-propagation, vertx]
-2025-10-28 11:16:15,654 WARN  [org.keycloak.quarkus.runtime.KeycloakMain] (main) Running the server in development mode. DO NOT use this configuration in production.
-2025-10-28 11:42:09,631 INFO  [com.arjuna.ats.jbossatx] (Shutdown thread) ARJUNA032014: Stopping transaction recovery manager
-2025-10-28 11:42:09,672 INFO  [io.quarkus] (Shutdown thread) Keycloak stopped in 0.084s
