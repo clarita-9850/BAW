@@ -1,3 +1,18 @@
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Package files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
 # Maven
 target/
 pom.xml.tag
@@ -15,68 +30,72 @@ buildNumber.properties
 build/
 !gradle/wrapper/gradle-wrapper.jar
 
-# IDE
+# IntelliJ IDEA
 .idea/
 *.iml
 *.iws
 *.ipr
-.vscode/
+out/
+
+# Eclipse
 .settings/
 .classpath
 .project
-.factorypath
-out/
 bin/
 
-# OS
+# VS Code
+.vscode/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# macOS
 .DS_Store
 .AppleDouble
 .LSOverride
 ._*
+
+# Windows
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 
-# Logs
-*.log
-logs/
+# Linux
+*~
 
 # Temporary files
 *.tmp
 *.temp
-*.bak
-*.orig
 *.swp
 *.swo
-*~
 
-# Application specific
+# Test output
+test-output/
+surefire-reports/
+
+# Spring Boot
+spring.log
+
+# Application-specific data directories
 data/
+logs/
+archive/
+error/
 *.csv
 *.json
 *.xml
-!**/src/test/resources/**/*.csv
-!**/src/test/resources/**/*.json
-!**/src/test/resources/**/*.xml
+!src/test/resources/**/*.csv
+!src/test/resources/**/*.json
+!src/test/resources/**/*.xml
 
-# Test reports
-test-results/
-test-output/
-surefire-reports/
+# Playwright
 playwright-report/
 playwright/.cache/
-
-# Compiled class files
-*.class
-
-# Package files
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
+test-results/
 
 # Credentials and secrets
 *.pem
@@ -89,6 +108,10 @@ secrets.json
 .env.local
 .env.*.local
 
+# IDE and editor backups
+*.bak
+*.orig
+
 # Node.js (for e2e tests)
 node_modules/
 npm-debug.log*
@@ -96,17 +119,4 @@ yarn-debug.log*
 yarn-error.log*
 package-lock.json
 yarn.lock
-
-# Spring Boot
-spring.log
-
-# Other project directories (exclude if you want to push only framework and demo)
-# Uncomment if you want to exclude other projects
-# cmipsapplication/
-# ihsspipeline-master/
-# California-State-Web-Template-Website-master/
-# DSD files/
-# keycloak-25.0.0/
-# load-testing/
-# screenshots/
 
