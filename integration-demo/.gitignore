@@ -81,7 +81,8 @@ surefire-reports/
 spring.log
 
 # Application-specific data directories
-data/
+data/output/
+data/upload/
 logs/
 archive/
 error/
@@ -91,6 +92,9 @@ error/
 !src/test/resources/**/*.csv
 !src/test/resources/**/*.json
 !src/test/resources/**/*.xml
+!data/input/**/*.csv
+!data/input/**/*.json
+!data/input/**/*.xml
 
 # Playwright
 playwright-report/
