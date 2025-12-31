@@ -2,8 +2,8 @@ package com.cmips.service;
 
 import com.cmips.entity.WorkQueueSubscription;
 import com.cmips.repository.WorkQueueSubscriptionRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,34 +12,40 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class WorkQueueSubscriptionService {
-    
+
+    private static final Logger log = LoggerFactory.getLogger(WorkQueueSubscriptionService.class);
+
     private final WorkQueueSubscriptionRepository subscriptionRepository;
     private final WorkQueueCatalogService catalogService;
-    
+
+    public WorkQueueSubscriptionService(WorkQueueSubscriptionRepository subscriptionRepository,
+                                        WorkQueueCatalogService catalogService) {
+        this.subscriptionRepository = subscriptionRepository;
+        this.catalogService = catalogService;
+    }
+
     /**
      * Subscribe a user to a work queue
      */
     @Transactional
     public WorkQueueSubscription subscribeUserToQueue(String username, String workQueue, String subscribedBy) {
         log.info("Subscribing user {} to queue {} by {}", username, workQueue, subscribedBy);
-        
+
         // Prevent subscribing to supervisor-only queues (like ESCALATED)
         if (catalogService.isSupervisorOnly(workQueue)) {
             throw new IllegalArgumentException("Cannot subscribe to supervisor-only queue: " + workQueue);
         }
-        
+
         // Check if subscription already exists
         Optional<WorkQueueSubscription> existing = subscriptionRepository
             .findByUsernameAndWorkQueue(username, workQueue);
-        
+
         if (existing.isPresent()) {
             log.warn("User {} is already subscribed to queue {}", username, workQueue);
             return existing.get();
         }
-        
+
         WorkQueueSubscription subscription = WorkQueueSubscription.builder()
             .username(username)
             .workQueue(workQueue)
@@ -47,10 +53,10 @@ public class WorkQueueSubscriptionService {
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();
-        
+
         return subscriptionRepository.save(subscription);
     }
-    
+
     /**
      * Unsubscribe a user from a work queue
      */
@@ -59,7 +65,7 @@ public class WorkQueueSubscriptionService {
         log.info("Unsubscribing user {} from queue {}", username, workQueue);
         subscriptionRepository.deleteByUsernameAndWorkQueue(username, workQueue);
     }
-    
+
     /**
      * Get all queues a user is subscribed to
      */
@@ -69,7 +75,7 @@ public class WorkQueueSubscriptionService {
             .map(WorkQueueSubscription::getWorkQueue)
             .toList();
     }
-    
+
     /**
      * Get all users subscribed to a queue
      */
@@ -79,7 +85,7 @@ public class WorkQueueSubscriptionService {
             .map(WorkQueueSubscription::getUsername)
             .toList();
     }
-    
+
     /**
      * Get all subscriptions for a queue (with full details)
      */
@@ -87,7 +93,7 @@ public class WorkQueueSubscriptionService {
         log.info("Getting full subscription details for queue {}", workQueue);
         return subscriptionRepository.findByWorkQueue(workQueue);
     }
-    
+
     /**
      * Get all subscriptions for a user (with full details)
      */
@@ -95,7 +101,7 @@ public class WorkQueueSubscriptionService {
         log.info("Getting full subscription details for user {}", username);
         return subscriptionRepository.findByUsername(username);
     }
-    
+
     /**
      * Check if user is subscribed to a queue
      */
@@ -103,4 +109,3 @@ public class WorkQueueSubscriptionService {
         return subscriptionRepository.findByUsernameAndWorkQueue(username, workQueue).isPresent();
     }
 }
-

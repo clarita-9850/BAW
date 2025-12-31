@@ -3,19 +3,37 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
-import WorkView from '@/components/WorkView';
 import NotificationCenter from '@/components/NotificationCenter';
 import apiClient from '@/lib/api';
+import { FieldAuthorizedValue, ActionButtons, ConditionalField } from '@/components/FieldAuthorizedValue';
+import { isFieldVisible } from '@/hooks/useFieldAuthorization';
 
 type Timesheet = {
   id: number;
-  employeeName: string;
-  payPeriodStart: string;
-  payPeriodEnd: string;
-  totalHours: number;
-  createdAt: string;
-  status: string;
+  userId?: string;
+  employeeId?: string;
+  employeeName?: string;
+  department?: string;
+  location?: string;
+  payPeriodStart?: string;
+  payPeriodEnd?: string;
+  regularHours?: number;
+  overtimeHours?: number;
+  totalHours?: number;
+  status?: string;
+  comments?: string;
+  supervisorComments?: string;
+  approvedBy?: string;
+  submittedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+type TimesheetResponse = {
+  content: Timesheet[];
+  totalElements: number;
+  numberOfElements: number;
+  allowedActions: string[];
 };
 
 type Provider = {
@@ -25,33 +43,43 @@ type Provider = {
   role: string;
 };
 
-function RecipientDashboardComponent() {
-  const { user, logout, loading: authLoading } = useAuth();
+export default function RecipientDashboard() {
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [pendingTimesheets, setPendingTimesheets] = useState<Timesheet[]>([]);
   const [providers, setProviders] = useState<Provider[]>([]);
+  const [allowedActions, setAllowedActions] = useState<string[]>([]);
 
   useEffect(() => {
-    if (authLoading) return;
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || authLoading) return;
     if (!user || (user.role !== 'RECIPIENT' && !user.roles?.includes('RECIPIENT'))) {
       window.location.href = '/login';
       return;
     }
     fetchDashboardData();
-  }, [user, authLoading]);
+  }, [user, authLoading, mounted]);
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      // Fetch pending timesheets
+      // Fetch pending timesheets with field-level authorization
       try {
-        const timesheetsResponse = await apiClient.get('/timesheets');
-        const timesheets = timesheetsResponse.data.content || timesheetsResponse.data || [];
+        const timesheetsResponse = await apiClient.get<TimesheetResponse>('/timesheets');
+        const responseData = timesheetsResponse.data;
+        const timesheets = responseData.content || [];
         setPendingTimesheets(timesheets.filter((ts: Timesheet) => ts.status === 'SUBMITTED'));
+        // Store allowed actions from the API response
+        setAllowedActions(responseData.allowedActions || []);
       } catch (err) {
         console.error('Error fetching timesheets:', err);
         setPendingTimesheets([]);
+        setAllowedActions([]);
       }
       
       // Fetch providers
@@ -85,115 +113,124 @@ function RecipientDashboardComponent() {
     }
   };
 
-  if (loading || authLoading || !user) {
+  if (!mounted || loading || authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1e3a8a] mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading Recipient Dashboard...</p>
+      <div className="min-h-screen d-flex align-items-center justify-content-center" style={{ backgroundColor: 'var(--gray-50, #fafafa)' }}>
+        <div className="text-center card p-5">
+          <div className="spinner-border text-primary mb-3" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="text-muted mb-0">Loading Recipient Dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-[#1e3a8a] text-white px-6 py-4 shadow-lg">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <div className="inline-flex w-10 h-8 bg-white rounded-md text-[#1e3a8a] text-xs font-bold items-center justify-center">CA</div>
-            <div>
-              <h1 className="text-xl font-bold">IHSS Electronic Services Portal</h1>
-              <p className="text-sm text-gray-200">In-Home Supportive Services</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <NotificationCenter userId={user?.username || ''} />
-            <span className="text-sm">
-              Welcome, <strong>{user?.username}</strong> (Recipient)
-            </span>
-            <button onClick={logout} className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-medium">
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
+    <div>
+      {/* Notification Center */}
+      <div className="mb-3 d-flex justify-content-end">
+        <NotificationCenter userId={user?.username || ''} />
+      </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* WorkView - Tasks */}
-        <div className="mb-6">
-          <WorkView username={user?.username || ''} />
-        </div>
-
+      <div>
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div
-            className="bg-white border border-gray-300 rounded-lg shadow-sm p-6 text-center cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => router.push('/recipient/timesheets')}
-          >
-            <div className="text-4xl mb-2">📋</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              TIMESHEETS TO REVIEW
-              {pendingTimesheets.length > 0 && (
-                <span className="ml-2 px-2 py-1 bg-red-600 text-white text-xs font-bold rounded">
-                  {pendingTimesheets.length} Pending
-                </span>
-              )}
-            </h3>
-            <p className="text-sm text-gray-600">Review & approve timesheets</p>
+        <div className="row mb-4">
+          <div className="col-lg-3 col-md-6 mb-3">
+            <div
+              className="card h-100"
+              style={{ cursor: 'pointer' }}
+              onClick={() => router.push('/recipient/timesheets')}
+            >
+              <div className="card-body text-center">
+                <div className="mb-3" style={{ fontSize: '3rem' }}>📋</div>
+                <h3 className="card-title">
+                  TIMESHEETS TO REVIEW
+                  {pendingTimesheets.length > 0 && (
+                    <span className="badge bg-danger ms-2">{pendingTimesheets.length} Pending</span>
+                  )}
+                </h3>
+                <p className="text-muted small mb-0">Review & approve timesheets</p>
+              </div>
+            </div>
           </div>
 
-          <div
-            className="bg-white border border-gray-300 rounded-lg shadow-sm p-6 text-center cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => router.push('/recipient/providers')}
-          >
-            <div className="text-4xl mb-2">👥</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">MY PROVIDERS</h3>
-            <p className="text-sm text-gray-600">Manage your caregivers</p>
+          <div className="col-lg-3 col-md-6 mb-3">
+            <div
+              className="card h-100"
+              style={{ cursor: 'pointer' }}
+              onClick={() => router.push('/recipient/providers')}
+            >
+              <div className="card-body text-center">
+                <div className="mb-3" style={{ fontSize: '3rem' }}>👥</div>
+                <h3 className="card-title">MY PROVIDERS</h3>
+                <p className="text-muted small mb-0">Manage your caregivers</p>
+              </div>
+            </div>
           </div>
 
-          <div className="bg-white border border-gray-300 rounded-lg shadow-sm p-6 text-center cursor-pointer hover:shadow-md transition-shadow">
-            <div className="text-4xl mb-2">📅</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">SERVICE SCHEDULE</h3>
-            <p className="text-sm text-gray-600">View upcoming services</p>
+          <div className="col-lg-3 col-md-6 mb-3">
+            <div className="card h-100" style={{ cursor: 'pointer' }}>
+              <div className="card-body text-center">
+                <div className="mb-3" style={{ fontSize: '3rem' }}>📅</div>
+                <h3 className="card-title">SERVICE SCHEDULE</h3>
+                <p className="text-muted small mb-0">View upcoming services</p>
+              </div>
+            </div>
           </div>
 
-          <div className="bg-white border border-gray-300 rounded-lg shadow-sm p-6 text-center cursor-pointer hover:shadow-md transition-shadow">
-            <div className="text-4xl mb-2">❓</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">HELP & SUPPORT</h3>
-            <p className="text-sm text-gray-600">Get assistance</p>
+          <div className="col-lg-3 col-md-6 mb-3">
+            <div className="card h-100" style={{ cursor: 'pointer' }}>
+              <div className="card-body text-center">
+                <div className="mb-3" style={{ fontSize: '3rem' }}>❓</div>
+                <h3 className="card-title">HELP & SUPPORT</h3>
+                <p className="text-muted small mb-0">Get assistance</p>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Timesheets Awaiting Approval */}
-        <div className="bg-white border border-gray-300 rounded-lg shadow-sm mb-6">
-          <div className="bg-[#1e3a8a] px-6 py-4 rounded-t-lg">
-            <h2 className="text-lg font-semibold text-white">🔔 TIMESHEETS AWAITING YOUR APPROVAL</h2>
+        <div className="card mb-4">
+          <div className="card-header d-flex justify-content-between align-items-center" style={{ backgroundColor: 'var(--color-p2, #046b99)', color: 'white' }}>
+            <h2 className="card-title mb-0" style={{ color: 'white' }}>🔔 TIMESHEETS AWAITING YOUR APPROVAL</h2>
+            {allowedActions.length > 0 && (
+              <small className="text-white-50">
+                Available actions: {allowedActions.join(', ')}
+              </small>
+            )}
           </div>
-          <div className="p-6">
+          <div className="card-body">
             {pendingTimesheets.length === 0 ? (
-              <p className="text-center text-gray-600 py-4">No timesheets pending review</p>
+              <p className="text-center text-muted py-4">No timesheets pending review</p>
             ) : (
-              <div className="space-y-4">
+              <div>
                 {pendingTimesheets.map((timesheet) => (
-                  <div key={timesheet.id} className="p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
-                    <div className="flex justify-between items-center">
+                  <div key={timesheet.id} className="alert alert-warning mb-3" style={{ borderLeft: '4px solid #ffc107' }}>
+                    <div className="d-flex justify-content-between align-items-center">
                       <div>
-                        <h3 className="font-semibold text-gray-900">
-                          {timesheet.employeeName} - {timesheet.payPeriodStart} to {timesheet.payPeriodEnd}
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          Total Hours: {timesheet.totalHours} • Submitted: {new Date(timesheet.createdAt).toLocaleDateString()}
+                        <h5 className="fw-semibold mb-1">
+                          <FieldAuthorizedValue data={timesheet} field="employeeName" /> -{' '}
+                          <FieldAuthorizedValue data={timesheet} field="payPeriodStart" type="date" /> to{' '}
+                          <FieldAuthorizedValue data={timesheet} field="payPeriodEnd" type="date" />
+                        </h5>
+                        <p className="text-muted small mb-0">
+                          Total Hours: <FieldAuthorizedValue data={timesheet} field="totalHours" type="number" />
+                          {isFieldVisible(timesheet, 'submittedAt') && (
+                            <> • Submitted: <FieldAuthorizedValue data={timesheet} field="submittedAt" type="date" /></>
+                          )}
+                          {isFieldVisible(timesheet, 'comments') && timesheet.comments && (
+                            <> • <FieldAuthorizedValue data={timesheet} field="comments" /></>
+                          )}
                         </p>
                       </div>
-                      <button
-                        onClick={() => router.push(`/recipient/timesheet/${timesheet.id}`)}
-                        className="px-4 py-2 bg-[#1e3a8a] text-white rounded hover:bg-[#1e40af] font-medium"
-                      >
-                        Review & Approve
-                      </button>
+                      <ActionButtons
+                        allowedActions={allowedActions}
+                        onView={() => router.push(`/recipient/timesheet/${timesheet.id}`)}
+                        onApprove={() => handleApproveTimesheet(timesheet.id)}
+                        onReject={() => handleRejectTimesheet(timesheet.id)}
+                      />
                     </div>
                   </div>
                 ))}
@@ -203,27 +240,31 @@ function RecipientDashboardComponent() {
         </div>
 
         {/* My Providers */}
-        <div className="bg-white border border-gray-300 rounded-lg shadow-sm">
-          <div className="bg-[#1e3a8a] px-6 py-4 rounded-t-lg">
-            <h2 className="text-lg font-semibold text-white">👥 MY PROVIDERS</h2>
+        <div className="card">
+          <div className="card-header" style={{ backgroundColor: 'var(--color-p2, #046b99)', color: 'white' }}>
+            <h2 className="card-title mb-0" style={{ color: 'white' }}>👥 MY PROVIDERS</h2>
           </div>
-          <div className="p-6">
+          <div className="card-body">
             {providers.length === 0 ? (
-              <p className="text-center text-gray-600 py-4">No providers assigned</p>
+              <p className="text-center text-muted py-4">No providers assigned</p>
             ) : (
-              <div className="space-y-3">
+              <div>
                 {providers.map((provider) => (
-                  <div key={provider.id} className="flex justify-between items-center p-4 bg-gray-50 rounded border border-gray-200">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{provider.name}</h3>
-                      <p className="text-sm text-gray-600">
-                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">{provider.status}</span>
-                        {' • '} {provider.role}
-                      </p>
+                  <div key={provider.id} className="card mb-3">
+                    <div className="card-body">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <div>
+                          <h5 className="fw-semibold mb-1">{provider.name}</h5>
+                          <p className="text-muted small mb-0">
+                            <span className="badge bg-success">{provider.status}</span>
+                            {' • '} {provider.role}
+                          </p>
+                        </div>
+                        <button className="btn btn-secondary">
+                          View Details
+                        </button>
+                      </div>
                     </div>
-                    <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 font-medium">
-                      View Details
-                    </button>
                   </div>
                 ))}
               </div>
@@ -233,6 +274,26 @@ function RecipientDashboardComponent() {
       </div>
     </div>
   );
-}
 
-export default dynamic(() => Promise.resolve(RecipientDashboardComponent), { ssr: false });
+  async function handleApproveTimesheet(id: number) {
+    try {
+      await apiClient.post(`/timesheets/${id}/approve`);
+      fetchDashboardData();
+    } catch (err) {
+      console.error('Error approving timesheet:', err);
+      alert('Failed to approve timesheet');
+    }
+  }
+
+  async function handleRejectTimesheet(id: number) {
+    const reason = prompt('Enter rejection reason:');
+    if (!reason) return;
+    try {
+      await apiClient.post(`/timesheets/${id}/reject`, { reason });
+      fetchDashboardData();
+    } catch (err) {
+      console.error('Error rejecting timesheet:', err);
+      alert('Failed to reject timesheet');
+    }
+  }
+}

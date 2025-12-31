@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Dive: Report Generation System - IHSS/CMIPS</title>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #e94560;
+            --accent-light: #ff6b6b;
+            --success: #00d9a5;
+            --warning: #ffc107;
+            --text: #eaeaea;
+            --text-muted: #a0a0a0;
+            --code-bg: #0f0f1a;
+            --border: #2d3748;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--primary);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--secondary) 0%, #0f3460 100%);
+            padding: 4rem 2rem;
+            text-align: center;
+            border-bottom: 3px solid var(--accent);
+        }
+
+        .header h1 {
+            font-size: 2.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header h1 span { color: var(--accent); }
+
+        .header p { color: var(--text-muted); font-size: 1.1rem; }
+
+        .container { max-width: 1300px; margin: 0 auto; padding: 2rem; }
+
+        .section {
+            background: var(--secondary);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .section h2 {
+            color: var(--accent);
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .section h3 { color: var(--text); font-size: 1.25rem; margin: 1.5rem 0 1rem; }
+        .section h4 { color: var(--accent-light); font-size: 1.1rem; margin: 1rem 0 0.75rem; }
+
+        .code-block {
+            background: var(--code-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+            line-height: 1.6;
+        }
+
+        .code-block .comment { color: #6a9955; }
+        .code-block .keyword { color: #c586c0; }
+        .code-block .string { color: #ce9178; }
+        .code-block .function { color: #dcdcaa; }
+        .code-block .annotation { color: #569cd6; }
+        .code-block .type { color: #4ec9b0; }
+        .code-block .number { color: #b5cea8; }
+
+        .pipeline-flow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            justify-content: center;
+        }
+
+        .pipeline-stage {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 1.5rem;
+            min-width: 200px;
+            text-align: center;
+            position: relative;
+        }
+
+        .pipeline-stage::after {
+            content: '→';
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .pipeline-stage:last-child::after { content: ''; }
+
+        .pipeline-stage .stage-num {
+            background: var(--accent);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin: 0 auto 0.75rem;
+        }
+
+        .pipeline-stage .stage-title {
+            font-weight: 600;
+            color: var(--accent-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .pipeline-stage .stage-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .format-card {
+            background: rgba(233, 69, 96, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .format-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .format-card h4 { color: var(--accent-light); margin-bottom: 0.5rem; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: rgba(233, 69, 96, 0.2);
+            color: var(--accent-light);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(233, 69, 96, 0.1) 0%, rgba(233, 69, 96, 0.05) 100%);
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+
+        .success-box {
+            background: linear-gradient(135deg, rgba(0, 217, 165, 0.1) 0%, rgba(0, 217, 165, 0.05) 100%);
+            border-left: 4px solid var(--success);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.05) 100%);
+            border-left: 4px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+
+        ul, ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.5rem; }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .service-card h4 {
+            color: var(--accent-light);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .masking-visual {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .mask-type {
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .mask-type .type-name {
+            font-weight: 600;
+            color: var(--accent-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .mask-type .example {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .mask-type .original { color: var(--warning); }
+        .mask-type .masked { color: var(--success); }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📄 Report <span>Generation</span> Deep Dive</h1>
+        <p>Complete Implementation Guide for Multi-Format Report System with Role-Based Field Masking</p>
+    </div>
+
+    <div class="container">
+        <!-- Overview Section -->
+        <section class="section">
+            <h2>🎯 System Overview</h2>
+            
+            <p>The Report Generation system is a sophisticated 5-stage pipeline that transforms raw timesheet data into masked, role-appropriate reports in multiple formats (JSON, CSV, XML, PDF). Every report request requires JWT authentication for security and proper field masking.</p>
+
+            <h3>Key Capabilities</h3>
+            <div class="format-grid">
+                <div class="format-card">
+                    <div class="icon">📊</div>
+                    <h4>JSON Reports</h4>
+                    <p>Streaming generation with chunked output for memory efficiency</p>
+                </div>
+                <div class="format-card">
+                    <div class="icon">📋</div>
+                    <h4>CSV Reports</h4>
+                    <p>Comma-separated values with proper escaping and headers</p>
+                </div>
+                <div class="format-card">
+                    <div class="icon">🔧</div>
+                    <h4>XML Reports</h4>
+                    <p>Structured XML with metadata and record elements</p>
+                </div>
+                <div class="format-card">
+                    <div class="icon">📑</div>
+                    <h4>PDF Reports</h4>
+                    <p>Professional reports with cover pages, charts, and analytics using OpenPDF</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5-Stage Pipeline -->
+        <section class="section">
+            <h2>🔄 5-Stage Report Generation Pipeline</h2>
+            
+            <div class="pipeline-flow">
+                <div class="pipeline-stage">
+                    <div class="stage-num">1</div>
+                    <div class="stage-title">Parameter Extraction</div>
+                    <div class="stage-desc">Extract user info from JWT token (role, county)</div>
+                </div>
+                <div class="pipeline-stage">
+                    <div class="stage-num">2</div>
+                    <div class="stage-title">Query Building</div>
+                    <div class="stage-desc">Build SQL query with role-based filters</div>
+                </div>
+                <div class="pipeline-stage">
+                    <div class="stage-num">3</div>
+                    <div class="stage-title">Data Fetching</div>
+                    <div class="stage-desc">Execute paginated database queries</div>
+                </div>
+                <div class="pipeline-stage">
+                    <div class="stage-num">4</div>
+                    <div class="stage-title">Field Masking</div>
+                    <div class="stage-desc">Apply role-specific field masking rules</div>
+                </div>
+                <div class="pipeline-stage">
+                    <div class="stage-num">5</div>
+                    <div class="stage-title">Report Output</div>
+                    <div class="stage-desc">Generate report in requested format</div>
+                </div>
+            </div>
+
+            <h3>Stage 1: Parameter Extraction & Validation</h3>
+            <div class="code-block">
+<span class="comment">// ReportGenerationService.java - JWT-ONLY method</span>
+<span class="keyword">public</span> ReportGenerationResponse <span class="function">generateReport</span>(ReportGenerationRequest request, String jwtToken) {
+    System.out.println(<span class="string">"🚀 ReportGenerationService.generateReport() called for role: "</span> + request.getUserRole());
+    
+    <span class="keyword">if</span> (jwtToken == <span class="keyword">null</span> || jwtToken.trim().isEmpty()) {
+        <span class="keyword">throw new</span> RuntimeException(<span class="string">"JWT token is required for report generation. No fallback methods available."</span>);
+    }
+    
+    <span class="comment">// Log request details for debugging</span>
+    System.out.println(<span class="string">"🔍 Request details: userRole="</span> + request.getUserRole() + 
+                       <span class="string">", startDate="</span> + request.getStartDate() + 
+                       <span class="string">", endDate="</span> + request.getEndDate() + 
+                       <span class="string">", countyId="</span> + request.getUserCounty());
+    
+    <span class="comment">// Step 1: Generate report data with JWT support</span>
+    ReportData reportData = <span class="function">generateSimpleReportDataWithJWT</span>(request, jwtToken);
+    
+    <span class="comment">// Step 2: Build response</span>
+    ReportGenerationResponse response = <span class="keyword">new</span> ReportGenerationResponse();
+    response.setReportId(UUID.randomUUID().toString());
+    response.setReportType(request.getReportType());
+    response.setUserRole(request.getUserRole());
+    response.setGeneratedAt(LocalDateTime.now());
+    response.setData(reportData);
+    response.setStatus(<span class="string">"SUCCESS"</span>);
+    response.setTotalRecords((<span class="keyword">int</span>) reportData.getTotalCount());
+    
+    <span class="keyword">return</span> response;
+}
+            </div>
+
+            <h3>Stage 2: Query Building</h3>
+            <div class="code-block">
+<span class="comment">// QueryBuilderService builds SQL parameters based on role</span>
+QueryBuilderService.QueryParameters queryParams = queryBuilderService.<span class="function">buildQuery</span>(
+    request.getUserRole(),      <span class="comment">// From JWT token</span>
+    request.getUserCounty(),    <span class="comment">// From JWT token (for restricted roles)</span>
+    request.getStartDate(),     <span class="comment">// Optional date filter</span>
+    request.getEndDate(),       <span class="comment">// Optional date filter</span>
+    <span class="keyword">null</span>                         <span class="comment">// Additional filters</span>
+);
+
+<span class="comment">// QueryParameters contains:</span>
+<span class="comment">// - userRole: The role from JWT (ADMIN, SUPERVISOR, CASE_WORKER, etc.)</span>
+<span class="comment">// - countyId: County filter (required for CASE_WORKER, PROVIDER, RECIPIENT)</span>
+<span class="comment">// - startDate: Pay period start filter</span>
+<span class="comment">// - endDate: Pay period end filter</span>
+<span class="comment">// - userId: User ID for PROVIDER/RECIPIENT roles (their own records only)</span>
+            </div>
+
+            <h3>Stage 3: Data Fetching</h3>
+            <div class="code-block">
+<span class="comment">// DataFetchingService.java - Role-based data access</span>
+<span class="keyword">public</span> DataFetchResult <span class="function">fetchData</span>(QueryParameters queryParams, <span class="keyword">int</span> page, <span class="keyword">int</span> pageSize) {
+    UserRole role = UserRole.from(queryParams.getUserRole());
+    
+    <span class="keyword">switch</span> (role) {
+        <span class="keyword">case</span> ADMIN, SYSTEM_SCHEDULER -&gt; {
+            <span class="comment">// Full access - optional county filter</span>
+            <span class="keyword">if</span> (queryParams.getCountyId() != <span class="keyword">null</span>) {
+                rawData = <span class="function">fetchCountyData</span>(queryParams, page, pageSize);
+            } <span class="keyword">else</span> {
+                rawData = <span class="function">fetchAllData</span>(queryParams, page, pageSize);
+            }
+        }
+        <span class="keyword">case</span> SUPERVISOR -&gt; {
+            <span class="comment">// All data, county filter optional</span>
+            <span class="keyword">if</span> (countyId != <span class="keyword">null</span>) {
+                rawData = <span class="function">fetchCountyData</span>(queryParams, page, pageSize);
+            } <span class="keyword">else</span> {
+                rawData = <span class="function">fetchAllData</span>(queryParams, page, pageSize);
+            }
+        }
+        <span class="keyword">case</span> CASE_WORKER -&gt; {
+            <span class="comment">// MUST have county filter - enforced</span>
+            <span class="keyword">if</span> (countyId == <span class="keyword">null</span> || countyId.trim().isEmpty()) {
+                <span class="keyword">throw new</span> IllegalArgumentException(
+                    <span class="string">"Location filter is required for case workers."</span>
+                );
+            }
+            rawData = <span class="function">fetchCountyData</span>(queryParams, page, pageSize);
+        }
+        <span class="keyword">case</span> PROVIDER, RECIPIENT -&gt; {
+            <span class="comment">// Own records only (by user_id from JWT)</span>
+            rawData = <span class="function">fetchOwnRecordsData</span>(queryParams, page, pageSize);
+        }
+    }
+    
+    <span class="keyword">return new</span> DataFetchResult(<span class="keyword">true</span>, <span class="string">"Data fetched successfully"</span>, rawData, rawData.size(), totalCount);
+}
+            </div>
+
+            <h3>Stage 4: Field Masking</h3>
+            <div class="code-block">
+<span class="comment">// FieldMaskingService.java - JWT-based masking rules</span>
+<span class="keyword">public</span> List&lt;MaskedTimesheetData&gt; <span class="function">applyFieldMasking</span>(
+    List&lt;TimesheetEntity&gt; timesheets, 
+    String userRole, 
+    String reportType, 
+    String jwtToken) {
+    
+    <span class="keyword">if</span> (jwtToken == <span class="keyword">null</span> || jwtToken.trim().isEmpty()) {
+        <span class="keyword">throw new</span> RuntimeException(<span class="string">"JWT token is required for field masking."</span>);
+    }
+    
+    <span class="comment">// Get masking rules from Keycloak JWT token</span>
+    FieldMaskingRules rules = <span class="function">getMaskingRules</span>(userRole, reportType, jwtToken);
+    
+    <span class="comment">// Apply masking to each timesheet</span>
+    List&lt;MaskedTimesheetData&gt; maskedData = timesheets.stream()
+        .map(timesheet -&gt; <span class="function">applyMasking</span>(timesheet, rules))
+        .collect(Collectors.toList());
+    
+    System.out.println(<span class="string">"✅ Applied field masking to "</span> + maskedData.size() + <span class="string">" records"</span>);
+    <span class="keyword">return</span> maskedData;
+}
+            </div>
+
+            <h3>Stage 5: Report Output Generation</h3>
+            <div class="code-block">
+<span class="comment">// Convert masked data to table format with camelCase field names</span>
+List&lt;Map&lt;String, Object&gt;&gt; tableData = <span class="keyword">new</span> ArrayList&lt;&gt;();
+<span class="keyword">for</span> (MaskedTimesheetData maskedRecord : maskedData) {
+    Map&lt;String, Object&gt; record = <span class="keyword">new</span> HashMap&lt;&gt;();
+    
+    <span class="comment">// Convert field names to camelCase for frontend compatibility</span>
+    <span class="keyword">for</span> (Map.Entry&lt;String, Object&gt; entry : maskedRecord.getFields().entrySet()) {
+        String camelCaseKey = <span class="function">convertToCamelCase</span>(entry.getKey());
+        record.put(camelCaseKey, entry.getValue());
+    }
+    tableData.add(record);
+}
+
+reportData.setRecords(tableData);
+reportData.setTotalRecords((<span class="keyword">int</span>) totalCount);
+            </div>
+        </section>
+
+        <!-- Field Masking Deep Dive -->
+        <section class="section">
+            <h2>🔒 Field Masking System</h2>
+
+            <h3>Masking Types Available</h3>
+            <div class="masking-visual">
+                <div class="mask-type">
+                    <div class="type-name">NONE</div>
+                    <div class="example">
+                        <div class="original">John Doe</div>
+                        <div>↓</div>
+                        <div class="masked">John Doe</div>
+                    </div>
+                </div>
+                <div class="mask-type">
+                    <div class="type-name">HIDDEN</div>
+                    <div class="example">
+                        <div class="original">John Doe</div>
+                        <div>↓</div>
+                        <div class="masked">***HIDDEN***</div>
+                    </div>
+                </div>
+                <div class="mask-type">
+                    <div class="type-name">PARTIAL_MASK</div>
+                    <div class="example">
+                        <div class="original">123-45-6789</div>
+                        <div>↓</div>
+                        <div class="masked">***-**-6789</div>
+                    </div>
+                </div>
+                <div class="mask-type">
+                    <div class="type-name">HASH_MASK</div>
+                    <div class="example">
+                        <div class="original">user123</div>
+                        <div>↓</div>
+                        <div class="masked">HASH_4821</div>
+                    </div>
+                </div>
+                <div class="mask-type">
+                    <div class="type-name">ANONYMIZE</div>
+                    <div class="example">
+                        <div class="original">John Doe</div>
+                        <div>↓</div>
+                        <div class="masked">User 482</div>
+                    </div>
+                </div>
+                <div class="mask-type">
+                    <div class="type-name">AGGREGATE</div>
+                    <div class="example">
+                        <div class="original">37.5</div>
+                        <div>↓</div>
+                        <div class="masked">20-40 hours</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Role-Based Default Masking Rules</h3>
+            <table>
+                <tr>
+                    <th>Field</th>
+                    <th>ADMIN</th>
+                    <th>SUPERVISOR</th>
+                    <th>CASE_WORKER</th>
+                    <th>PROVIDER</th>
+                    <th>RECIPIENT</th>
+                </tr>
+                <tr>
+                    <td>timesheetId</td>
+                    <td>NONE</td>
+                    <td>NONE</td>
+                    <td>NONE</td>
+                    <td>NONE</td>
+                    <td>NONE</td>
+                </tr>
+                <tr>
+                    <td>providerId</td>
+                    <td>NONE</td>
+                    <td>HASH_MASK</td>
+                    <td>HASH_MASK</td>
+                    <td>NONE</td>
+                    <td>HASH_MASK</td>
+                </tr>
+                <tr>
+                    <td>providerName</td>
+                    <td>NONE</td>
+                    <td>ANONYMIZE</td>
+                    <td>ANONYMIZE</td>
+                    <td>NONE</td>
+                    <td>ANONYMIZE</td>
+                </tr>
+                <tr>
+                    <td>providerEmail</td>
+                    <td>NONE</td>
+                    <td>HIDDEN</td>
+                    <td>HIDDEN</td>
+                    <td>NONE</td>
+                    <td>HIDDEN</td>
+                </tr>
+                <tr>
+                    <td>providerGender</td>
+                    <td>NONE</td>
+                    <td>HIDDEN</td>
+                    <td>AGGREGATE</td>
+                    <td>NONE</td>
+                    <td>HIDDEN</td>
+                </tr>
+                <tr>
+                    <td>totalHours</td>
+                    <td>NONE</td>
+                    <td>NONE</td>
+                    <td>NONE</td>
+                    <td>NONE</td>
+                    <td>NONE</td>
+                </tr>
+                <tr>
+                    <td>totalAmount</td>
+                    <td>NONE</td>
+                    <td>NONE</td>
+                    <td>AGGREGATE</td>
+                    <td>HIDDEN</td>
+                    <td>HIDDEN</td>
+                </tr>
+            </table>
+
+            <h3>Masking Implementation Code</h3>
+            <div class="code-block">
+<span class="comment">// Apply masking rule to field value</span>
+<span class="keyword">private</span> Object <span class="function">applyMaskingRule</span>(Object value, FieldMaskingRule rule) {
+    <span class="keyword">if</span> (value == <span class="keyword">null</span>) <span class="keyword">return null</span>;
+
+    <span class="keyword">switch</span> (rule.getMaskingType()) {
+        <span class="keyword">case</span> NONE:
+            <span class="keyword">return</span> value;
+            
+        <span class="keyword">case</span> HIDDEN:
+            <span class="keyword">return</span> <span class="string">"***HIDDEN***"</span>;
+            
+        <span class="keyword">case</span> PARTIAL_MASK:
+            <span class="keyword">return</span> <span class="function">applyPartialMask</span>(value.toString(), rule.getMaskingPattern());
+            
+        <span class="keyword">case</span> HASH_MASK:
+            <span class="keyword">return</span> <span class="string">"HASH_"</span> + Math.abs(value.toString().hashCode());
+            
+        <span class="keyword">case</span> ANONYMIZE:
+            <span class="keyword">return</span> <span class="function">applyAnonymization</span>(value, rule.getFieldName());
+            
+        <span class="keyword">case</span> AGGREGATE:
+            <span class="keyword">return</span> <span class="function">applyAggregation</span>(value, rule.getFieldName());
+            
+        <span class="keyword">default</span>:
+            <span class="keyword">return</span> value;
+    }
+}
+
+<span class="comment">// Anonymization based on field type</span>
+<span class="keyword">private</span> String <span class="function">applyAnonymization</span>(Object value, String fieldName) {
+    <span class="keyword">switch</span> (fieldName.toLowerCase()) {
+        <span class="keyword">case</span> <span class="string">"providerid"</span>, <span class="string">"recipientid"</span>:
+            <span class="keyword">return</span> <span class="string">"USER_"</span> + Math.abs(value.toString().hashCode() % <span class="number">10000</span>);
+        <span class="keyword">case</span> <span class="string">"provideremail"</span>, <span class="string">"recipientemail"</span>:
+            <span class="keyword">return</span> <span class="string">"user"</span> + Math.abs(value.toString().hashCode() % <span class="number">1000</span>) + <span class="string">"@company.com"</span>;
+        <span class="keyword">case</span> <span class="string">"providername"</span>, <span class="string">"recipientname"</span>:
+            <span class="keyword">return</span> <span class="string">"User "</span> + Math.abs(value.toString().hashCode() % <span class="number">1000</span>);
+        <span class="keyword">default</span>:
+            <span class="keyword">return</span> <span class="string">"ANONYMIZED_"</span> + Math.abs(value.toString().hashCode() % <span class="number">1000</span>);
+    }
+}
+
+<span class="comment">// Aggregation for ranges</span>
+<span class="keyword">private</span> String <span class="function">applyAggregation</span>(Object value, String fieldName) {
+    <span class="keyword">if</span> (value <span class="keyword">instanceof</span> Number) {
+        <span class="keyword">double</span> num = ((Number) value).doubleValue();
+        <span class="keyword">if</span> (fieldName.toLowerCase().contains(<span class="string">"hours"</span>)) {
+            <span class="keyword">if</span> (num &lt; <span class="number">20</span>) <span class="keyword">return</span> <span class="string">"0-20 hours"</span>;
+            <span class="keyword">if</span> (num &lt; <span class="number">40</span>) <span class="keyword">return</span> <span class="string">"20-40 hours"</span>;
+            <span class="keyword">return</span> <span class="string">"40+ hours"</span>;
+        }
+        <span class="keyword">if</span> (fieldName.toLowerCase().contains(<span class="string">"amount"</span>)) {
+            <span class="keyword">if</span> (num &lt; <span class="number">1000</span>) <span class="keyword">return</span> <span class="string">"$0-1000"</span>;
+            <span class="keyword">if</span> (num &lt; <span class="number">5000</span>) <span class="keyword">return</span> <span class="string">"$1000-5000"</span>;
+            <span class="keyword">return</span> <span class="string">"$5000+"</span>;
+        }
+    }
+    <span class="keyword">return</span> <span class="string">"AGGREGATED"</span>;
+}
+            </div>
+        </section>
+
+        <!-- PDF Generation -->
+        <section class="section">
+            <h2>📑 PDF Report Generation</h2>
+
+            <h3>PDF Structure & Sections</h3>
+            <div class="highlight-box">
+                <ol>
+                    <li><strong>Cover Page</strong> - Report title, metadata, date range, generated timestamp</li>
+                    <li><strong>Executive Summary</strong> - KPI cards, status distribution chart, top providers</li>
+                    <li><strong>Analytics & Insights</strong> - Demographics, geographic analysis, service type breakdown</li>
+                    <li><strong>Detailed Data</strong> - Full data table with role-appropriate fields</li>
+                    <li><strong>Appendices</strong> - Data source info, field visibility, applied filters</li>
+                </ol>
+            </div>
+
+            <h3>PDF Generation Implementation</h3>
+            <div class="code-block">
+<span class="comment">// PDFReportGeneratorService.java - Using OpenPDF library</span>
+<span class="keyword">public</span> <span class="keyword">byte</span>[] <span class="function">generatePDFReport</span>(String reportType, String userRole, 
+                               List&lt;Map&lt;String, Object&gt;&gt; reportData, 
+                               Map&lt;String, Object&gt; additionalData, String jwtToken) {
+    
+    <span class="keyword">if</span> (jwtToken == <span class="keyword">null</span> || jwtToken.trim().isEmpty()) {
+        <span class="keyword">throw new</span> RuntimeException(<span class="string">"JWT token is required for PDF generation."</span>);
+    }
+    
+    <span class="comment">// Get visible fields based on role (from JWT)</span>
+    List&lt;String&gt; visibleFields = fieldVisibilityService.<span class="function">getVisibleFields</span>(userRole, jwtToken);
+    
+    <span class="comment">// Create PDF document</span>
+    Document document = <span class="keyword">new</span> Document(PageSize.A4);
+    ByteArrayOutputStream outputStream = <span class="keyword">new</span> ByteArrayOutputStream();
+    PdfWriter.getInstance(document, outputStream);
+    
+    <span class="comment">// Add metadata</span>
+    document.addTitle(<span class="function">getReportTitle</span>(reportType));
+    document.addSubject(<span class="string">"Generated for "</span> + userRole);
+    document.addCreator(<span class="string">"Report System"</span>);
+    document.addCreationDate();
+    
+    document.open();
+    
+    <span class="comment">// 1. Cover Page</span>
+    <span class="function">addCoverPage</span>(document, reportType, userRole, additionalData);
+    document.newPage();
+    
+    <span class="comment">// 2. Executive Summary with KPIs</span>
+    <span class="function">addExecutiveSummary</span>(document, reportData, userRole, jwtToken, startDate, endDate, county, districtId);
+    document.newPage();
+    
+    <span class="comment">// 3. Analytics & Insights Section</span>
+    <span class="function">addAnalyticsSection</span>(document, reportData, userRole, jwtToken, startDate, endDate, county, districtId);
+    document.newPage();
+    
+    <span class="comment">// 4. Detailed Data Section</span>
+    <span class="function">addDetailedDataSection</span>(document, reportData, visibleFields, userRole);
+    
+    <span class="comment">// 5. Appendices</span>
+    <span class="function">addAppendices</span>(document, reportData, userRole, jwtToken, additionalData);
+    
+    <span class="comment">// Add footer</span>
+    <span class="function">addReportFooter</span>(document, userRole);
+    
+    document.close();
+    
+    <span class="keyword">return</span> outputStream.toByteArray();
+}
+            </div>
+
+            <h3>Executive Summary Metrics Calculation</h3>
+            <div class="code-block">
+<span class="comment">// Calculate KPIs from report data</span>
+<span class="keyword">private</span> ExecutiveSummaryMetrics <span class="function">calculateExecutiveSummaryMetrics</span>(
+    List&lt;Map&lt;String, Object&gt;&gt; reportData, 
+    LocalDate startDate, LocalDate endDate,
+    String county, String districtId) {
+    
+    ExecutiveSummaryMetrics metrics = <span class="keyword">new</span> ExecutiveSummaryMetrics();
+    
+    <span class="keyword">if</span> (reportData == <span class="keyword">null</span> || reportData.isEmpty()) <span class="keyword">return</span> metrics;
+    
+    metrics.totalRecords = reportData.size();
+    
+    Map&lt;String, Integer&gt; statusCounts = <span class="keyword">new</span> HashMap&lt;&gt;();
+    Map&lt;String, Double&gt; providerHours = <span class="keyword">new</span> HashMap&lt;&gt;();
+    
+    <span class="keyword">for</span> (Map&lt;String, Object&gt; record : reportData) {
+        <span class="comment">// Total hours</span>
+        Object hoursObj = record.get(<span class="string">"totalHours"</span>);
+        <span class="keyword">if</span> (hoursObj != <span class="keyword">null</span>) {
+            <span class="keyword">double</span> hours = hoursObj <span class="keyword">instanceof</span> Number ? 
+                ((Number) hoursObj).doubleValue() : 
+                Double.parseDouble(hoursObj.toString());
+            metrics.totalHours += hours;
+        }
+        
+        <span class="comment">// Status distribution</span>
+        String status = record.get(<span class="string">"status"</span>) != <span class="keyword">null</span> ? 
+            record.get(<span class="string">"status"</span>).toString() : <span class="string">"UNKNOWN"</span>;
+        statusCounts.put(status, statusCounts.getOrDefault(status, <span class="number">0</span>) + <span class="number">1</span>);
+        
+        <span class="comment">// Provider performance tracking</span>
+        String providerName = record.get(<span class="string">"providerName"</span>) != <span class="keyword">null</span> ? 
+            record.get(<span class="string">"providerName"</span>).toString() : <span class="string">"Unknown"</span>;
+        providerHours.put(providerName, 
+            providerHours.getOrDefault(providerName, <span class="number">0.0</span>) + hours);
+    }
+    
+    metrics.statusDistribution = statusCounts;
+    
+    <span class="comment">// Calculate approval rate</span>
+    <span class="keyword">int</span> approvedCount = statusCounts.getOrDefault(<span class="string">"APPROVED"</span>, <span class="number">0</span>);
+    metrics.approvalRate = metrics.totalRecords > <span class="number">0</span> ? 
+        (approvedCount * <span class="number">100.0</span> / metrics.totalRecords) : <span class="number">0.0</span>;
+    
+    <span class="comment">// Top 5 providers by hours</span>
+    metrics.topProviders = providerHours.entrySet().stream()
+        .sorted(Map.Entry.&lt;String, Double&gt;comparingByValue().reversed())
+        .limit(<span class="number">5</span>)
+        .map(e -&gt; <span class="keyword">new</span> ProviderPerformance(e.getKey(), e.getValue()))
+        .collect(Collectors.toList());
+    
+    <span class="keyword">return</span> metrics;
+}
+            </div>
+        </section>
+
+        <!-- CSV and JSON Generation -->
+        <section class="section">
+            <h2>📊 Streaming Report Generation (JSON/CSV/XML)</h2>
+
+            <h3>Why Streaming?</h3>
+            <div class="warning-box">
+                <strong>Memory Efficiency:</strong> For large datasets (10,000+ records), loading all data into memory before writing would cause OutOfMemoryError. Streaming writes chunks directly to file.
+            </div>
+
+            <h3>Streaming Implementation</h3>
+            <div class="code-block">
+<span class="comment">// BackgroundProcessingService.java - Chunked streaming generation</span>
+<span class="keyword">private</span> String <span class="function">processDataInChunksStreaming</span>(
+    PipelineExtractionRequest request, ReportJobEntity job, String jwtToken) {
+    
+    <span class="comment">// Create output file</span>
+    String filePath = reportsDir.getAbsolutePath() + File.separator + filename;
+    FileWriter writer = <span class="keyword">new</span> FileWriter(filePath);
+    <span class="keyword">boolean</span> isFirstChunk = <span class="keyword">true</span>;
+    
+    <span class="comment">// Write file header based on format</span>
+    <span class="function">writeFileHeader</span>(writer, job, isFirstChunk);
+    
+    <span class="comment">// Process data in chunks</span>
+    <span class="keyword">int</span> chunkSize = job.getChunkSize() != <span class="keyword">null</span> ? job.getChunkSize() : <span class="number">1000</span>;
+    <span class="keyword">int</span> page = <span class="number">0</span>;
+    <span class="keyword">long</span> processedRecords = <span class="number">0</span>;
+    
+    <span class="keyword">while</span> (processedRecords &lt; totalRecords) {
+        <span class="comment">// Check for cancellation</span>
+        Optional&lt;ReportJobEntity&gt; currentJob = jobRepository.findByJobId(job.getJobId());
+        <span class="keyword">if</span> (currentJob.isPresent() && <span class="string">"CANCELLED"</span>.equals(currentJob.get().getStatus())) {
+            writer.close();
+            <span class="keyword">new</span> File(filePath).delete();  <span class="comment">// Delete partial file</span>
+            <span class="keyword">throw new</span> RuntimeException(<span class="string">"Job was cancelled"</span>);
+        }
+        
+        <span class="comment">// Update progress</span>
+        jobQueueService.<span class="function">updateJobProgress</span>(job.getJobId(), processedRecords, totalRecords);
+        
+        <span class="comment">// Process chunk with retry (max 3 attempts, exponential backoff)</span>
+        List&lt;MaskedTimesheetData&gt; chunkData = <span class="function">processChunkWithRetry</span>(
+            request, page, chunkSize, jwtToken, job.getJobId()
+        );
+        
+        <span class="comment">// Write chunk directly to file (don't accumulate in memory!)</span>
+        <span class="function">writeChunkToFile</span>(writer, chunkData, job, isFirstChunk);
+        isFirstChunk = <span class="keyword">false</span>;
+        
+        processedRecords += chunkData.size();
+        page++;
+        
+        <span class="comment">// Break if no more data</span>
+        <span class="keyword">if</span> (chunkData.size() &lt; chunkSize) <span class="keyword">break</span>;
+    }
+    
+    <span class="comment">// Write file footer</span>
+    <span class="function">writeFileFooter</span>(writer, job);
+    writer.close();
+    
+    <span class="keyword">return</span> filePath;
+}
+            </div>
+
+            <h3>Format-Specific Output</h3>
+            <div class="code-block">
+<span class="comment">// JSON chunk writing</span>
+<span class="keyword">case</span> <span class="string">"JSON"</span>:
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; chunkData.size(); i++) {
+        MaskedTimesheetData record = chunkData.get(i);
+        <span class="keyword">if</span> (!isFirstChunk || i &gt; <span class="number">0</span>) {
+            writer.write(<span class="string">",\n"</span>);
+        }
+        writer.write(<span class="string">"    {\n"</span>);
+        writer.write(<span class="string">"      \"timesheetId\": \""</span> + record.getTimesheetId() + <span class="string">"\",\n"</span>);
+        writer.write(<span class="string">"      \"userRole\": \""</span> + record.getUserRole() + <span class="string">"\",\n"</span>);
+        writer.write(<span class="string">"      \"fields\": "</span> + <span class="function">convertFieldsToJson</span>(record.getFields()) + <span class="string">"\n"</span>);
+        writer.write(<span class="string">"    }"</span>);
+    }
+    <span class="keyword">break</span>;
+
+<span class="comment">// CSV chunk writing</span>
+<span class="keyword">case</span> <span class="string">"CSV"</span>:
+    <span class="keyword">for</span> (MaskedTimesheetData record : chunkData) {
+        writer.write(String.format(<span class="string">"%s,%s,%s,%s,%s\n"</span>,
+            <span class="function">escapeCsv</span>(record.getTimesheetId()),
+            <span class="function">escapeCsv</span>(record.getUserRole()),
+            <span class="function">escapeCsv</span>(record.getReportType()),
+            <span class="function">escapeCsv</span>(record.getMaskedAt().toString()),
+            <span class="function">escapeCsv</span>(<span class="function">convertFieldsToCsv</span>(record.getFields()))
+        ));
+    }
+    <span class="keyword">break</span>;
+
+<span class="comment">// XML chunk writing</span>
+<span class="keyword">case</span> <span class="string">"XML"</span>:
+    <span class="keyword">for</span> (MaskedTimesheetData record : chunkData) {
+        writer.write(<span class="string">"    &lt;record&gt;\n"</span>);
+        writer.write(<span class="string">"      &lt;timesheetId&gt;"</span> + <span class="function">escapeXml</span>(record.getTimesheetId()) + <span class="string">"&lt;/timesheetId&gt;\n"</span>);
+        writer.write(<span class="string">"      &lt;fields&gt;"</span> + <span class="function">escapeXml</span>(<span class="function">convertFieldsToXml</span>(record.getFields())) + <span class="string">"&lt;/fields&gt;\n"</span>);
+        writer.write(<span class="string">"    &lt;/record&gt;\n"</span>);
+    }
+    <span class="keyword">break</span>;
+            </div>
+        </section>
+
+        <!-- Report Types -->
+        <section class="section">
+            <h2>📋 Report Types & Configuration</h2>
+
+            <table>
+                <tr>
+                    <th>Report Type</th>
+                    <th>Frequency</th>
+                    <th>Roles</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>COUNTY_DAILY</td>
+                    <td>Daily</td>
+                    <td>ADMIN, SUPERVISOR, CASE_WORKER</td>
+                    <td>Daily county-specific timesheet summary</td>
+                </tr>
+                <tr>
+                    <td>DAILY_SUMMARY</td>
+                    <td>Daily</td>
+                    <td>ADMIN, SUPERVISOR, CASE_WORKER</td>
+                    <td>Aggregated daily metrics across timesheets</td>
+                </tr>
+                <tr>
+                    <td>WEEKLY_REPORT</td>
+                    <td>Weekly (Monday)</td>
+                    <td>ADMIN</td>
+                    <td>Weekly summary with trends</td>
+                </tr>
+                <tr>
+                    <td>MONTHLY_REPORT</td>
+                    <td>Monthly (1st)</td>
+                    <td>All roles</td>
+                    <td>Monthly comprehensive report</td>
+                </tr>
+                <tr>
+                    <td>QUARTERLY_REPORT</td>
+                    <td>Quarterly</td>
+                    <td>ADMIN</td>
+                    <td>Quarterly analysis report</td>
+                </tr>
+                <tr>
+                    <td>ANNUAL_REPORT</td>
+                    <td>Yearly (Jan 1)</td>
+                    <td>ADMIN</td>
+                    <td>Annual comprehensive report</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Error Handling -->
+        <section class="section">
+            <h2>⚠️ Error Handling & Edge Cases</h2>
+
+            <h3>Common Errors & Solutions</h3>
+            <div class="service-card">
+                <h4>Missing JWT Token</h4>
+                <p>All report generation methods require a valid JWT token. Without it, the request fails immediately.</p>
+                <div class="code-block">
+<span class="keyword">if</span> (jwtToken == <span class="keyword">null</span> || jwtToken.trim().isEmpty()) {
+    <span class="keyword">throw new</span> RuntimeException(<span class="string">"JWT token is required for report generation. No fallback methods available."</span>);
+}
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h4>County Required for CASE_WORKER</h4>
+                <p>Case workers MUST have a county in their JWT token to access any data.</p>
+                <div class="code-block">
+<span class="keyword">if</span> (role == UserRole.CASE_WORKER && (countyId == <span class="keyword">null</span> || countyId.trim().isEmpty())) {
+    <span class="keyword">throw new</span> IllegalArgumentException(
+        <span class="string">"Location filter is required for case workers. Please select a county from the dropdown."</span>
+    );
+}
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h4>Chunk Processing Retry</h4>
+                <p>If a chunk fails to process, the system retries up to 3 times with exponential backoff.</p>
+                <div class="code-block">
+<span class="keyword">private</span> List&lt;MaskedTimesheetData&gt; <span class="function">processChunkWithRetry</span>(...) {
+    <span class="keyword">int</span> maxRetries = <span class="number">3</span>;
+    <span class="keyword">int</span> attempt = <span class="number">0</span>;
+    
+    <span class="keyword">while</span> (attempt &lt; maxRetries) {
+        <span class="keyword">try</span> {
+            <span class="keyword">return</span> <span class="function">processChunk</span>(request, page, chunkSize, jwtToken);
+        } <span class="keyword">catch</span> (Exception e) {
+            attempt++;
+            <span class="keyword">if</span> (attempt >= maxRetries) {
+                <span class="keyword">throw new</span> RuntimeException(<span class="string">"Chunk processing failed after retries"</span>, e);
+            }
+            Thread.sleep(<span class="number">1000</span> * attempt);  <span class="comment">// Exponential backoff</span>
+        }
+    }
+}
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+            <p>Report Generation Deep Dive | IHSS/CMIPS Timesheet Management System</p>
+            <p>Generated: December 8, 2025</p>
+        </div>
+    </div>
+</body>
+</html>
+

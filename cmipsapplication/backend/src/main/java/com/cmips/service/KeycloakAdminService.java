@@ -96,6 +96,28 @@ public class KeycloakAdminService {
     // ============================== USER MANAGEMENT ==============================
     
     /**
+     * Create a new user in Keycloak with role assignment
+     * Used by ESP Registration for self-service user creation
+     */
+    public String createUser(String username, String email, String firstName, String lastName,
+                            String passwordHash, String role) {
+        // Create the user first
+        String userId = createUser(username, email, null, firstName, lastName);
+
+        // Then assign the role
+        if (role != null && !role.isEmpty()) {
+            try {
+                assignRoleToUser(userId, role);
+                logger.info("Assigned role {} to user {}", role, username);
+            } catch (Exception e) {
+                logger.warn("Failed to assign role {} to user {}: {}", role, username, e.getMessage());
+            }
+        }
+
+        return userId;
+    }
+
+    /**
      * Create a new user in Keycloak
      */
     public String createUser(String username, String email, String password, String firstName, String lastName) {

@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Job Processing - Flow Diagrams</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #764ba2;
+            font-size: 2em;
+            margin-top: 50px;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        h3 {
+            color: #555;
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+        }
+
+        .flow-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 2px solid #e0e0e0;
+        }
+
+        .flow-box {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 5px solid;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .flow-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .entry-point {
+            border-left-color: #4CAF50;
+            background: linear-gradient(135deg, #e8f5e9 0%, #ffffff 100%);
+        }
+
+        .scheduler {
+            border-left-color: #2196F3;
+            background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
+        }
+
+        .processor {
+            border-left-color: #FF9800;
+            background: linear-gradient(135deg, #fff3e0 0%, #ffffff 100%);
+        }
+
+        .database {
+            border-left-color: #9C27B0;
+            background: linear-gradient(135deg, #f3e5f5 0%, #ffffff 100%);
+        }
+
+        .dependency {
+            border-left-color: #E91E63;
+            background: linear-gradient(135deg, #fce4ec 0%, #ffffff 100%);
+        }
+
+        .service-name {
+            font-weight: bold;
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .service-details {
+            color: #666;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+
+        .service-details ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .service-details li {
+            margin: 5px 0;
+        }
+
+        .arrow {
+            text-align: center;
+            font-size: 2em;
+            color: #667eea;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .arrow::before {
+            content: "↓";
+        }
+
+        .arrow-horizontal {
+            display: inline-block;
+            margin: 0 20px;
+            font-size: 1.5em;
+            color: #667eea;
+        }
+
+        .arrow-horizontal::before {
+            content: "→";
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .status-queued {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .status-processing {
+            background: #2196F3;
+            color: white;
+        }
+
+        .status-completed {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .status-failed {
+            background: #f44336;
+            color: white;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .info-box h3 {
+            color: white;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 10px 0;
+        }
+
+        .section-divider {
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            margin: 40px 0;
+            border-radius: 2px;
+        }
+
+        .legend {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .legend-item {
+            display: inline-block;
+            margin: 10px 20px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 5px solid;
+        }
+
+        .legend-entry { border-left-color: #4CAF50; background: #e8f5e9; }
+        .legend-scheduler { border-left-color: #2196F3; background: #e3f2fd; }
+        .legend-processor { border-left-color: #FF9800; background: #fff3e0; }
+        .legend-database { border-left-color: #9C27B0; background: #f3e5f5; }
+        .legend-dependency { border-left-color: #E91E63; background: #fce4ec; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Batch Job Processing System</h1>
+        <p class="subtitle">Complete Flow Diagrams & Architecture Overview</p>
+
+        <div class="legend">
+            <h3>📋 Color Legend</h3>
+            <div class="legend-item legend-entry">Entry Points</div>
+            <div class="legend-item legend-scheduler">Scheduler Services</div>
+            <div class="legend-item legend-processor">Processing Services</div>
+            <div class="legend-item legend-database">Database</div>
+            <div class="legend-item legend-dependency">Dependency Services</div>
+        </div>
+
+        <!-- Section 1: Job Creation Flow -->
+        <h2>1️⃣ Job Creation Flow</h2>
+        
+        <h3>📅 Scheduled Job Creation</h3>
+        <div class="flow-container">
+            <div class="flow-box entry-point">
+                <div class="service-name">⏰ Spring @EnableScheduling</div>
+                <div class="service-details">Application startup - Enables scheduled task execution</div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box entry-point">
+                <div class="service-name">📋 ScheduledReportService</div>
+                <div class="service-details">
+                    <strong>Cron Jobs:</strong>
+                    <ul>
+                        <li>Daily: <code>0 30 5 * * ?</code> (5:30 AM IST)</li>
+                        <li>Weekly: <code>0 30 5 * * MON</code> (Monday 5:30 AM)</li>
+                        <li>Monthly: <code>0 30 5 1 * ?</code> (1st of month)</li>
+                        <li>Quarterly: <code>0 30 5 1 1,4,7,10 ?</code></li>
+                        <li>Yearly: <code>0 30 5 1 1 ?</code> (Jan 1st)</li>
+                        <li>System: <code>0 */2 * * * ?</code> (Every 2 min)</li>
+                    </ul>
+                    <strong>Actions:</strong>
+                    <ul>
+                        <li>Gets SYSTEM_SCHEDULER token from Keycloak</li>
+                        <li>Creates BIReportRequest for each role/report type</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box processor">
+                <div class="service-name">📥 JobQueueService.queueReportJob()</div>
+                <div class="service-details">
+                    <ul>
+                        <li>Generates unique Job ID (JOB_XXXXXXXX)</li>
+                        <li>Creates ReportJobEntity</li>
+                        <li>Sets status = <span class="status-badge status-queued">QUEUED</span></li>
+                        <li>Stores JWT token with job</li>
+                        <li>Serializes request data</li>
+                        <li>Estimates completion time</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box database">
+                <div class="service-name">💾 Database (report_jobs table)</div>
+                <div class="service-details">
+                    <strong>Job Record:</strong>
+                    <ul>
+                        <li>job_id: JOB_XXXXXXXX</li>
+                        <li>status: <span class="status-badge status-queued">QUEUED</span></li>
+                        <li>report_type: DAILY_REPORT</li>
+                        <li>user_role: CASE_WORKER</li>
+                        <li>jwt_token: &lt;stored token&gt;</li>
+                        <li>parent_job_id: NULL</li>
+                        <li>created_at: &lt;timestamp&gt;</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h3>👤 Manual Job Creation (API)</h3>
+        <div class="flow-container">
+            <div class="flow-box entry-point">
+                <div class="service-name">🌐 Frontend / API Client</div>
+                <div class="service-details">
+                    <strong>POST</strong> <code>/api/reports/generate</code><br>
+                    <strong>Headers:</strong> Authorization: Bearer &lt;JWT_TOKEN&gt;<br>
+                    <strong>Body:</strong> { reportType, targetSystem, dataFormat, ... }
+                </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box processor">
+                <div class="service-name">🔐 BusinessIntelligenceController</div>
+                <div class="service-details">
+                    <strong>generateBIReport()</strong>
+                    <ol>
+                        <li>Validates Authorization header</li>
+                        <li>Extracts JWT token</li>
+                        <li>Parses JWT to get user role & countyId</li>
+                        <li>Creates BIReportRequest from request body</li>
+                        <li>Sets role from JWT (security - ignores request body)</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box processor">
+                <div class="service-name">📥 JobQueueService.queueReportJob()</div>
+                <div class="service-details">Same process as scheduled flow</div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box database">
+                <div class="service-name">💾 Database</div>
+                <div class="service-details">Status: <span class="status-badge status-queued">QUEUED</span></div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Section 2: Job Processing Flow -->
+        <h2>2️⃣ Job Processing Flow</h2>
+        <div class="flow-container">
+            <div class="flow-box scheduler">
+                <div class="service-name">⏱️ BatchJobScheduler</div>
+                <div class="service-details">
+                    <strong>@Scheduled(fixedDelay = 5000ms)</strong> - Runs every 5 seconds<br><br>
+                    <strong>pollAndDispatchJobs():</strong>
+                    <ol>
+                        <li>Checks if scheduler enabled</li>
+                        <li>Queries: <code>findTopQueuedJobs(maxJobsPerPoll=3)</code></li>
+                        <li>Gets jobs with status = <span class="status-badge status-queued">QUEUED</span></li>
+                    </ol>
+                </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box processor">
+                <div class="service-name">🔒 JobQueueService.markJobAsProcessing()</div>
+                <div class="service-details">
+                    <ul>
+                        <li>Uses optimistic locking (version field)</li>
+                        <li>Updates status: <span class="status-badge status-queued">QUEUED</span> → <span class="status-badge status-processing">PROCESSING</span></li>
+                        <li>Sets started_at timestamp</li>
+                        <li>Returns job if successfully claimed</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box scheduler">
+                <div class="service-name">⚙️ ThreadPoolTaskExecutor</div>
+                <div class="service-details">
+                    <strong>batchJobExecutor</strong> (worker-pool-size: 2)<br>
+                    Executes job in background thread<br>
+                    Calls: <code>backgroundProcessingService.processJob(jobId)</code>
+                </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box processor">
+                <div class="service-name">🔄 BackgroundProcessingService.processJob()</div>
+                <div class="service-details">
+                    <ol>
+                        <li>Loads job from database by jobId</li>
+                        <li>Deserializes BIReportRequest from job.requestData</li>
+                        <li>Extracts JWT token from job.jwtToken</li>
+                        <li>Calls processReportInBackground()</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box processor">
+                <div class="service-name">📊 processReportInBackground()</div>
+                <div class="service-details">
+                    <ol>
+                        <li>Checks if job was cancelled</li>
+                        <li>Parses JWT token to extract user role & countyId</li>
+                        <li>Creates PipelineExtractionRequest</li>
+                        <li>Calls processDataInChunksStreaming()</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box processor">
+                <div class="service-name">📦 processDataInChunksStreaming()</div>
+                <div class="service-details">
+                    <ol>
+                        <li>Calculates total records to process</li>
+                        <li>Processes data in chunks (chunkSize from request)</li>
+                        <li><strong>For each chunk:</strong>
+                            <ul>
+                                <li>Fetches data (DataFetchingService)</li>
+                                <li>Applies field masking (ReportGenerationService)</li>
+                                <li>Writes to file stream</li>
+                                <li>Updates job progress</li>
+                            </ul>
+                        </li>
+                        <li>Returns result file path</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box processor">
+                <div class="service-name">✅ JobQueueService.setJobResult()</div>
+                <div class="service-details">
+                    <ul>
+                        <li>Updates status: <span class="status-badge status-processing">PROCESSING</span> → <span class="status-badge status-completed">COMPLETED</span></li>
+                        <li>Sets result_path to file location</li>
+                        <li>Sets completed_at timestamp</li>
+                        <li>Updates progress to 100%</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box dependency">
+                <div class="service-name">🔗 triggerDependentJobs()</div>
+                <div class="service-details">
+                    <ul>
+                        <li>Checks if JobDependencyService available</li>
+                        <li>Reloads job from DB to get latest status</li>
+                        <li>Only triggers if status = <span class="status-badge status-completed">COMPLETED</span></li>
+                        <li>Calls JobDependencyService.triggerDependentJobs()</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Section 3: Dependency Tracking -->
+        <h2>3️⃣ Dependency Tracking Flow</h2>
+        <div class="flow-container">
+            <div class="flow-box dependency">
+                <div class="service-name">🔍 JobDependencyService.triggerDependentJobs()</div>
+                <div class="service-details">
+                    <strong>STEP 1:</strong> Check if dependency system enabled<br>
+                    <strong>STEP 2:</strong> Extract parent job details
+                    <ul>
+                        <li>parentReportType: DAILY_REPORT</li>
+                        <li>parentRole: CASE_WORKER</li>
+                        <li>parentStatus: <span class="status-badge status-completed">COMPLETED</span></li>
+                    </ul>
+                    <strong>STEP 3:</strong> Find matching dependencies
+                </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box dependency">
+                <div class="service-name">🔎 findMatchingDependencies()</div>
+                <div class="service-details">
+                    <ul>
+                        <li>Reads from JobDependencyConfig (from application.yml)</li>
+                        <li>Filters dependencies by:
+                            <ul>
+                                <li>parentReportType matches</li>
+                                <li>parentRole matches (if specified in config)</li>
+                                <li>condition met (ON_SUCCESS or ON_COMPLETION)</li>
+                            </ul>
+                        </li>
+                        <li>Returns list of matching JobDependency objects</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box dependency">
+                <div class="service-name">⚡ Processing Dependencies</div>
+                <div class="service-details">
+                    <strong>For each matching dependency:</strong><br><br>
+                    <strong>IF Single Dependency:</strong>
+                    <ul>
+                        <li>Create dependent job immediately</li>
+                    </ul>
+                    <strong>IF Multiple Dependency:</strong>
+                    <ul>
+                        <li>Call checkMultipleDependencies()</li>
+                        <li>Queries DB for all required parent report types</li>
+                        <li>Checks if ALL parents have status = <span class="status-badge status-completed">COMPLETED</span></li>
+                        <li>If all found → Create dependent job</li>
+                        <li>If not all found → Skip (wait for other parents)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box dependency">
+                <div class="service-name">📝 createDependentJobRequest()</div>
+                <div class="service-details">
+                    <ul>
+                        <li>Creates BIReportRequest for dependent job</li>
+                        <li>Sets dependentReportType from config</li>
+                        <li>Sets role (from config or inherits from parent)</li>
+                        <li>Sets targetSystem, dataFormat, priority</li>
+                        <li>Sets chunkSize (uses dependent-chunk-size from config)</li>
+                        <li>Adds parentJobId to metadata</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box processor">
+                <div class="service-name">📥 JobQueueService.queueReportJob(..., parentJobId)</div>
+                <div class="service-details">
+                    <ul>
+                        <li>Generates dependent job ID</li>
+                        <li>Creates ReportJobEntity</li>
+                        <li>Sets parentJobId = &lt;parent job ID&gt;</li>
+                        <li>Sets status = <span class="status-badge status-queued">QUEUED</span></li>
+                        <li>Saves to database</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="arrow"></div>
+            <div class="flow-box database">
+                <div class="service-name">💾 Database (report_jobs table)</div>
+                <div class="service-details">
+                    <strong>Dependent Job Record:</strong>
+                    <ul>
+                        <li>job_id: JOB_DEPENDENT_XX</li>
+                        <li>status: <span class="status-badge status-queued">QUEUED</span></li>
+                        <li>report_type: DAILY_SUMMARY</li>
+                        <li>parent_job_id: JOB_PARENT_XX ← Links to parent</li>
+                        <li>user_role: CASE_WORKER</li>
+                    </ul>
+                    <em>BatchJobScheduler picks up dependent job (same processing flow as parent)</em>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Section 4: Service Responsibilities -->
+        <h2>4️⃣ Service Responsibilities</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>Responsibility</th>
+                    <th>Key Methods</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>JobQueueService</strong></td>
+                    <td>Job queue management</td>
+                    <td>
+                        <ul>
+                            <li>queueReportJob()</li>
+                            <li>markJobAsProcessing()</li>
+                            <li>setJobResult()</li>
+                            <li>updateJobStatus()</li>
+                            <li>getJobStatus()</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>BatchJobScheduler</strong></td>
+                    <td>Polls database and dispatches jobs</td>
+                    <td>pollAndDispatchJobs() - Runs every 5 seconds</td>
+                </tr>
+                <tr>
+                    <td><strong>BackgroundProcessingService</strong></td>
+                    <td>Executes job processing logic</td>
+                    <td>
+                        <ul>
+                            <li>processJob()</li>
+                            <li>processReportInBackground()</li>
+                            <li>processDataInChunksStreaming()</li>
+                            <li>triggerDependentJobs()</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>JobDependencyService</strong></td>
+                    <td>Tracks and triggers dependent jobs</td>
+                    <td>
+                        <ul>
+                            <li>triggerDependentJobs()</li>
+                            <li>findMatchingDependencies()</li>
+                            <li>checkMultipleDependencies()</li>
+                            <li>createDependentJobRequest()</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>ScheduledReportService</strong></td>
+                    <td>Creates scheduled jobs via cron</td>
+                    <td>
+                        <ul>
+                            <li>generateDailyReports()</li>
+                            <li>generateWeeklyReports()</li>
+                            <li>generateMonthlyReports()</li>
+                            <li>generateQuarterlyReports()</li>
+                            <li>generateYearlyReports()</li>
+                            <li>generateCountyReportsForScheduler()</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>BusinessIntelligenceController</strong></td>
+                    <td>API endpoint for manual job creation</td>
+                    <td>generateBIReport() - REST endpoint</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <!-- Section 5: Configuration -->
+        <h2>5️⃣ Configuration Points</h2>
+        <div class="two-column">
+            <div class="info-box">
+                <h3>Batch Scheduler</h3>
+                <div class="code-block">batch:
+  scheduler:
+    enabled: true
+    interval-ms: 5000
+    max-jobs-per-poll: 3
+    worker-pool-size: 2</div>
+            </div>
+            <div class="info-box">
+                <h3>Job Dependencies</h3>
+                <div class="code-block">job-dependencies:
+  enabled: true
+  dependencies:
+    - parent-report-type: "DAILY_REPORT"
+      dependent-report-type: "DAILY_SUMMARY"
+      condition: "ON_SUCCESS"</div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Section 6: Database Schema -->
+        <h2>6️⃣ Database Schema</h2>
+        <div class="flow-box database">
+            <div class="service-name">📊 report_jobs table</div>
+            <div class="service-details">
+                <ul>
+                    <li><strong>job_id</strong> (PK) - Unique job identifier</li>
+                    <li><strong>status</strong> - QUEUED, PROCESSING, COMPLETED, FAILED, CANCELLED</li>
+                    <li><strong>report_type</strong> - DAILY_REPORT, WEEKLY_REPORT, etc.</li>
+                    <li><strong>user_role</strong> - CASE_WORKER, SUPERVISOR, ADMIN, etc.</li>
+                    <li><strong>parent_job_id</strong> - NULL for parent jobs, job_id for dependent jobs</li>
+                    <li><strong>jwt_token</strong> - Stored JWT token for authentication</li>
+                    <li><strong>request_data</strong> - Serialized BIReportRequest (JSON)</li>
+                    <li><strong>result_path</strong> - File path to generated report</li>
+                    <li><strong>progress</strong> - 0-100 percentage</li>
+                    <li><strong>created_at</strong> - Job creation timestamp</li>
+                    <li><strong>started_at</strong> - Processing start timestamp</li>
+                    <li><strong>completed_at</strong> - Completion timestamp</li>
+                    <li><strong>estimated_completion_time</strong> - Estimated completion time</li>
+                    <li><strong>version</strong> - Optimistic locking version field</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Section 7: Design Patterns -->
+        <h2>7️⃣ Key Design Patterns</h2>
+        <div class="two-column">
+            <div class="flow-box processor">
+                <div class="service-name">🔐 Optimistic Locking</div>
+                <div class="service-details">Prevents race conditions when claiming jobs</div>
+            </div>
+            <div class="flow-box processor">
+                <div class="service-name">🧵 Thread Pool Pattern</div>
+                <div class="service-details">Parallel job processing with configurable pool size</div>
+            </div>
+            <div class="flow-box dependency">
+                <div class="service-name">🔗 Dependency Chain Pattern</div>
+                <div class="service-details">Jobs can have dependent jobs, creating chains</div>
+            </div>
+            <div class="flow-box processor">
+                <div class="service-name">📦 Chunked Processing</div>
+                <div class="service-details">Large datasets processed in chunks for memory efficiency</div>
+            </div>
+            <div class="flow-box entry-point">
+                <div class="service-name">⚡ Event-Driven</div>
+                <div class="service-details">Cron jobs trigger job creation, scheduler triggers processing</div>
+            </div>
+            <div class="flow-box processor">
+                <div class="service-name">🎯 Separation of Concerns</div>
+                <div class="service-details">Each service has a single responsibility</div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Section 8: Monitoring -->
+        <h2>8️⃣ Monitoring Points</h2>
+        <div class="info-box">
+            <h3>📈 Key Metrics to Monitor</h3>
+            <ul style="list-style: none; padding-left: 0;">
+                <li>📊 <strong>Job Queue Size:</strong> Number of QUEUED jobs in database</li>
+                <li>⚙️ <strong>Processing Jobs:</strong> Number of PROCESSING jobs</li>
+                <li>✅ <strong>Completed Jobs:</strong> Success rate and completion times</li>
+                <li>❌ <strong>Failed Jobs:</strong> Error messages and failure reasons</li>
+                <li>🔗 <strong>Dependent Jobs:</strong> Number of dependent jobs created</li>
+                <li>🧵 <strong>Worker Thread Utilization:</strong> Active vs idle threads</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px; padding: 20px; color: #666;">
+            <p>Batch Job Processing System - Flow Diagrams</p>
+            <p style="font-size: 0.9em;">Generated for presentation purposes</p>
+        </div>
+    </div>
+</body>
+</html>
+

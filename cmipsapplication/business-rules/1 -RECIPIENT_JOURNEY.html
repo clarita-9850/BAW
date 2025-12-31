@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipient Journey - IHSS CMIPS</title>
+    <style>
+        :root {
+            --primary-color: #FF9900;
+            --primary-dark: #E88300;
+            --accent-color: #146EB4;
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F7F7F7;
+            --bg-tertiary: #EAEDED;
+            --text-primary: #0F1111;
+            --text-secondary: #565959;
+            --text-muted: #767676;
+            --border-color: #D5D9D9;
+            --code-bg: #232F3E;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+            font-size: 14px;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.688rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 1rem;
+        }
+
+        .nav-menu li {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-menu a {
+            display: block;
+            padding: 0.5rem 0.75rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.813rem;
+            font-weight: 400;
+            border-radius: 0;
+            transition: all 0.15s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-menu a:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-left-color: var(--primary-color);
+        }
+
+        .nav-menu a.active {
+            background: #FEF9E7;
+            color: var(--text-primary);
+            font-weight: 700;
+            border-left-color: var(--primary-color);
+        }
+
+        .nav-section-header {
+            padding: 1rem 0.75rem 0.5rem;
+            font-size: 0.688rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 3rem;
+            max-width: 1400px;
+        }
+
+        .page-header {
+            background: var(--code-bg);
+            color: white;
+            padding: 2.5rem 3rem;
+            margin-bottom: 2rem;
+            border-bottom: 4px solid var(--primary-color);
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .page-header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            color: white;
+        }
+
+        section {
+            background: var(--bg-primary);
+            padding: 2rem 2.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--primary-color);
+            letter-spacing: -0.01em;
+        }
+
+        h3 {
+            font-size: 1.375rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 2rem 0 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 1.5rem 0 1rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        ul, ol {
+            margin: 1rem 0 1rem 1.5rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .info-box {
+            background: #FEF9E7;
+            border-left: 4px solid var(--primary-color);
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-box h4 {
+            margin-top: 0;
+        }
+
+        .warning-box {
+            background: #FFF3CD;
+            border-left: 4px solid #FFC107;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .success-box {
+            background: #D1F2EB;
+            border-left: 4px solid #00A65A;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .step-box {
+            background: var(--bg-tertiary);
+            padding: 1.25rem 1.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .step-box h4 {
+            margin-top: 0;
+            color: var(--accent-color);
+        }
+
+        .flow-diagram {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .flow-diagram pre {
+            background: transparent;
+            color: var(--text-primary);
+            box-shadow: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        thead {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        th {
+            padding: 0.875rem 1rem;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.813rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody tr:hover {
+            background: #FAFAFA;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .phase-badge {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-available {
+            background: #D1F2EB;
+            color: #00695C;
+        }
+
+        .status-hired {
+            background: #E3F2FD;
+            color: #1565C0;
+        }
+
+        .status-not-eligible {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .status-restricted {
+            background: #FFF3CD;
+            color: #856404;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @media print {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>Recipient Journey</h1>
+                <p>IHSS CMIPS System</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#overview">Overview</a></li>
+                <li class="nav-section-header">Phase 1</li>
+                <li><a href="#phase1">Initial Application</a></li>
+                <li class="nav-section-header">Phase 2</li>
+                <li><a href="#phase2">ESP Registration</a></li>
+                <li class="nav-section-header">Phase 3</li>
+                <li><a href="#phase3">Hiring a Provider</a></li>
+                <li><a href="#search">Search for Provider</a></li>
+                <li><a href="#confirm">Confirm Hire</a></li>
+                <li><a href="#after-hire">After Hiring</a></li>
+                <li class="nav-section-header">Additional Info</li>
+                <li><a href="#pathways">Two Pathways</a></li>
+                <li><a href="#important">Important Points</a></li>
+                <li><a href="#summary">Summary Workflow</a></li>
+                <li><a href="#tldr">TL;DR</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1>Recipient Journey</h1>
+                <p>From initial contact to hiring a provider</p>
+            </div>
+
+            <section id="overview">
+                <h2>Overview</h2>
+                <p>This guide walks you through the complete journey as an IHSS recipient, from your first contact with the county to successfully hiring and managing a provider.</p>
+            </section>
+
+            <section id="phase1">
+                <span class="phase-badge">Phase 1</span>
+                <h2>Initial Application (County Handles)</h2>
+
+                <div class="step-box">
+                    <h4>Step 1: Contact County</h4>
+                    <ul>
+                        <li>Phone, walk-in, or referral</li>
+                        <li>A county worker takes the information</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Step 2: County Worker Creates Referral/Application in CMIPS</h4>
+                    <ul>
+                        <li><strong>If someone else referred you:</strong> County creates a Referral (Person Type = OPEN_REFERRAL)</li>
+                        <li><strong>If you applied yourself:</strong> County creates an Application (Person Type = APPLICANT)</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Step 3: County Processes Your Case</h4>
+                    <ul>
+                        <li>CIN clearance and Medi-Cal verification</li>
+                        <li>Service eligibility assessment</li>
+                        <li>Health Care Certification (SOC 873)</li>
+                        <li>Case approval/denial</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Step 4: Case Approved</h4>
+                    <ul>
+                        <li>Case Status = ELIGIBLE or PRESUMPTIVE_ELIGIBLE</li>
+                        <li>Person Type = RECIPIENT</li>
+                        <li>You can now register for ESP</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="phase2">
+                <span class="phase-badge">Phase 2</span>
+                <h2>ESP Self-Service Registration (You Do This)</h2>
+
+                <div class="step-box">
+                    <h4>Step 1: Go to ESP Website</h4>
+                    <ul>
+                        <li>URL: <a href="https://www.etimesheets.ihss.ca.gov" target="_blank">https://www.etimesheets.ihss.ca.gov</a></li>
+                        <li>Click "Register as New User"</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Step 2: Complete 5-Step Registration</h4>
+                    
+                    <h4>Step 2.1: Validate Identity</h4>
+                    <ul>
+                        <li>Select "I am a Recipient"</li>
+                        <li>Enter Case Number (provided by county)</li>
+                        <li>Enter Last 4 digits of CIN (Client Index Number)</li>
+                        <li>Enter Last Name, First Name, DOB</li>
+                        <li>System validates against CMIPS records</li>
+                    </ul>
+
+                    <h4>Step 2.2: Verify Email</h4>
+                    <ul>
+                        <li>Enter email address (twice)</li>
+                        <li>System sends 6-digit verification code</li>
+                        <li>Enter code to verify</li>
+                    </ul>
+
+                    <h4>Step 2.3: Create Username</h4>
+                    <ul>
+                        <li>6-20 characters</li>
+                        <li>Letters, numbers, underscore, hyphen only</li>
+                        <li>Must be unique</li>
+                    </ul>
+
+                    <h4>Step 2.4: Create Password</h4>
+                    <ul>
+                        <li>Minimum 8 characters</li>
+                        <li>Must include: uppercase, lowercase, number, special character</li>
+                        <li>Strength indicator shown</li>
+                    </ul>
+
+                    <h4>Step 2.5: Security Questions</h4>
+                    <ul>
+                        <li>Select 3 different security questions</li>
+                        <li>Provide answers (for password recovery)</li>
+                    </ul>
+                </div>
+
+                <div class="success-box">
+                    <h4>Step 3: Registration Complete</h4>
+                    <ul>
+                        <li>Welcome email sent</li>
+                        <li>You can now log in to ESP</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="phase3">
+                <span class="phase-badge">Phase 3</span>
+                <h2>Hiring a Provider (You Can Do This in ESP)</h2>
+
+                <div class="info-box">
+                    <h4>Prerequisites</h4>
+                    <ul>
+                        <li>Age 18 or older</li>
+                        <li>Case Status = ELIGIBLE or PRESUMPTIVE_ELIGIBLE</li>
+                        <li>Registered in ESP</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Step 1: Log in to ESP</h4>
+                    <ul>
+                        <li>Go to <a href="https://www.etimesheets.ihss.ca.gov" target="_blank">https://www.etimesheets.ihss.ca.gov</a></li>
+                        <li>Use your username and password</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Step 2: Access "Hire Provider"</h4>
+                    <p>From Recipient Home → "Hire Provider"</p>
+                </div>
+            </section>
+
+            <section id="search">
+                <h3>Step 3: Search for Provider</h3>
+
+                <h4>Search Options:</h4>
+                <ul>
+                    <li><strong>Provider Name</strong> (Last Name required, First Name optional)</li>
+                    <li><strong>Provider Number</strong> (9 digits)</li>
+                    <li><strong>Last 4 digits of SSN</strong></li>
+                </ul>
+
+                <h4>Optional Filters:</h4>
+                <ul>
+                    <li>County (defaults to yours)</li>
+                    <li>Gender</li>
+                    <li>Language</li>
+                </ul>
+
+                <p>Click "Search"</p>
+
+                <h3>Step 4: Review Search Results</h3>
+
+                <h4>Results Show:</h4>
+                <ul>
+                    <li>Provider Name</li>
+                    <li>Provider Number</li>
+                    <li>Gender</li>
+                    <li>County</li>
+                    <li>Languages</li>
+                    <li>Status (Available, Already Hired, Not Eligible, Restricted)</li>
+                </ul>
+
+                <h4>Status Meanings:</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Meaning</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="status-badge status-available">Available</span></td>
+                            <td>Can be hired</td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-badge status-hired">Already Hired</span></td>
+                            <td>Already on your case</td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-badge status-not-eligible">Not Eligible</span></td>
+                            <td>Cannot be hired (see details)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-badge status-restricted">Restricted</span></td>
+                            <td>Has CORI restrictions</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Step 5: Select and Confirm Provider</h3>
+
+                <p>Click "Select" on a provider</p>
+
+                <h4>Review Provider Information:</h4>
+                <ul>
+                    <li>Provider details</li>
+                    <li>Eligibility status (Background Check, Orientation, SOC 846)</li>
+                    <li>Current assignments (how many active cases)</li>
+                </ul>
+
+                <div class="info-box">
+                    <h4>Before Hiring:</h4>
+                    <ul>
+                        <li>Interview or speak with provider</li>
+                        <li>Verify availability for your schedule</li>
+                        <li>Discuss services needed</li>
+                        <li>Confirm comfort with your needs</li>
+                        <li>Check references if desired</li>
+                    </ul>
+                    <p><strong>Your Social Worker can help with interviews and verifying qualifications.</strong></p>
+                </div>
+            </section>
+
+            <section id="confirm">
+                <h3>Step 6: Confirm Hire</h3>
+
+                <h4>Review:</h4>
+                <ul>
+                    <li>Provider name and number</li>
+                    <li>Your case information</li>
+                    <li>Authorized services</li>
+                    <li>Monthly hours</li>
+                </ul>
+
+                <h4>Certification:</h4>
+                <ul>
+                    <li>I am age 18 or older</li>
+                    <li>I want to hire this provider</li>
+                    <li>Provider will be assigned immediately</li>
+                    <li>I will direct the provider's work</li>
+                    <li>I will review and approve timesheets</li>
+                </ul>
+
+                <ul>
+                    <li>Enter your name as electronic signature</li>
+                    <li>Check "I agree and want to hire"</li>
+                    <li>Click "Complete Hire"</li>
+                </ul>
+            </section>
+
+            <section id="after-hire">
+                <h3>Step 7: Hire Confirmation</h3>
+
+                <div class="success-box">
+                    <h4>Success Message:</h4>
+                    <ul>
+                        <li>Confirmation number</li>
+                        <li>Provider assigned</li>
+                        <li>What happens next</li>
+                    </ul>
+                </div>
+
+                <h3>What Happens Next:</h3>
+
+                <h4>Immediate Assignment</h4>
+                <ul>
+                    <li>Provider is assigned to your case</li>
+                    <li>Can begin working right away</li>
+                </ul>
+
+                <h4>County Processing (1-2 Business Days)</h4>
+                <ul>
+                    <li>Social Worker notified</li>
+                    <li>Provider contacted</li>
+                    <li>Pay rate set</li>
+                    <li>Hours assigned</li>
+                    <li>Timesheets generated</li>
+                </ul>
+
+                <h4>Your Next Steps</h4>
+                <ul>
+                    <li>Contact provider to coordinate schedule</li>
+                    <li>Discuss care needs</li>
+                    <li>Agree on work schedule</li>
+                </ul>
+
+                <h4>Timesheet Setup</h4>
+                <ul>
+                    <li>Generated for next pay period</li>
+                    <li>Provider submits electronically</li>
+                    <li>You review and approve in ESP</li>
+                </ul>
+
+                <h4>Notifications</h4>
+                <ul>
+                    <li>You receive confirmation email</li>
+                    <li>Provider receives assignment notification</li>
+                    <li>County receives processing alert</li>
+                </ul>
+
+                <h3>Restrictions and Limitations</h3>
+
+                <div class="warning-box">
+                    <h4>You Cannot Hire a Provider If:</h4>
+                    <ul>
+                        <li>Under age 18 (contact Social Worker instead)</li>
+                        <li>Case Status is not ELIGIBLE or PRESUMPTIVE_ELIGIBLE</li>
+                        <li>Case is terminated or on leave</li>
+                        <li>You've reached maximum providers for your case</li>
+                        <li>Provider has CORI restrictions without proper waivers</li>
+                        <li>Provider is not eligible to work</li>
+                    </ul>
+                </div>
+
+                <h3>Help Desk</h3>
+                <ul>
+                    <li>Can assist with search</li>
+                    <li>Cannot complete the hire for you</li>
+                    <li>For technical issues only</li>
+                </ul>
+            </section>
+
+            <section id="pathways">
+                <h2>Two Pathways Summary</h2>
+
+                <h3>Pathway A: County Assigns Provider (Traditional)</h3>
+                <ol>
+                    <li>County worker assigns provider through CMIPS</li>
+                    <li>Provider receives notification</li>
+                    <li>Provider starts serving you</li>
+                    <li>You review timesheets</li>
+                </ol>
+
+                <h3>Pathway B: You Hire Provider Yourself (Self-Service)</h3>
+                <ol>
+                    <li>You register in ESP (after case is eligible)</li>
+                    <li>You search for providers</li>
+                    <li>You hire provider through ESP</li>
+                    <li>System notifies county</li>
+                    <li>County completes setup (1-2 business days)</li>
+                    <li>Provider starts serving you</li>
+                    <li>You review timesheets in ESP</li>
+                </ol>
+            </section>
+
+            <section id="important">
+                <h2>Important Points</h2>
+                
+                <div class="info-box">
+                    <ul>
+                        <li><strong>You cannot create your own case.</strong> County workers create it after initial contact.</li>
+                        <li><strong>You can register for ESP only after your case is approved</strong> (ELIGIBLE status).</li>
+                        <li><strong>You can hire providers yourself through ESP if you are 18+.</strong></li>
+                        <li><strong>County still finalizes setup</strong> (pay rate, hours, timesheet generation) after your hire.</li>
+                        <li><strong>You direct the provider's work</strong> and approve/reject timesheets.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="summary">
+                <h2>Summary Workflow</h2>
+
+                <div class="flow-diagram">
+                    <pre>YOUR JOURNEY AS A RECIPIENT:
+
+1. CONTACT COUNTY (Phone/Walk-in)
+   ↓
+2. COUNTY CREATES REFERRAL/APPLICATION
+   ↓
+3. COUNTY PROCESSES CASE (Assessment, Approval)
+   ↓
+4. CASE APPROVED → Status: ELIGIBLE
+   ↓
+5. YOU REGISTER IN ESP (Self-Service - 5 Steps)
+   ↓
+6. YOU LOGIN TO ESP
+   ↓
+7. YOU HIRE PROVIDER (Self-Service - Search & Hire)
+   ↓
+8. COUNTY COMPLETES SETUP (1-2 days)
+   ↓
+9. PROVIDER STARTS SERVING YOU
+   ↓
+10. YOU REVIEW/APPROVE TIMESHEETS IN ESP</pre>
+                </div>
+            </section>
+
+            <section id="tldr">
+                <h2>TL;DR</h2>
+                
+                <div class="info-box">
+                    <p><strong>You don't enroll yourself initially — the county creates your case. Once approved, you can register in ESP and hire providers yourself if you're 18+.</strong></p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-menu a');
+
+        function updateActiveNav() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= (sectionTop - 100)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveNav);
+        updateActiveNav();
+    </script>
+</body>
+</html>

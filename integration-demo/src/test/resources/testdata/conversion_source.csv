@@ -1,0 +1,6 @@
+sourceId,firstName,lastName,email,birthDate,salary,department,isActive
+101,Alice,Johnson,ALICE.JOHNSON@example.com,1990-05-15,5000.00,Engineering,true
+102,Bob,Smith,bob.smith@EXAMPLE.COM,1985-08-22,6500.00,Sales,true
+103,Carol,Williams,carol.williams@example.com,1992-11-30,4500.00,HR,false
+104,David,Brown,DAVID.BROWN@example.com,1988-03-10,7200.00,Engineering,true
+105,Eve,Davis,Eve.Davis@Example.Com,1995-07-25,5500.00,Marketing,true

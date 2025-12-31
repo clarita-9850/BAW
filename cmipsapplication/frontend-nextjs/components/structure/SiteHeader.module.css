@@ -1,0 +1,76 @@
+.siteHeader {
+  background-color: transparent;
+  padding: 1rem 0;
+  flex: 1;
+}
+
+.flexRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.headerCagovLogo {
+  flex-shrink: 0;
+}
+
+.caGovLogoSvg {
+  display: inline-block;
+  width: 60px;
+  height: 40px;
+  background-color: var(--color-p2, #046b99);
+  border-radius: 4px;
+  position: relative;
+}
+
+.caGovLogoSvg::after {
+  content: "CA.gov";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: bold;
+  font-size: 0.75rem;
+}
+
+.headerText {
+  flex: 1;
+}
+
+.siteTitle {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-p2, #046b99);
+}
+
+.siteSubtitle {
+  margin: 0;
+  font-size: 1rem;
+  color: #6b7280;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 767.98px) {
+  .flexRow {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .siteTitle {
+    font-size: 1.25rem;
+  }
+}
+

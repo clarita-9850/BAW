@@ -1,0 +1,5 @@
+0000000001John Smith                    00123      1500.00A Standard description text here
+0000000002Jane Doe                      00456      2300.50B Premium service package
+0000000003Bob Johnson                   00789      1800.25C Basic membership tier
+0000000004Alice Williams                01234      3200.00A Enterprise solution
+0000000005Charlie Brown                 05678      2750.75B Standard description text here

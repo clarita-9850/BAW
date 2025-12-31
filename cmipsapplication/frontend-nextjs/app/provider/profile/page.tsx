@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import apiClient from '@/lib/api';
 
 type Recipient = {
@@ -12,8 +11,13 @@ type Recipient = {
   caseNumber: string;
 };
 
-function ProviderProfileComponent() {
+export default function ProviderProfileComponent() {
   const { user, loading: authLoading } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const router = useRouter();
   const [addressForm, setAddressForm] = useState({ street: '', city: '', state: 'CA', zipCode: '' });
   const [recipients, setRecipients] = useState<Recipient[]>([]);
@@ -84,7 +88,7 @@ function ProviderProfileComponent() {
     }
   };
 
-  if (loading || authLoading || !user) {
+  if (!mounted || loading || authLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -222,6 +226,3 @@ function ProviderProfileComponent() {
     </div>
   );
 }
-
-export default dynamic(() => Promise.resolve(ProviderProfileComponent), { ssr: false });
-

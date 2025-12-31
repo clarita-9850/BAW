@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Dive: Batch Processing System - IHSS/CMIPS</title>
+    <style>
+        :root {
+            --primary: #0d1b2a;
+            --secondary: #1b263b;
+            --accent: #415a77;
+            --accent-bright: #778da9;
+            --highlight: #00b4d8;
+            --success: #06d6a0;
+            --warning: #ffd166;
+            --danger: #ef476f;
+            --text: #e0e1dd;
+            --text-muted: #a8dadc;
+            --code-bg: #0a0f14;
+            --border: #415a77;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, var(--primary) 0%, #0a0f14 100%);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+            padding: 4rem 2rem;
+            text-align: center;
+            border-bottom: 3px solid var(--highlight);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23778da9' fill-opacity='0.05'%3E%3Cpath d='m36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .header h1 {
+            font-size: 2.75rem;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 span { color: var(--highlight); }
+
+        .header p { color: var(--text-muted); font-size: 1.1rem; position: relative; z-index: 1; }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+        .section {
+            background: var(--secondary);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .section h2 {
+            color: var(--highlight);
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--highlight);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section h3 { color: var(--text); font-size: 1.25rem; margin: 1.5rem 0 1rem; }
+        .section h4 { color: var(--accent-bright); font-size: 1.1rem; margin: 1rem 0 0.75rem; }
+
+        .code-block {
+            background: var(--code-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+            line-height: 1.6;
+        }
+
+        .code-block .comment { color: #6a9955; }
+        .code-block .keyword { color: #569cd6; }
+        .code-block .string { color: #ce9178; }
+        .code-block .function { color: #dcdcaa; }
+        .code-block .annotation { color: #c586c0; }
+        .code-block .type { color: #4ec9b0; }
+        .code-block .number { color: #b5cea8; }
+
+        .job-flow {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .job-flow-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--highlight), var(--success));
+            transform: translateX(-50%);
+        }
+
+        .job-state {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .job-state:nth-child(odd) { flex-direction: row; }
+        .job-state:nth-child(even) { flex-direction: row-reverse; }
+
+        .job-state-content {
+            width: 45%;
+            background: rgba(0, 180, 216, 0.1);
+            border: 2px solid var(--highlight);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .job-state-marker {
+            width: 40px;
+            height: 40px;
+            background: var(--highlight);
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            z-index: 2;
+        }
+
+        .state-name {
+            font-weight: 600;
+            color: var(--highlight);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .state-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: rgba(0, 180, 216, 0.2);
+            color: var(--highlight);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(0, 180, 216, 0.1) 0%, rgba(0, 180, 216, 0.05) 100%);
+            border-left: 4px solid var(--highlight);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+
+        .success-box {
+            background: linear-gradient(135deg, rgba(6, 214, 160, 0.1) 0%, rgba(6, 214, 160, 0.05) 100%);
+            border-left: 4px solid var(--success);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, rgba(255, 209, 102, 0.1) 0%, rgba(255, 209, 102, 0.05) 100%);
+            border-left: 4px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+
+        .danger-box {
+            background: linear-gradient(135deg, rgba(239, 71, 111, 0.1) 0%, rgba(239, 71, 111, 0.05) 100%);
+            border-left: 4px solid var(--danger);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+
+        ul, ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.5rem; }
+
+        .scheduler-card {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border: 1px solid var(--highlight);
+        }
+
+        .scheduler-card h4 {
+            color: var(--highlight);
+            margin-bottom: 1rem;
+        }
+
+        .cron-expression {
+            font-family: 'IBM Plex Mono', monospace;
+            background: var(--code-bg);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 0.5rem 0;
+        }
+
+        .dependency-tree {
+            padding: 1.5rem;
+            background: var(--code-bg);
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+
+        .dependency-node {
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .dependency-node.parent {
+            background: rgba(0, 180, 216, 0.2);
+            border: 1px solid var(--highlight);
+        }
+
+        .dependency-node.child {
+            background: rgba(6, 214, 160, 0.2);
+            border: 1px solid var(--success);
+            margin-left: 2rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-queued { background: var(--accent-bright); color: var(--primary); }
+        .status-processing { background: var(--highlight); color: var(--primary); }
+        .status-completed { background: var(--success); color: var(--primary); }
+        .status-failed { background: var(--danger); color: white; }
+        .status-cancelled { background: var(--warning); color: var(--primary); }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .config-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .config-card h4 { color: var(--highlight); margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚙️ Batch <span>Processing</span> Deep Dive</h1>
+        <p>Complete Implementation Guide for Asynchronous Job Queue, Scheduler, and Dependencies</p>
+    </div>
+
+    <div class="container">
+        <!-- Overview -->
+        <section class="section">
+            <h2>🎯 System Overview</h2>
+            
+            <p>The Batch Processing system handles asynchronous report generation through a robust job queue architecture. It supports scheduled reports, manual triggers, job dependencies, progress tracking, and multi-format output generation.</p>
+
+            <h3>Key Components</h3>
+            <div class="grid-2">
+                <div class="config-card">
+                    <h4>📋 JobQueueService</h4>
+                    <p>Core service managing job lifecycle: queue, claim, process, complete/fail. Handles job creation, status updates, and result storage.</p>
+                </div>
+                <div class="config-card">
+                    <h4>⏰ BatchJobScheduler</h4>
+                    <p>Polls database every 5 seconds for QUEUED jobs, claims them atomically, and dispatches to worker thread pool.</p>
+                </div>
+                <div class="config-card">
+                    <h4>🔄 BackgroundProcessingService</h4>
+                    <p>Worker service that processes jobs: fetches data, applies masking, generates output files, triggers dependencies.</p>
+                </div>
+                <div class="config-card">
+                    <h4>🔗 JobDependencyService</h4>
+                    <p>Manages job chains: when a parent job completes, triggers dependent jobs based on configuration.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Job Lifecycle -->
+        <section class="section">
+            <h2>🔄 Job Lifecycle & State Transitions</h2>
+
+            <div class="job-flow">
+                <div class="job-flow-line"></div>
+                
+                <div class="job-state">
+                    <div class="job-state-content">
+                        <div class="state-name"><span class="status-badge status-queued">QUEUED</span></div>
+                        <div class="state-desc">Job created and waiting in queue. Has unique jobId, userRole, reportType, and JWT token stored.</div>
+                    </div>
+                    <div class="job-state-marker">1</div>
+                    <div style="width: 45%;"></div>
+                </div>
+
+                <div class="job-state">
+                    <div style="width: 45%;"></div>
+                    <div class="job-state-marker">2</div>
+                    <div class="job-state-content">
+                        <div class="state-name"><span class="status-badge status-processing">PROCESSING</span></div>
+                        <div class="state-desc">Claimed by worker thread. startedAt timestamp set. Progress updated as chunks complete.</div>
+                    </div>
+                </div>
+
+                <div class="job-state">
+                    <div class="job-state-content">
+                        <div class="state-name"><span class="status-badge status-completed">COMPLETED</span></div>
+                        <div class="state-desc">Processing finished. resultPath points to generated file. Triggers dependent jobs if configured.</div>
+                    </div>
+                    <div class="job-state-marker">3</div>
+                    <div style="width: 45%;"></div>
+                </div>
+
+                <div class="job-state">
+                    <div style="width: 45%;"></div>
+                    <div class="job-state-marker">!</div>
+                    <div class="job-state-content" style="border-color: var(--danger);">
+                        <div class="state-name"><span class="status-badge status-failed">FAILED</span></div>
+                        <div class="state-desc">Processing error. errorMessage stored. Parent job status unaffected.</div>
+                    </div>
+                </div>
+
+                <div class="job-state">
+                    <div class="job-state-content" style="border-color: var(--warning);">
+                        <div class="state-name"><span class="status-badge status-cancelled">CANCELLED</span></div>
+                        <div class="state-desc">User cancelled while QUEUED or PROCESSING. Partial files deleted.</div>
+                    </div>
+                    <div class="job-state-marker">X</div>
+                    <div style="width: 45%;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Job Queue Service -->
+        <section class="section">
+            <h2>📋 JobQueueService Implementation</h2>
+
+            <h3>Creating a Job</h3>
+            <div class="code-block">
+<span class="comment">// JobQueueService.java - Queue a new report job with JWT token</span>
+<span class="keyword">public</span> String <span class="function">queueReportJob</span>(BIReportRequest request, String jwtToken, String parentJobId) {
+    <span class="keyword">boolean</span> isDependentJob = parentJobId != <span class="keyword">null</span> && !parentJobId.isEmpty();
+    
+    <span class="keyword">if</span> (isDependentJob) {
+        System.out.println(<span class="string">"   └─ [QUEUEING DEPENDENT JOB]"</span>);
+        System.out.println(<span class="string">"      └─ Parent Job ID: "</span> + parentJobId);
+    } <span class="keyword">else</span> {
+        System.out.println(<span class="string">"📋 JobQueueService: Queuing new report job for role: "</span> + request.getUserRole());
+    }
+    
+    <span class="comment">// Generate unique job ID (format: JOB_XXXXXXXX)</span>
+    String jobId = <span class="string">"JOB_"</span> + UUID.randomUUID().toString().substring(<span class="number">0</span>, <span class="number">8</span>).toUpperCase();
+    
+    <span class="comment">// Create job entity</span>
+    ReportJobEntity job = <span class="keyword">new</span> ReportJobEntity(
+        jobId,
+        request.getUserRole(),
+        request.getReportType(),
+        request.getTargetSystem()
+    );
+    
+    <span class="comment">// Set additional properties</span>
+    job.setDataFormat(request.getDataFormat());
+    job.setChunkSize(request.getChunkSize());
+    job.setPriority(request.getPriority());
+    job.setRequestData(<span class="function">serializeRequest</span>(request));  <span class="comment">// Store full request as JSON</span>
+    job.setJwtToken(jwtToken);  <span class="comment">// Store JWT for background processing</span>
+    
+    <span class="comment">// Set parent job ID for dependency tracking</span>
+    <span class="keyword">if</span> (isDependentJob) {
+        job.setParentJobId(parentJobId);
+    }
+    
+    <span class="comment">// Estimate completion time based on report type</span>
+    LocalDateTime estimatedCompletion = <span class="function">estimateCompletionTime</span>(request);
+    job.setEstimatedCompletionTime(estimatedCompletion);
+    
+    <span class="comment">// Save to database (scheduler will pick it up)</span>
+    jobRepository.save(job);
+    
+    <span class="keyword">return</span> jobId;
+}
+            </div>
+
+            <h3>Claiming a Job for Processing</h3>
+            <div class="code-block">
+<span class="comment">// Atomic claim operation - prevents double processing</span>
+<span class="keyword">public</span> Optional&lt;ReportJobEntity&gt; <span class="function">markJobAsProcessing</span>(String jobId) {
+    <span class="keyword">try</span> {
+        Optional&lt;ReportJobEntity&gt; jobOpt = jobRepository.findByJobId(jobId);
+        <span class="keyword">if</span> (jobOpt.isPresent()) {
+            ReportJobEntity job = jobOpt.get();
+            
+            <span class="comment">// Only claim if status is QUEUED (prevents race conditions)</span>
+            <span class="keyword">if</span> (!<span class="string">"QUEUED"</span>.equals(job.getStatus())) {
+                <span class="keyword">return</span> Optional.empty();  <span class="comment">// Already claimed or completed</span>
+            }
+            
+            job.setStatus(<span class="string">"PROCESSING"</span>);
+            job.setStartedAt(LocalDateTime.now());
+            jobRepository.save(job);
+            
+            System.out.println(<span class="string">"⏳ JobQueueService: Job claimed for processing - "</span> + jobId);
+            <span class="keyword">return</span> Optional.of(job);
+        }
+        <span class="keyword">return</span> Optional.empty();
+    } <span class="keyword">catch</span> (Exception e) {
+        System.err.println(<span class="string">"❌ Error claiming job for processing: "</span> + e.getMessage());
+        <span class="keyword">return</span> Optional.empty();
+    }
+}
+            </div>
+
+            <h3>Updating Job Progress</h3>
+            <div class="code-block">
+<span class="comment">// Called during chunk processing to update progress</span>
+<span class="keyword">public void</span> <span class="function">updateJobProgress</span>(String jobId, <span class="keyword">long</span> processed, <span class="keyword">long</span> total) {
+    <span class="keyword">try</span> {
+        Optional&lt;ReportJobEntity&gt; jobOpt = jobRepository.findByJobId(jobId);
+        <span class="keyword">if</span> (jobOpt.isPresent()) {
+            ReportJobEntity job = jobOpt.get();
+            job.<span class="function">updateProgress</span>(processed, total);  <span class="comment">// Calculates percentage</span>
+            jobRepository.save(job);
+            
+            System.out.println(<span class="string">"📊 JobQueueService: Job progress updated - "</span> + jobId + 
+                             <span class="string">" -> "</span> + processed + <span class="string">"/"</span> + total + <span class="string">" ("</span> + job.getProgress() + <span class="string">"%)"</span>);
+        }
+    } <span class="keyword">catch</span> (Exception e) {
+        System.err.println(<span class="string">"❌ Error updating job progress: "</span> + e.getMessage());
+    }
+}
+
+<span class="comment">// Set job result and mark as completed</span>
+<span class="keyword">public void</span> <span class="function">setJobResult</span>(String jobId, String resultPath) {
+    Optional&lt;ReportJobEntity&gt; jobOpt = jobRepository.findByJobId(jobId);
+    <span class="keyword">if</span> (jobOpt.isPresent()) {
+        ReportJobEntity job = jobOpt.get();
+        job.setResultPath(resultPath);
+        job.setStatus(<span class="string">"COMPLETED"</span>);
+        job.setCompletedAt(LocalDateTime.now());
+        
+        <span class="comment">// Ensure progress is set to 100% for completed jobs</span>
+        <span class="keyword">if</span> (job.getProgress() == <span class="keyword">null</span> || job.getProgress() &lt; <span class="number">100</span>) {
+            job.setProgress(<span class="number">100</span>);
+        }
+        
+        <span class="comment">// Set processed records equal to total records</span>
+        <span class="keyword">if</span> (job.getTotalRecords() != <span class="keyword">null</span> && job.getTotalRecords() > <span class="number">0</span>) {
+            job.setProcessedRecords(job.getTotalRecords());
+        }
+        
+        jobRepository.save(job);
+    }
+}
+            </div>
+        </section>
+
+        <!-- Batch Job Scheduler -->
+        <section class="section">
+            <h2>⏰ BatchJobScheduler - The Poll Loop</h2>
+
+            <div class="code-block">
+<span class="comment">// BatchJobScheduler.java - Polls and dispatches jobs</span>
+<span class="annotation">@Component</span>
+<span class="keyword">public class</span> <span class="type">BatchJobScheduler</span> {
+
+    <span class="keyword">private final</span> ReportJobRepository jobRepository;
+    <span class="keyword">private final</span> JobQueueService jobQueueService;
+    <span class="keyword">private final</span> BackgroundProcessingService backgroundProcessingService;
+    <span class="keyword">private final</span> TaskExecutor batchJobExecutor;  <span class="comment">// Thread pool</span>
+    <span class="keyword">private final</span> BatchSchedulerProperties properties;
+
+    <span class="annotation">@Scheduled</span>(fixedDelayString = <span class="string">"${batch.scheduler.interval-ms:5000}"</span>)
+    <span class="keyword">public void</span> <span class="function">pollAndDispatchJobs</span>() {
+        <span class="comment">// Check if scheduler is enabled</span>
+        <span class="keyword">if</span> (!properties.isEnabled()) {
+            <span class="keyword">return</span>;
+        }
+
+        <span class="comment">// Fetch top N queued jobs ordered by priority and created_at</span>
+        List&lt;ReportJobEntity&gt; queuedJobs = jobRepository.<span class="function">findTopQueuedJobs</span>(
+            properties.getMaxJobsPerPoll()  <span class="comment">// Default: 3 jobs per poll</span>
+        );
+        
+        <span class="keyword">if</span> (queuedJobs.isEmpty()) {
+            <span class="keyword">return</span>;  <span class="comment">// Nothing to process</span>
+        }
+
+        <span class="comment">// Process each queued job</span>
+        <span class="keyword">for</span> (ReportJobEntity job : queuedJobs) {
+            <span class="comment">// Attempt to claim job atomically</span>
+            jobQueueService.<span class="function">markJobAsProcessing</span>(job.getJobId())
+                .ifPresent(claimedJob -> 
+                    <span class="comment">// Dispatch to thread pool for background processing</span>
+                    batchJobExecutor.execute(() -> 
+                        backgroundProcessingService.<span class="function">processJob</span>(claimedJob.getJobId())
+                    )
+                );
+        }
+    }
+}
+            </div>
+
+            <h3>Scheduler Configuration</h3>
+            <div class="code-block">
+<span class="comment">// BatchSchedulerProperties.java - Configurable properties</span>
+<span class="annotation">@ConfigurationProperties</span>(prefix = <span class="string">"batch.scheduler"</span>)
+<span class="keyword">public class</span> <span class="type">BatchSchedulerProperties</span> {
+    <span class="keyword">private boolean</span> enabled = <span class="keyword">true</span>;
+    <span class="keyword">private long</span> intervalMs = <span class="number">5000</span>;       <span class="comment">// Poll every 5 seconds</span>
+    <span class="keyword">private int</span> maxJobsPerPoll = <span class="number">3</span>;        <span class="comment">// Max jobs to claim per poll</span>
+    <span class="keyword">private int</span> workerPoolSize = <span class="number">2</span>;        <span class="comment">// Thread pool size</span>
+    
+    <span class="comment">// Getters and setters...</span>
+}
+
+<span class="comment">// application.yml configuration</span>
+batch:
+  scheduler:
+    enabled: true
+    interval-ms: 5000
+    max-jobs-per-poll: 3
+    worker-pool-size: 2
+            </div>
+        </section>
+
+        <!-- Background Processing Service -->
+        <section class="section">
+            <h2>🔄 BackgroundProcessingService - The Worker</h2>
+
+            <h3>Main Processing Flow</h3>
+            <div class="code-block">
+<span class="comment">// BackgroundProcessingService.java - Process a queued job</span>
+<span class="keyword">public void</span> <span class="function">processJob</span>(String jobId) {
+    <span class="keyword">try</span> {
+        <span class="comment">// Get job from database</span>
+        Optional&lt;ReportJobEntity&gt; jobOpt = jobRepository.findByJobId(jobId);
+        <span class="keyword">if</span> (jobOpt.isEmpty()) {
+            System.err.println(<span class="string">"❌ [JOB ERROR] Job not found in database: "</span> + jobId);
+            <span class="keyword">return</span>;
+        }
+        
+        ReportJobEntity job = jobOpt.get();
+        BIReportRequest originalRequest = jobQueueService.<span class="function">deserializeRequest</span>(job);
+        
+        System.out.println(<span class="string">"═══════════════════════════════════════════════════════════════"</span>);
+        System.out.println(<span class="string">"🚀 [JOB STARTED] Job ID: "</span> + jobId);
+        System.out.println(<span class="string">"   Report Type: "</span> + job.getReportType());
+        System.out.println(<span class="string">"   User Role: "</span> + job.getUserRole());
+        System.out.println(<span class="string">"   Target System: "</span> + job.getTargetSystem());
+        System.out.println(<span class="string">"═══════════════════════════════════════════════════════════════"</span>);
+        
+        <span class="comment">// Process the report</span>
+        <span class="function">processReportInBackground</span>(job, originalRequest);
+        
+    } <span class="keyword">catch</span> (Exception e) {
+        System.err.println(<span class="string">"❌ [JOB FAILED] Job ID: "</span> + jobId);
+        System.err.println(<span class="string">"   Error: "</span> + e.getMessage());
+        
+        <span class="comment">// Update job status to failed</span>
+        jobQueueService.<span class="function">updateJobStatus</span>(jobId, <span class="string">"FAILED"</span>, e.getMessage());
+    }
+}
+            </div>
+
+            <h3>Chunked Processing with Cancellation Check</h3>
+            <div class="code-block">
+<span class="comment">// Process data in chunks with streaming file generation</span>
+<span class="keyword">private</span> String <span class="function">processDataInChunksStreaming</span>(
+    PipelineExtractionRequest request, ReportJobEntity job, String jwtToken) {
+    
+    <span class="comment">// Create reports directory if it doesn't exist</span>
+    File reportsDir = <span class="keyword">new</span> File(<span class="string">"reports"</span>);
+    <span class="keyword">if</span> (!reportsDir.exists()) {
+        reportsDir.mkdirs();
+    }
+    
+    <span class="comment">// First, get actual total record count from database</span>
+    <span class="keyword">long</span> totalRecords = <span class="function">estimateTotalRecords</span>(request);
+    job.setTotalRecords(totalRecords);
+    jobRepository.save(job);
+    
+    <span class="comment">// PDF format requires different handling - collect all data first</span>
+    String format = job.getDataFormat() != <span class="keyword">null</span> ? job.getDataFormat().toUpperCase() : <span class="string">"JSON"</span>;
+    <span class="keyword">if</span> (<span class="string">"PDF"</span>.equals(format)) {
+        <span class="keyword">return</span> <span class="function">processPdfGeneration</span>(request, job, jwtToken, filePath, totalRecords);
+    }
+    
+    <span class="comment">// For JSON, CSV, XML - use streaming approach</span>
+    FileWriter writer = <span class="keyword">new</span> FileWriter(filePath);
+    <span class="function">writeFileHeader</span>(writer, job, isFirstChunk);
+    
+    <span class="comment">// Process data in chunks</span>
+    <span class="keyword">int</span> chunkSize = job.getChunkSize() != <span class="keyword">null</span> ? job.getChunkSize() : <span class="number">1000</span>;
+    <span class="keyword">int</span> page = <span class="number">0</span>;
+    <span class="keyword">long</span> processedRecords = <span class="number">0</span>;
+    
+    <span class="keyword">while</span> (processedRecords &lt; totalRecords) {
+        <span class="comment">// ⚠️ Check if job was cancelled</span>
+        Optional&lt;ReportJobEntity&gt; currentJob = jobRepository.findByJobId(job.getJobId());
+        <span class="keyword">if</span> (currentJob.isPresent() && <span class="string">"CANCELLED"</span>.equals(currentJob.get().getStatus())) {
+            System.out.println(<span class="string">"⚠️ Job cancelled during processing: "</span> + job.getJobId());
+            writer.close();
+            <span class="keyword">new</span> File(filePath).delete();  <span class="comment">// Delete partial file</span>
+            <span class="keyword">throw new</span> RuntimeException(<span class="string">"Job was cancelled"</span>);
+        }
+        
+        <span class="comment">// Update progress every chunk</span>
+        jobQueueService.<span class="function">updateJobProgress</span>(job.getJobId(), processedRecords, totalRecords);
+        
+        <span class="comment">// Process chunk with retry (max 3 attempts)</span>
+        List&lt;MaskedTimesheetData&gt; chunkData = <span class="function">processChunkWithRetry</span>(
+            request, page, chunkSize, jwtToken, job.getJobId()
+        );
+        
+        <span class="comment">// Write chunk directly to file (don't accumulate in memory)</span>
+        <span class="function">writeChunkToFile</span>(writer, chunkData, job, isFirstChunk);
+        isFirstChunk = <span class="keyword">false</span>;
+        
+        processedRecords += chunkData.size();
+        page++;
+        
+        <span class="comment">// Break if no more data</span>
+        <span class="keyword">if</span> (chunkData.size() &lt; chunkSize) <span class="keyword">break</span>;
+    }
+    
+    <span class="function">writeFileFooter</span>(writer, job);
+    writer.close();
+    
+    <span class="keyword">return</span> filePath;
+}
+            </div>
+        </section>
+
+        <!-- Job Dependencies -->
+        <section class="section">
+            <h2>🔗 Job Dependencies System</h2>
+
+            <h3>How Dependencies Work</h3>
+            <div class="highlight-box">
+                <p>When a parent job completes successfully, the system checks for matching dependency configurations and triggers dependent jobs. This enables report chains like:</p>
+                <ul style="margin-top: 1rem;">
+                    <li>DAILY_REPORT → DAILY_SUMMARY</li>
+                    <li>Multiple COUNTY_DAILY reports → CONSOLIDATED_REPORT (when all complete)</li>
+                </ul>
+            </div>
+
+            <h3>Dependency Tree Visualization</h3>
+            <div class="dependency-tree">
+                <div class="dependency-node parent">
+                    <span class="status-badge status-completed">COMPLETED</span>
+                    <span>COUNTY_DAILY (Orange) - JOB_A1B2C3D4</span>
+                </div>
+                <div class="dependency-node child">
+                    <span class="status-badge status-queued">QUEUED</span>
+                    <span>DAILY_SUMMARY (Orange) - JOB_E5F6G7H8</span>
+                    <span style="margin-left: auto; font-size: 0.8rem; color: var(--text-muted);">Triggered by parent</span>
+                </div>
+            </div>
+
+            <h3>Triggering Dependent Jobs</h3>
+            <div class="code-block">
+<span class="comment">// JobDependencyService.java - Trigger dependent jobs</span>
+<span class="keyword">public</span> List&lt;String&gt; <span class="function">triggerDependentJobs</span>(ReportJobEntity parentJob, String jwtToken) {
+    List&lt;String&gt; triggeredJobIds = <span class="keyword">new</span> ArrayList&lt;&gt;();
+    String parentJobId = parentJob.getJobId();
+    
+    System.out.println(<span class="string">"   [STEP 1] Checking if dependency system is enabled..."</span>);
+    <span class="keyword">if</span> (!dependencyConfig.isEnabled()) {
+        System.out.println(<span class="string">"   ⚠️  Dependency system is disabled in configuration"</span>);
+        <span class="keyword">return</span> triggeredJobIds;
+    }
+    
+    <span class="comment">// Only trigger dependencies if job completed successfully</span>
+    <span class="keyword">if</span> (!<span class="string">"COMPLETED"</span>.equals(parentJob.getStatus())) {
+        System.out.println(<span class="string">"   ⏸️  Parent job did not complete successfully"</span>);
+        <span class="keyword">return</span> triggeredJobIds;
+    }
+    
+    <span class="comment">// Find matching dependencies</span>
+    List&lt;JobDependency&gt; matchingDependencies = <span class="function">findMatchingDependencies</span>(
+        parentJob.getReportType(), parentJob.getUserRole(), parentJob.getStatus()
+    );
+    
+    <span class="keyword">for</span> (JobDependency dependency : matchingDependencies) {
+        <span class="keyword">if</span> (dependency.isMultipleDependency()) {
+            <span class="comment">// Check if ALL required parent jobs have completed</span>
+            <span class="keyword">if</span> (<span class="function">checkMultipleDependencies</span>(dependency, parentJob.getUserRole())) {
+                <span class="comment">// Create dependent job</span>
+                BIReportRequest dependentRequest = <span class="function">createDependentJobRequest</span>(dependency, parentJob);
+                String dependentJobId = jobQueueService.<span class="function">queueReportJob</span>(
+                    dependentRequest, jwtToken, parentJob.getJobId()
+                );
+                triggeredJobIds.add(dependentJobId);
+            }
+        } <span class="keyword">else</span> {
+            <span class="comment">// Single dependency - create dependent job immediately</span>
+            BIReportRequest dependentRequest = <span class="function">createDependentJobRequest</span>(dependency, parentJob);
+            String dependentJobId = jobQueueService.<span class="function">queueReportJob</span>(
+                dependentRequest, jwtToken, parentJob.getJobId()
+            );
+            triggeredJobIds.add(dependentJobId);
+        }
+    }
+    
+    <span class="keyword">return</span> triggeredJobIds;
+}
+            </div>
+
+            <h3>Multiple Dependency Check</h3>
+            <div class="code-block">
+<span class="comment">// Check if ALL required parent jobs have completed</span>
+<span class="keyword">private boolean</span> <span class="function">checkMultipleDependencies</span>(JobDependency dependency, String userRole) {
+    <span class="keyword">if</span> (!dependency.isMultipleDependency()) <span class="keyword">return false</span>;
+    
+    List&lt;String&gt; requiredReportTypes = dependency.getParentReportTypes();
+    System.out.println(<span class="string">"         └─ Required report types: "</span> + requiredReportTypes);
+    
+    <span class="comment">// Find all completed jobs matching the required report types and role</span>
+    List&lt;ReportJobEntity&gt; completedJobs = jobRepository.<span class="function">findByReportTypeInAndUserRoleAndStatus</span>(
+        requiredReportTypes, userRole, <span class="string">"COMPLETED"</span>
+    );
+    
+    <span class="comment">// Check if we have at least one completed job for each required type</span>
+    <span class="keyword">for</span> (String reportType : requiredReportTypes) {
+        <span class="keyword">boolean</span> found = completedJobs.stream()
+            .anyMatch(job -> reportType.equals(job.getReportType()));
+        
+        <span class="keyword">if</span> (!found) {
+            System.out.println(<span class="string">"            ❌ Missing completed job for: "</span> + reportType);
+            <span class="keyword">return false</span>;
+        }
+    }
+    
+    <span class="keyword">return true</span>;  <span class="comment">// All required parent jobs have completed</span>
+}
+            </div>
+        </section>
+
+        <!-- Scheduled Reports -->
+        <section class="section">
+            <h2>📅 Scheduled Report Service</h2>
+
+            <h3>Cron Schedule Configuration</h3>
+            <div class="grid-2">
+                <div class="scheduler-card">
+                    <h4>Daily Reports</h4>
+                    <div class="cron-expression">0 30 5 * * ?</div>
+                    <p>Runs at 5:30 AM IST daily. Generates COUNTY_DAILY and DAILY_SUMMARY for each configured profile.</p>
+                </div>
+                <div class="scheduler-card">
+                    <h4>Weekly Reports</h4>
+                    <div class="cron-expression">0 30 5 * * MON</div>
+                    <p>Runs at 5:30 AM IST every Monday. Generates WEEKLY_REPORT for ADMIN role.</p>
+                </div>
+                <div class="scheduler-card">
+                    <h4>Monthly Reports</h4>
+                    <div class="cron-expression">0 30 5 1 * ?</div>
+                    <p>Runs at 5:30 AM IST on the 1st of each month. Generates MONTHLY_REPORT for all roles.</p>
+                </div>
+                <div class="scheduler-card">
+                    <h4>Quarterly Reports</h4>
+                    <div class="cron-expression">0 30 5 1 1,4,7,10 ?</div>
+                    <p>Runs at 5:30 AM IST on Jan 1, Apr 1, Jul 1, Oct 1. QUARTERLY_REPORT for ADMIN.</p>
+                </div>
+            </div>
+
+            <h3>Cron Job Profiles</h3>
+            <div class="code-block">
+<span class="comment">// Configured profiles for scheduled reports</span>
+<span class="keyword">private static</span> Map&lt;String, CronJobProfile&gt; <span class="function">buildRoleReportConfig</span>() {
+    Map&lt;String, CronJobProfile&gt; config = <span class="keyword">new</span> LinkedHashMap&lt;&gt;();
+
+    <span class="comment">// Admin - Full access, no county restriction</span>
+    config.put(<span class="string">"ADMIN_CORE"</span>, <span class="keyword">new</span> CronJobProfile(
+        <span class="string">"ADMIN_CORE"</span>,
+        UserRole.ADMIN,
+        Collections.emptyList(),  <span class="comment">// No county restriction</span>
+        Arrays.asList(<span class="string">"COUNTY_DAILY"</span>, <span class="string">"DAILY_SUMMARY"</span>)
+    ));
+
+    <span class="comment">// Supervisor - Access to 5 configured counties</span>
+    config.put(<span class="string">"SUPERVISOR_CORE"</span>, <span class="keyword">new</span> CronJobProfile(
+        <span class="string">"SUPERVISOR_CORE"</span>,
+        UserRole.SUPERVISOR,
+        Arrays.asList(<span class="string">"Orange"</span>, <span class="string">"Sacramento"</span>, <span class="string">"Riverside"</span>, <span class="string">"Los Angeles"</span>, <span class="string">"Alameda"</span>),
+        Arrays.asList(<span class="string">"COUNTY_DAILY"</span>, <span class="string">"DAILY_SUMMARY"</span>)
+    ));
+
+    <span class="comment">// Case Worker profiles - One per county (CT1-CT5)</span>
+    config.put(<span class="string">"CASE_WORKER_CT1"</span>, <span class="keyword">new</span> CronJobProfile(
+        <span class="string">"CASE_WORKER_CT1"</span>,
+        UserRole.CASE_WORKER,
+        List.of(<span class="string">"Orange"</span>),  <span class="comment">// County CT1 = Orange</span>
+        Arrays.asList(<span class="string">"COUNTY_DAILY"</span>, <span class="string">"DAILY_SUMMARY"</span>)
+    ));
+    
+    <span class="comment">// ... CT2 (Sacramento), CT3 (Riverside), CT4 (Los Angeles), CT5 (Alameda)</span>
+
+    <span class="keyword">return</span> config;
+}
+            </div>
+
+            <h3>JWT Token Generation for Scheduled Jobs</h3>
+            <div class="code-block">
+<span class="comment">// Generate JWT token for a specific profile using cron user credentials</span>
+<span class="keyword">private</span> String <span class="function">generateJwtTokenForProfile</span>(CronJobProfile profile) {
+    <span class="keyword">try</span> {
+        String username = <span class="function">getCronUsernameForProfile</span>(profile);  <span class="comment">// e.g., caseworker_CT1</span>
+        String password = <span class="function">getCronPasswordForProfile</span>(profile);
+        
+        <span class="keyword">if</span> (username == <span class="keyword">null</span> || password == <span class="keyword">null</span>) {
+            System.err.println(<span class="string">"❌ No cron credentials configured for profile: "</span> + profile.getTokenKey());
+            <span class="keyword">return null</span>;
+        }
+        
+        String tokenUrl = keycloakAuthServerUrl + <span class="string">"/realms/"</span> + keycloakRealm + 
+                         <span class="string">"/protocol/openid-connect/token"</span>;
+        
+        String requestBody = <span class="string">"username="</span> + username +
+                           <span class="string">"&amp;password="</span> + password +
+                           <span class="string">"&amp;grant_type=password"</span> +
+                           <span class="string">"&amp;client_id="</span> + keycloakClientId +
+                           <span class="string">"&amp;client_secret="</span> + keycloakClientSecret;
+        
+        HttpHeaders headers = <span class="keyword">new</span> HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        
+        HttpEntity&lt;String&gt; entity = <span class="keyword">new</span> HttpEntity&lt;&gt;(requestBody, headers);
+        ResponseEntity&lt;Map&gt; response = restTemplate.postForEntity(tokenUrl, entity, Map.<span class="keyword">class</span>);
+        
+        <span class="keyword">if</span> (response.getStatusCode() == HttpStatus.OK && response.getBody() != <span class="keyword">null</span>) {
+            String accessToken = (String) response.getBody().get(<span class="string">"access_token"</span>);
+            System.out.println(<span class="string">"✅ Successfully generated JWT token for profile: "</span> + profile.getTokenKey());
+            <span class="keyword">return</span> accessToken;
+        }
+        
+        <span class="keyword">return null</span>;
+    } <span class="keyword">catch</span> (Exception e) {
+        System.err.println(<span class="string">"❌ Error generating JWT token: "</span> + e.getMessage());
+        <span class="keyword">return null</span>;
+    }
+}
+            </div>
+        </section>
+
+        <!-- Job Entity -->
+        <section class="section">
+            <h2>📊 ReportJobEntity - Database Schema</h2>
+
+            <table>
+                <tr>
+                    <th>Field</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>id</td>
+                    <td>BIGINT (PK)</td>
+                    <td>Auto-generated primary key</td>
+                </tr>
+                <tr>
+                    <td>jobId</td>
+                    <td>VARCHAR(255)</td>
+                    <td>Unique job identifier (e.g., JOB_A1B2C3D4)</td>
+                </tr>
+                <tr>
+                    <td>userRole</td>
+                    <td>VARCHAR(50)</td>
+                    <td>Role the report is generated for (ADMIN, SUPERVISOR, etc.)</td>
+                </tr>
+                <tr>
+                    <td>reportType</td>
+                    <td>VARCHAR(100)</td>
+                    <td>Type of report (COUNTY_DAILY, WEEKLY_REPORT, etc.)</td>
+                </tr>
+                <tr>
+                    <td>targetSystem</td>
+                    <td>VARCHAR(50)</td>
+                    <td>SCHEDULED, MANUAL, or API</td>
+                </tr>
+                <tr>
+                    <td>status</td>
+                    <td>VARCHAR(20)</td>
+                    <td>QUEUED, PROCESSING, COMPLETED, FAILED, CANCELLED</td>
+                </tr>
+                <tr>
+                    <td>progress</td>
+                    <td>INTEGER</td>
+                    <td>Percentage complete (0-100)</td>
+                </tr>
+                <tr>
+                    <td>totalRecords</td>
+                    <td>BIGINT</td>
+                    <td>Total records to process</td>
+                </tr>
+                <tr>
+                    <td>processedRecords</td>
+                    <td>BIGINT</td>
+                    <td>Records processed so far</td>
+                </tr>
+                <tr>
+                    <td>resultPath</td>
+                    <td>VARCHAR(500)</td>
+                    <td>Path to generated report file</td>
+                </tr>
+                <tr>
+                    <td>dataFormat</td>
+                    <td>VARCHAR(20)</td>
+                    <td>Output format (JSON, CSV, XML, PDF)</td>
+                </tr>
+                <tr>
+                    <td>chunkSize</td>
+                    <td>INTEGER</td>
+                    <td>Records per processing chunk</td>
+                </tr>
+                <tr>
+                    <td>priority</td>
+                    <td>INTEGER</td>
+                    <td>Job priority (higher = more important)</td>
+                </tr>
+                <tr>
+                    <td>requestData</td>
+                    <td>TEXT</td>
+                    <td>Serialized BIReportRequest JSON</td>
+                </tr>
+                <tr>
+                    <td>jwtToken</td>
+                    <td>TEXT</td>
+                    <td>Stored JWT for background processing</td>
+                </tr>
+                <tr>
+                    <td>parentJobId</td>
+                    <td>VARCHAR(255)</td>
+                    <td>Parent job ID (for dependencies)</td>
+                </tr>
+                <tr>
+                    <td>jobSource</td>
+                    <td>VARCHAR(20)</td>
+                    <td>SCHEDULED, MANUAL, or API</td>
+                </tr>
+                <tr>
+                    <td>errorMessage</td>
+                    <td>TEXT</td>
+                    <td>Error details if FAILED</td>
+                </tr>
+                <tr>
+                    <td>createdAt</td>
+                    <td>TIMESTAMP</td>
+                    <td>Job creation time</td>
+                </tr>
+                <tr>
+                    <td>startedAt</td>
+                    <td>TIMESTAMP</td>
+                    <td>Processing start time</td>
+                </tr>
+                <tr>
+                    <td>completedAt</td>
+                    <td>TIMESTAMP</td>
+                    <td>Completion time</td>
+                </tr>
+                <tr>
+                    <td>estimatedCompletionTime</td>
+                    <td>TIMESTAMP</td>
+                    <td>Estimated completion time</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Troubleshooting -->
+        <section class="section">
+            <h2>🔧 Troubleshooting Guide</h2>
+
+            <h3>Job Stuck in PROCESSING</h3>
+            <div class="warning-box">
+                <p><strong>Cause:</strong> Worker thread crashed without updating status.</p>
+                <p><strong>Solution:</strong> Implement a stale job cleanup that marks jobs as FAILED if processing for more than configured timeout (e.g., 1 hour).</p>
+            </div>
+
+            <h3>Jobs Not Being Picked Up</h3>
+            <div class="warning-box">
+                <p><strong>Check:</strong></p>
+                <ol>
+                    <li>Is <code>batch.scheduler.enabled</code> set to <code>true</code>?</li>
+                    <li>Is the job status actually <code>QUEUED</code>?</li>
+                    <li>Check application logs for scheduler poll activity</li>
+                    <li>Verify database connectivity</li>
+                </ol>
+            </div>
+
+            <h3>OutOfMemoryError During Processing</h3>
+            <div class="danger-box">
+                <p><strong>Cause:</strong> Chunk size too large or not using streaming approach.</p>
+                <p><strong>Solution:</strong></p>
+                <ol>
+                    <li>Reduce <code>chunkSize</code> (default: 1000)</li>
+                    <li>Ensure streaming is used for JSON/CSV/XML (not collecting all data first)</li>
+                    <li>For PDF, data is collected in memory - consider splitting large reports</li>
+                </ol>
+            </div>
+
+            <h3>Dependent Jobs Not Triggering</h3>
+            <div class="warning-box">
+                <p><strong>Check:</strong></p>
+                <ol>
+                    <li>Is <code>job-dependencies.enabled</code> set to <code>true</code>?</li>
+                    <li>Does the parent job have status <code>COMPLETED</code>?</li>
+                    <li>Is there a matching dependency configuration for the report type and role?</li>
+                    <li>For multiple dependencies, have ALL required parent jobs completed?</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+            <p>Batch Processing Deep Dive | IHSS/CMIPS Timesheet Management System</p>
+            <p>Generated: December 8, 2025</p>
+        </div>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IHSS Caseworker Role - User Stories & Tasks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-orange: #FF9900;
+            --primary-blue: #146EB4;
+            --dark-blue: #232F3E;
+            --light-gray: #F7F7F7;
+            --border-gray: #D5D9D9;
+            --text-dark: #0F1111;
+            --success-green: #00A65A;
+            --warning-orange: #FFC107;
+            --danger-red: #DC3545;
+            --purple: #8B5CF6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--light-gray);
+            font-size: 14px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--dark-blue) 0%, #1a2a3a 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            font-size: 1.125rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .intro-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .intro-section h2 {
+            color: var(--dark-blue);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .intro-section p {
+            margin-bottom: 0.75rem;
+            color: #565959;
+        }
+
+        .accordion-section {
+            background: white;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .accordion-header {
+            background: var(--dark-blue);
+            color: white;
+            padding: 1.5rem 2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .accordion-header:hover {
+            background: #1a2a3a;
+        }
+
+        .accordion-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-number {
+            background: var(--primary-orange);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        .accordion-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .accordion-section.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+
+        .accordion-section.active .accordion-content {
+            max-height: 15000px;
+            transition: max-height 0.6s ease-in;
+        }
+
+        .content-inner {
+            padding: 2rem;
+        }
+
+        .user-story {
+            background: #F8F9FA;
+            border-left: 4px solid var(--primary-blue);
+            padding: 1.25rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .user-story h4 {
+            color: var(--primary-blue);
+            margin-bottom: 0.75rem;
+            font-size: 1.125rem;
+        }
+
+        .user-story .story-text {
+            font-style: italic;
+            color: #495057;
+            margin-bottom: 0.75rem;
+            padding-left: 1rem;
+            border-left: 2px solid var(--border-gray);
+        }
+
+        .user-story .acceptance-criteria {
+            margin-top: 0.75rem;
+        }
+
+        .user-story .acceptance-criteria h5 {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-story ul {
+            margin-left: 1.5rem;
+        }
+
+        .user-story li {
+            margin: 0.25rem 0;
+            font-size: 0.875rem;
+        }
+
+        .task-card {
+            background: white;
+            border: 1px solid var(--border-gray);
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 0.75rem 0;
+        }
+
+        .task-card h4 {
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .task-card .task-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--primary-orange);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .task-steps {
+            background: var(--light-gray);
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 0.75rem 0;
+        }
+
+        .task-steps h5 {
+            margin-bottom: 0.5rem;
+            color: var(--primary-blue);
+        }
+
+        .task-steps ol {
+            margin-left: 1.5rem;
+        }
+
+        .task-steps li {
+            margin: 0.5rem 0;
+        }
+
+        .workflow-diagram {
+            background: white;
+            border: 2px solid var(--primary-blue);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .workflow-diagram h4 {
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .workflow-step {
+            background: var(--light-gray);
+            border-left: 3px solid var(--primary-orange);
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .workflow-step::after {
+            content: "↓";
+            position: absolute;
+            left: -15px;
+            bottom: -20px;
+            font-size: 1.5rem;
+            color: var(--primary-orange);
+        }
+
+        .workflow-step:last-child::after {
+            content: "";
+        }
+
+        .workflow-step h5 {
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box {
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+
+        .info-box.primary {
+            background: #FEF9E7;
+            border-color: var(--primary-orange);
+        }
+
+        .info-box.success {
+            background: #E8F5E9;
+            border-color: var(--success-green);
+        }
+
+        .info-box.info {
+            background: #E3F2FD;
+            border-color: var(--primary-blue);
+        }
+
+        .info-box.warning {
+            background: #FFF9E6;
+            border-color: var(--warning-orange);
+        }
+
+        h3 {
+            color: var(--primary-blue);
+            font-size: 1.25rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        th {
+            background: var(--dark-blue);
+            color: white;
+            padding: 0.875rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        td {
+            padding: 0.875rem;
+            border-bottom: 1px solid var(--border-gray);
+            font-size: 0.875rem;
+        }
+
+        tr:hover {
+            background: var(--light-gray);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+
+        .badge.primary {
+            background: #FFF3CD;
+            color: #856404;
+        }
+
+        .badge.success {
+            background: #D4EDDA;
+            color: #155724;
+        }
+
+        .badge.info {
+            background: #D1ECF1;
+            color: #0C5460;
+        }
+
+        .badge.danger {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+
+        .role-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .role-summary h2 {
+            margin-bottom: 1rem;
+        }
+
+        .role-summary ul {
+            margin-left: 1.5rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #767676;
+            font-size: 0.875rem;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            .header h1 {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>👤 IHSS Caseworker Role</h1>
+        <div class="subtitle">User Stories & Daily Tasks Based on CMIPS DSD Sections 20-25</div>
+    </div>
+
+    <div class="container">
+        <div class="intro-section">
+            <h2>📖 About This Document</h2>
+            <p><strong>Purpose:</strong> Document the caseworker role through user stories and task descriptions based on actual CMIPS system workflows</p>
+            <p><strong>Source:</strong> DSD Sections 20 (Intake), 21 (Service Eligibility), 22 (Final Determination), 23 (Provider Management), 24 (Time & Attendance), 25 (Case Maintenance)</p>
+            <p><strong>Format:</strong> User stories written as "As a caseworker, I [action] so that [outcome]"</p>
+            <p><strong>Audience:</strong> New caseworkers, training staff, supervisors, system developers</p>
+        </div>
+
+        <div class="role-summary">
+            <h2>IHSS Caseworker Role Overview</h2>
+            <p>As an IHSS caseworker, I am responsible for managing recipient cases from initial application through ongoing services. My primary responsibilities include:</p>
+            <ul>
+                <li><strong>Intake & Application Processing:</strong> Receiving and processing new IHSS applications within 45-day federal timeline</li>
+                <li><strong>Needs Assessment:</strong> Conducting comprehensive in-home assessments to evaluate recipient functional abilities</li>
+                <li><strong>Eligibility Determination:</strong> Making final eligibility decisions and determining authorized service hours</li>
+                <li><strong>Provider Management:</strong> Enrolling, assigning, and managing IHSS providers for my cases</li>
+                <li><strong>Ongoing Case Maintenance:</strong> Conducting annual reassessments, processing changes, maintaining case records</li>
+                <li><strong>Timesheet & Payment Oversight:</strong> Reviewing and approving provider timesheets for payment</li>
+                <li><strong>Compliance & Documentation:</strong> Ensuring all actions comply with regulations and are properly documented</li>
+            </ul>
+        </div>
+
+        <!-- Section 1: Intake & Application Processing -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">1</span>
+                    Intake & Application Processing
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p><strong>Source:</strong> DSD Section 20 - Online Search, Initial Contact, Intake Application</p>
+
+                    <div class="user-story">
+                        <h4>US-001: Search for Existing Person Records</h4>
+                        <div class="story-text">
+                            As a caseworker, I search for existing person records in CMIPS before creating new ones, so that I can avoid creating duplicate records and maintain data integrity.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Search by name, SSN, date of birth, CIN, or person ID</li>
+                                <li>Use wildcard searches to find similar names</li>
+                                <li>Filter results by county and person type</li>
+                                <li>View person details before deciding to create new record</li>
+                                <li>Access Person Home screen directly from search results</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-002: Create Referral for Initial Contact</h4>
+                        <div class="story-text">
+                            As a caseworker, I create referrals when someone contacts the county inquiring about IHSS, so that I can track initial contacts and follow up appropriately.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Capture caller's basic information (name, DOB, contact info)</li>
+                                <li>Record referral source (self, family, hospital, medical provider, agency)</li>
+                                <li>Document referral reason and initial conversation</li>
+                                <li>Assign referral to myself or another worker</li>
+                                <li>Schedule follow-up contact</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-003: Create and Process Applications</h4>
+                        <div class="story-text">
+                            As a caseworker, I create formal IHSS applications when individuals decide to apply for services, so that I can begin the eligibility determination process within the required 45-day timeline.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Create application with application date (starts 45-day clock)</li>
+                                <li>Enter personal, contact, eligibility, medical, and financial information</li>
+                                <li>Perform CIN clearance with Statewide Client Index</li>
+                                <li>Verify Medi-Cal eligibility through MEDS interface</li>
+                                <li>Track application processing days remaining</li>
+                                <li>Document any delays or extensions with good cause</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="task-card">
+                        <h4><span class="task-icon">📋</span>Daily Task: Process New Applications</h4>
+                        <div class="task-steps">
+                            <h5>My typical workflow:</h5>
+                            <ol>
+                                <li>Review new applications assigned to my queue</li>
+                                <li>Contact applicant to schedule in-home assessment</li>
+                                <li>Verify all required documentation is received (application form SOC 873, medical records, proof of residency)</li>
+                                <li>Check Medi-Cal eligibility status in MEDS</li>
+                                <li>Perform CIN clearance if not already done</li>
+                                <li>Document all contacts and actions in Person Notes</li>
+                                <li>Schedule assessment within timeframe to meet 45-day deadline</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="info-box warning">
+                        <h4>⚠️ Critical Deadline</h4>
+                        <p>Federal law requires I process applications within 45 days from application date. I must closely monitor my pending applications and take action before deadlines expire.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Conducting Needs Assessments -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">2</span>
+                    Conducting Needs Assessments
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p><strong>Source:</strong> DSD Section 21 - Service Eligibility (Assessments, Evidence, Health Care Certification)</p>
+
+                    <div class="user-story">
+                        <h4>US-004: Conduct Comprehensive In-Home Assessment</h4>
+                        <div class="story-text">
+                            As a caseworker, I conduct in-home assessments to evaluate the applicant's functional abilities and determine service needs, so that I can make accurate eligibility and authorization decisions.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Create assessment record (Initial, Reassessment, or Change Assessment)</li>
+                                <li>Schedule and document in-home visit</li>
+                                <li>Evaluate functional abilities across 8 service categories</li>
+                                <li>Rank functional index levels (1-5 or N/A) for each task</li>
+                                <li>Document medical conditions and how they impact functioning</li>
+                                <li>Assess living environment and safety concerns</li>
+                                <li>Write comprehensive assessment narrative</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="workflow-diagram">
+                        <h4>Assessment Workflow I Follow</h4>
+                        <div class="workflow-step">
+                            <h5>Step 1: Pre-Assessment Preparation</h5>
+                            <p>I review medical documentation, previous assessments (if any), and application information before the home visit.</p>
+                        </div>
+                        <div class="workflow-step">
+                            <h5>Step 2: In-Home Visit</h5>
+                            <p>I visit the applicant's home, observe their environment, and evaluate their ability to perform daily living tasks. I interview the applicant and may speak with family or caregivers.</p>
+                        </div>
+                        <div class="workflow-step">
+                            <h5>Step 3: Functional Ranking</h5>
+                            <p>I rank each task using the functional index: 1 (Unable/Unable to Participate), 2 (Needs Assistance), 3 (Needs Supervision), 4 (Independent with Difficulty), 5 (Independent), N/A (Not Applicable).</p>
+                        </div>
+                        <div class="workflow-step">
+                            <h5>Step 4: Document Assessment</h5>
+                            <p>I enter all assessment evidence into CMIPS and write a detailed narrative explaining my observations and rankings.</p>
+                        </div>
+                        <div class="workflow-step">
+                            <h5>Step 5: Review & Validate</h5>
+                            <p>I use "Check Eligibility" to preview the determination before submitting for approval.</p>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-005: Enter Assessment Evidence</h4>
+                        <div class="story-text">
+                            As a caseworker, I enter detailed assessment evidence into CMIPS for each service category, so that the system can accurately calculate authorized hours and I can justify my determinations.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>For each of 8 service categories, I can:</h5>
+                            <ul>
+                                <li><strong>Domestic Services:</strong> Meal preparation, cleanup, laundry, shopping</li>
+                                <li><strong>Personal Care:</strong> Bathing, dressing, grooming, eating, mobility</li>
+                                <li><strong>Bowel/Bladder Care:</strong> Toileting, catheter care, ostomy care</li>
+                                <li><strong>Paramedical Services:</strong> Respiration, medication management, wound care</li>
+                                <li><strong>Accompanying to Medical:</strong> Transportation assistance to appointments</li>
+                                <li><strong>Teaching/Demonstration:</strong> Training on tasks they can't currently do</li>
+                                <li><strong>Protective Supervision:</strong> Continuous supervision for mental conditions</li>
+                                <li><strong>Disaster Preparedness:</strong> Planning for emergencies</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-006: Obtain Health Care Certification</h4>
+                        <div class="story-text">
+                            As a caseworker, I obtain health care certification (SOC 873 form) from the applicant's physician, so that I can verify the medical need for IHSS services as required by regulations.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Send SOC 873 Health Care Certification form to physician</li>
+                                <li>Track status: Sent, Received, Follow-up Needed</li>
+                                <li>Review physician's attestation of functional limitations</li>
+                                <li>Ensure certification received within required timeframe</li>
+                                <li>Document form receipt date in CMIPS</li>
+                                <li>Follow up if form not returned within 10 days</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="task-card">
+                        <h4><span class="task-icon">🏠</span>Daily Task: Complete Assessment Narratives</h4>
+                        <div class="task-steps">
+                            <h5>I write narratives that include:</h5>
+                            <ol>
+                                <li><strong>Medical Background:</strong> Diagnosis, conditions, how they affect functioning</li>
+                                <li><strong>Observations:</strong> What I observed during home visit</li>
+                                <li><strong>Functional Limitations:</strong> Specific tasks applicant cannot perform independently</li>
+                                <li><strong>Living Environment:</strong> Home safety, accessibility, available assistance</li>
+                                <li><strong>Service Justification:</strong> Why each authorized service is medically necessary</li>
+                                <li><strong>Protective Supervision Justification:</strong> If applicable, detailed explanation of mental impairment and continuous supervision need</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Making Eligibility Determinations -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">3</span>
+                    Making Eligibility Determinations
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p><strong>Source:</strong> DSD Section 22 - Final Determination, Assign Modes of Service</p>
+
+                    <div class="user-story">
+                        <h4>US-007: Check Eligibility Before Submission</h4>
+                        <div class="story-text">
+                            As a caseworker, I use "Check Eligibility" to preview the determination outcome, so that I can identify and fix any errors before officially submitting the case for approval.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Click "Check Eligibility" after entering all assessment evidence</li>
+                                <li>Review preliminary eligibility outcome (approve, deny, hours)</li>
+                                <li>Identify any validation errors or warnings</li>
+                                <li>Review which business rules triggered</li>
+                                <li>See preliminary NOA codes that would be generated</li>
+                                <li>Make corrections and re-check before final submission</li>
+                                <li>Confirm this does NOT generate Notice of Action</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-008: Submit Case for Approval</h4>
+                        <div class="story-text">
+                            As a caseworker, I submit completed assessments for approval (either supervisor approval or self-approval based on county policy), so that cases can be authorized and recipients can begin receiving services.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Click "Submit for Approval" when assessment is complete</li>
+                                <li>If supervisor approval required: create task for supervisor</li>
+                                <li>If self-approval: immediately process business rules</li>
+                                <li>Cancel my own submission before supervisor reviews (if needed)</li>
+                                <li>View which supervisor the case is assigned to</li>
+                                <li>Track submission status and approval timeline</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-009: Review Authorization Summary</h4>
+                        <div class="story-text">
+                            As a caseworker, I review the Authorization Summary after approval, so that I can verify the correct hours were authorized and understand which NOA messages will be sent to the recipient.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can see:</h5>
+                            <ul>
+                                <li>Authorization start and end dates (12-month period)</li>
+                                <li>Funding source (SSI/SSP, Residual, PCSP, IPO)</li>
+                                <li>Impairment level (Severe or Non-Severe)</li>
+                                <li>Total authorized hours per month</li>
+                                <li>Hours breakdown by service type</li>
+                                <li>Mode of service (IP, CC, or HM)</li>
+                                <li>All NOA codes that will print on recipient's notice</li>
+                                <li>Share of Cost amounts (if applicable)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-010: Assign Modes of Service</h4>
+                        <div class="story-text">
+                            As a caseworker, I assign modes of service (Individual Provider, Contract Care, or Homemaker) to distribute authorized hours, so that recipients receive services in the most appropriate manner.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>View that all hours default to Individual Provider (IP) mode initially</li>
+                                <li>For mixed mode cases (IP & CC or IP & HM), manually distribute hours</li>
+                                <li>Ensure total distributed hours don't exceed authorized hours</li>
+                                <li>Document reason for Contract Care or Homemaker mode assignment</li>
+                                <li>Modify mode distribution if recipient circumstances change</li>
+                                <li>View mode of service history</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="workflow-diagram">
+                        <h4>My Final Determination Workflow</h4>
+                        <div class="workflow-step">
+                            <h5>Complete Assessment Evidence Entry</h5>
+                            <p>I ensure all functional rankings, medical information, and narrative are complete.</p>
+                        </div>
+                        <div class="workflow-step">
+                            <h5>Check Eligibility (Preview)</h5>
+                            <p>I click "Check Eligibility" to preview outcome and catch any errors.</p>
+                        </div>
+                        <div class="workflow-step">
+                            <h5>Fix Any Errors</h5>
+                            <p>I correct any validation errors or missing information.</p>
+                        </div>
+                        <div class="workflow-step">
+                            <h5>Submit for Approval</h5>
+                            <p>I formally submit the case, which sends it to supervisor (if required) or immediately processes.</p>
+                        </div>
+                        <div class="workflow-step">
+                            <h5>Supervisor Approval (if required)</h5>
+                            <p>My supervisor reviews and approves or rejects. If rejected, I receive it back as a task with feedback.</p>
+                        </div>
+                        <div class="workflow-step">
+                            <h5>Authorization Created</h5>
+                            <p>Upon approval, authorization is established and Notice of Action generated.</p>
+                        </div>
+                        <div class="workflow-step">
+                            <h5>Assign Modes of Service</h5>
+                            <p>If mixed mode, I distribute hours between IP, CC, and/or HM.</p>
+                        </div>
+                    </div>
+
+                    <div class="info-box success">
+                        <h4>✅ What Happens After Approval</h4>
+                        <p>Once I approve a case:</p>
+                        <ul>
+                            <li>Authorization period is established (typically 12 months)</li>
+                            <li>Notice of Action (NOA) is automatically generated and mailed to recipient</li>
+                            <li>Case status changes to "Active"</li>
+                            <li>I can now assign providers to the case</li>
+                            <li>Providers can begin submitting timesheets</li>
+                            <li>Recipient can enroll in Electronic Services Portal (ESP)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Provider Management -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">4</span>
+                    Provider Management
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p><strong>Source:</strong> DSD Section 23 - Provider Management (Enrollment, CORI, Workweek, Overtime, Benefits)</p>
+
+                    <div class="user-story">
+                        <h4>US-011: Enroll New Providers</h4>
+                        <div class="story-text">
+                            As a caseworker, I enroll new providers into the IHSS program, so that they can provide services to recipients and receive payment for their work.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Search for existing person records before creating new provider</li>
+                                <li>Create new provider person record if not found</li>
+                                <li>Enter required information: name, SSN, DOB, address, phone</li>
+                                <li>Have provider complete enrollment forms (W-4, DE-4, I-9)</li>
+                                <li>Set up direct deposit information</li>
+                                <li>Verify provider is 18+ years old</li>
+                                <li>Verify provider is not legally responsible relative (or exception applies)</li>
+                                <li>Initiate CORI background check</li>
+                                <li>Submit provider enrollment for supervisor approval</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-012: Process CORI Background Checks</h4>
+                        <div class="story-text">
+                            As a caseworker, I initiate and review Criminal Offender Record Information (CORI) background checks for all providers, so that only qualified individuals with acceptable backgrounds can provide IHSS services.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Submit CORI request after provider completes enrollment</li>
+                                <li>Track CORI status: Pending, Clear, Disqualifying Conviction Found</li>
+                                <li>Review CORI results when returned</li>
+                                <li>Identify Tier 1 convictions (permanently disqualifying, no waiver)</li>
+                                <li>Identify Tier 2 convictions (disqualifying unless waiver granted)</li>
+                                <li>Approve provider enrollment if CORI is clear</li>
+                                <li>Deny provider enrollment if Tier 1 conviction found</li>
+                                <li>Process recipient waiver request if Tier 2 conviction found</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-013: Assign Providers to Cases</h4>
+                        <div class="story-text">
+                            As a caseworker, I assign approved providers to recipient cases with specific hours, so that recipients have designated caregivers who can submit timesheets and receive payment.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Assign only approved/active providers to cases</li>
+                                <li>Specify assignment start date and hours</li>
+                                <li>Assign regular IHSS hours, backup hours, WPCS hours</li>
+                                <li>Assign travel time hours (if provider travels between recipients)</li>
+                                <li>Ensure total assigned provider hours ≤ case authorized hours</li>
+                                <li>Assign multiple providers to one case</li>
+                                <li>View provider assignment history</li>
+                                <li>Modify provider hours as needs change</li>
+                                <li>Terminate provider assignment when needed</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-014: Create Provider Workweek Agreements</h4>
+                        <div class="story-text">
+                            As a caseworker, I create Provider Workweek Agreements (SOC 2255), so that the system can correctly calculate overtime for providers who work more than 40 hours per week.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Create workweek agreement defining 7-consecutive-day workweek</li>
+                                <li>Select workweek period (e.g., Sunday-Saturday, Monday-Sunday)</li>
+                                <li>Ensure same workweek applies to all recipients provider works for</li>
+                                <li>Obtain signed SOC 2255 form from provider</li>
+                                <li>Document workweek agreement effective date</li>
+                                <li>View workweek agreement history</li>
+                                <li>Understand that without proper workweek, system cannot calculate overtime</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-015: Review and Resolve Overtime Violations</h4>
+                        <div class="story-text">
+                            As a caseworker, I review overtime violations detected by CMIPS, so that I can determine if violations are valid and take appropriate action to ensure FLSA compliance.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>View overtime violation when provider works >40 hrs/week without agreement</li>
+                                <li>Review violation details (provider, recipient, hours, week)</li>
+                                <li>Determine if violation is sustained or not sustained</li>
+                                <li>If not sustained: document reason and dismiss violation</li>
+                                <li>If sustained: issue warning (first offense) or penalty</li>
+                                <li>Create Recipient Overtime Agreement to authorize future overtime</li>
+                                <li>Request overtime exemption for extraordinary circumstances</li>
+                                <li>Submit county review for supervisor approval</li>
+                                <li>Track violations through 4-level review process (County→State→CDSS)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="task-card">
+                        <h4><span class="task-icon">👥</span>Daily Task: Provider Maintenance</h4>
+                        <div class="task-steps">
+                            <h5>My regular provider management tasks:</h5>
+                            <ol>
+                                <li>Review new provider enrollments awaiting approval</li>
+                                <li>Check CORI background check results</li>
+                                <li>Process provider assignment requests from recipients</li>
+                                <li>Update provider information (address changes, bank account updates)</li>
+                                <li>Create or update workweek agreements as needed</li>
+                                <li>Review overtime violation notifications and determine action</li>
+                                <li>Process provider termination requests</li>
+                                <li>Respond to provider inquiries via phone or Message Center</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="info-box primary">
+                        <h4>Provider Relationship Restrictions I Must Enforce</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Relationship</th>
+                                    <th>Allowed to be Provider?</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Spouse</td>
+                                    <td><span class="badge danger">NO</span> (unless exception granted)</td>
+                                </tr>
+                                <tr>
+                                    <td>Parent of minor child</td>
+                                    <td><span class="badge danger">NO</span> (unless exception granted)</td>
+                                </tr>
+                                <tr>
+                                    <td>Adult child of recipient</td>
+                                    <td><span class="badge success">YES</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Sibling</td>
+                                    <td><span class="badge success">YES</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Other relative</td>
+                                    <td><span class="badge success">YES</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Non-relative</td>
+                                    <td><span class="badge success">YES</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Timesheet & Payment Processing -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">5</span>
+                    Timesheet & Payment Processing
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p><strong>Source:</strong> DSD Section 24 - Time & Attendance (Timesheets, Travel Claims, EVV, Payroll)</p>
+
+                    <div class="user-story">
+                        <h4>US-016: Review Timesheet Exceptions</h4>
+                        <div class="story-text">
+                            As a caseworker, I review timesheets flagged with validation errors or exceptions, so that I can determine if timesheets should be approved, modified, or rejected before payment processing.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>View list of timesheets in exception status assigned to me</li>
+                                <li>See exception reason (hours over authorization, MEDS POS error, missing signature, etc.)</li>
+                                <li>View timesheet image (for paper timesheets)</li>
+                                <li>Review timesheet details and hours entered</li>
+                                <li>Compare timesheet hours to authorized hours</li>
+                                <li>Check recipient's eligibility status for service dates</li>
+                                <li>Make decision: Approve, Modify Hours, Reject, or Cancel timesheet</li>
+                                <li>Document reason for my decision</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-017: Review EVV Discrepancies</h4>
+                        <div class="story-text">
+                            As a caseworker, I review timesheets where Electronic Visit Verification (EVV) data doesn't match the submitted timesheet hours, so that I can verify the accuracy of claimed hours and ensure proper payment.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>View EVV check-in/check-out times for each service date</li>
+                                <li>Compare EVV hours to timesheet claimed hours</li>
+                                <li>See GPS location data (if using mobile EVV)</li>
+                                <li>Review EVV exception reason (missing data, hours don't match, wrong location)</li>
+                                <li>Determine if good cause exception applies (no cell service, natural disaster, technology failure, safety concerns)</li>
+                                <li>Accept timesheet hours despite EVV mismatch (with documented justification)</li>
+                                <li>Adjust timesheet hours to match EVV data</li>
+                                <li>Reject timesheet and request provider resubmit</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-018: Approve Homemaker Timesheets</h4>
+                        <div class="story-text">
+                            As a caseworker (for Homemaker mode cases), I review and approve timesheets before they go to payroll, so that I can verify services were provided as authorized.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>View timesheets pending my approval (Homemaker/PA mode only)</li>
+                                <li>Review timesheet details and hours</li>
+                                <li>Verify hours are within authorized amounts</li>
+                                <li>Approve timesheet to release for payroll</li>
+                                <li>Reject timesheet with reason if issues found</li>
+                                <li>Submit approved timesheets to supervisor (if dual approval required)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-019: Process Travel Claims</h4>
+                        <div class="story-text">
+                            As a caseworker, I review travel claim forms submitted by providers who travel between multiple recipients, so that I can approve compensable travel time in accordance with policy.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>View travel claim form (paper or electronic)</li>
+                                <li>Verify provider has authorized travel time between specific recipients</li>
+                                <li>Confirm travel occurred between two recipient homes (not home to recipient or recipient to home)</li>
+                                <li>Verify travel hours are within authorized limits</li>
+                                <li>Ensure travel claim dates align with work dates on timesheets</li>
+                                <li>Approve travel claim for payment</li>
+                                <li>Reject travel claim if not eligible or exceeds authorization</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-020: Issue Replacement Timesheets</h4>
+                        <div class="story-text">
+                            As a caseworker, I issue replacement timesheets when providers report lost or damaged forms, so that providers can continue submitting hours for payment without delay.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Search for recipient case or provider</li>
+                                <li>Select pay period for which replacement is needed</li>
+                                <li>Issue replacement timesheet (standard or large font)</li>
+                                <li>Choose delivery method (mail to provider, mail to recipient, pickup at office)</li>
+                                <li>Document reason for replacement issuance</li>
+                                <li>Track that replacement was issued</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="task-card">
+                        <h4><span class="task-icon">⏰</span>Daily Task: Timesheet Review Queue</h4>
+                        <div class="task-steps">
+                            <h5>Each day I work through my timesheet queue:</h5>
+                            <ol>
+                                <li>Log in and review my timesheet exception task list</li>
+                                <li>Prioritize timesheets by pay period urgency (older pay periods first)</li>
+                                <li>Review each exception, determine root cause</li>
+                                <li>For MEDS POS errors: verify if recipient had Medi-Cal eligibility, may need to hold timesheet</li>
+                                <li>For over-authorization: check if hours legitimately needed or should be reduced</li>
+                                <li>For missing signatures: contact provider/recipient to obtain signature or approve electronically if policy allows</li>
+                                <li>For EVV discrepancies: review EVV data, determine good cause, make decision</li>
+                                <li>Document decision and reason in notes</li>
+                                <li>Approve, modify, or reject timesheets based on findings</li>
+                                <li>Respond to provider inquiries about rejected timesheets</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="info-box warning">
+                        <h4>⚠️ Timesheet Review Timeline</h4>
+                        <p>I must review and process timesheets promptly to ensure providers receive payment on time. Typical timeline:</p>
+                        <ul>
+                            <li><strong>Day 1-7:</strong> Provider submits timesheet (within 7 days after pay period ends)</li>
+                            <li><strong>Day 8-12:</strong> County receives and processes timesheet</li>
+                            <li><strong>Day 13-15:</strong> I review and approve exceptions</li>
+                            <li><strong>Day 16-18:</strong> Submit to payroll</li>
+                            <li><strong>Day 19-21:</strong> Payroll processing</li>
+                            <li><strong>Day 22+:</strong> Provider receives payment</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: Ongoing Case Maintenance -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">6</span>
+                    Ongoing Case Maintenance
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p><strong>Source:</strong> DSD Section 25 - Case Maintenance (Reassessments, Changes, Leave, Termination)</p>
+
+                    <div class="user-story">
+                        <h4>US-021: Conduct Annual Reassessments</h4>
+                        <div class="story-text">
+                            As a caseworker, I conduct annual reassessments for all active cases, so that I can verify continued eligibility and adjust authorized hours based on current needs.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>View list of cases due for reassessment</li>
+                                <li>Schedule reassessment within required timeframe (before authorization expires)</li>
+                                <li>Create reassessment record in CMIPS</li>
+                                <li>Conduct in-home visit and re-evaluate functional abilities</li>
+                                <li>Enter new assessment evidence and compare to previous assessment</li>
+                                <li>Determine if hours should increase, decrease, or stay the same</li>
+                                <li>Submit reassessment for approval</li>
+                                <li>Generate NOA explaining any changes in authorization</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-022: Process Change Assessments</h4>
+                        <div class="story-text">
+                            As a caseworker, I conduct change assessments when recipient's condition or circumstances change mid-authorization, so that I can adjust services to meet current needs without waiting for annual reassessment.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Create change assessment when notified of recipient condition change</li>
+                                <li>Document reason for change (medical condition worsened, improved, new diagnosis, hospitalization)</li>
+                                <li>Conduct in-home visit to evaluate current functional status</li>
+                                <li>Adjust authorized hours and services as needed</li>
+                                <li>Create new authorization segment for changed hours</li>
+                                <li>Generate NOA explaining the change</li>
+                                <li>Ensure change assessment effective date is appropriate</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-023: Place Cases on Leave</h4>
+                        <div class="story-text">
+                            As a caseworker, I place cases on temporary leave when recipients are hospitalized or in nursing facilities, so that IHSS services and payments are suspended during the time recipient is not receiving in-home services.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Document leave reason (hospitalization, nursing facility, out of state, incarceration)</li>
+                                <li>Enter leave start date</li>
+                                <li>Suspend service authorization during leave period</li>
+                                <li>Generate NOA informing recipient of leave status</li>
+                                <li>Track leave duration</li>
+                                <li>Return recipient from leave when they return home</li>
+                                <li>Resume services effective date of return</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-024: Terminate Cases</h4>
+                        <div class="story-text">
+                            As a caseworker, I terminate cases when recipients are no longer eligible for IHSS, so that services and payments cease and case records reflect current status.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Document termination reason (no longer eligible, deceased, moved out of state, requested termination, Medi-Cal ended, nursing home placement)</li>
+                                <li>Enter termination effective date</li>
+                                <li>Generate 10-day advance NOA (except for death or voluntary withdrawal)</li>
+                                <li>End all provider assignments effective termination date</li>
+                                <li>Ensure final timesheets are processed</li>
+                                <li>Close case in system</li>
+                                <li>Process overpayments if services provided after termination date</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-025: Rescind Terminations</h4>
+                        <div class="story-text">
+                            As a caseworker, I rescind case terminations when termination was done in error or when recipient successfully appeals, so that services can resume without requiring new application.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Document rescind reason (state hearing decision, county error, Medi-Cal restored)</li>
+                                <li>Enter rescind effective date</li>
+                                <li>Restore authorization to active status</li>
+                                <li>Reactivate provider assignments</li>
+                                <li>Generate NOA explaining reinstatement</li>
+                                <li>Process retroactive payments if applicable</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-026: Maintain Case Documentation</h4>
+                        <div class="story-text">
+                            As a caseworker, I maintain comprehensive case notes documenting all contacts, decisions, and significant events, so that case history is preserved and accessible for continuity of care, audits, and appeals.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Create case notes for every contact with recipient, provider, or family</li>
+                                <li>Document phone calls, in-person visits, emails</li>
+                                <li>Record decisions made and rationale</li>
+                                <li>Note follow-up actions needed</li>
+                                <li>Upload supporting documents (medical records, forms, correspondence)</li>
+                                <li>View complete chronological case history</li>
+                                <li>Search notes by date, type, or keyword</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="task-card">
+                        <h4><span class="task-icon">📅</span>Monthly Task: Reassessment Planning</h4>
+                        <div class="task-steps">
+                            <h5>Each month I plan my reassessment schedule:</h5>
+                            <ol>
+                                <li>Review list of cases with authorizations expiring in next 60-90 days</li>
+                                <li>Contact recipients to schedule reassessment home visits</li>
+                                <li>Prioritize cases expiring soonest</li>
+                                <li>Confirm recipient contact information is current</li>
+                                <li>Request updated medical records if needed</li>
+                                <li>Block calendar time for home visits</li>
+                                <li>Prepare by reviewing previous assessment and current services</li>
+                                <li>Complete reassessments at least 30 days before authorization expires to allow processing time</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="workflow-diagram">
+                        <h4>My Case Lifecycle Management</h4>
+                        <div class="workflow-step">
+                            <h5>Month 1: Case Activation</h5>
+                            <p>New case approved, I assign providers and ensure services begin.</p>
+                        </div>
+                        <div class="workflow-step">
+                            <h5>Months 2-11: Ongoing Maintenance</h5>
+                            <p>I review timesheets, respond to inquiries, process changes as needed (change assessments, new providers, address changes).</p>
+                        </div>
+                        <div class="workflow-step">
+                            <h5>Month 10-11: Reassessment Planning</h5>
+                            <p>I schedule annual reassessment, gather updated information.</p>
+                        </div>
+                        <div class="workflow-step">
+                            <h5>Month 11-12: Reassessment Conducted</h5>
+                            <p>I conduct in-home reassessment, enter evidence, submit for approval before authorization expires.</p>
+                        </div>
+                        <div class="workflow-step">
+                            <h5>Cycle Repeats</h5>
+                            <p>New 12-month authorization begins, case continues.</p>
+                        </div>
+                    </div>
+
+                    <div class="info-box info">
+                        <h4>Case Status Transitions I Manage</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>From Status</th>
+                                    <th>To Status</th>
+                                    <th>Action I Take</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Application</td>
+                                    <td>Active</td>
+                                    <td>Approve initial assessment, create case</td>
+                                </tr>
+                                <tr>
+                                    <td>Active</td>
+                                    <td>On Leave</td>
+                                    <td>Place on leave (hospital, nursing facility)</td>
+                                </tr>
+                                <tr>
+                                    <td>On Leave</td>
+                                    <td>Active</td>
+                                    <td>Take off leave when recipient returns home</td>
+                                </tr>
+                                <tr>
+                                    <td>Active</td>
+                                    <td>Terminated</td>
+                                    <td>Terminate case (various reasons)</td>
+                                </tr>
+                                <tr>
+                                    <td>Terminated</td>
+                                    <td>Active</td>
+                                    <td>Rescind termination (error, appeal won)</td>
+                                </tr>
+                                <tr>
+                                    <td>Active</td>
+                                    <td>Active (New Authorization)</td>
+                                    <td>Complete and approve annual reassessment</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 7: Special Situations & Problem-Solving -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">7</span>
+                    Special Situations & Problem-Solving
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p><strong>Source:</strong> Multiple DSD Sections</p>
+
+                    <div class="user-story">
+                        <h4>US-027: Handle State Fair Hearings</h4>
+                        <div class="story-text">
+                            As a caseworker, I respond to state fair hearing requests filed by recipients appealing my decisions, so that I can provide documentation to support county's position and ensure recipients receive due process.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Receive notification when recipient files appeal</li>
+                                <li>Review appeal reason and recipient's concerns</li>
+                                <li>Gather supporting documentation (assessment, medical records, notes)</li>
+                                <li>Prepare position statement explaining county decision</li>
+                                <li>If aid paid pending: continue services during appeal</li>
+                                <li>Attend state hearing (in person or by phone)</li>
+                                <li>Implement hearing decision (uphold or overturn county action)</li>
+                                <li>Process retroactive payments if hearing favorable to recipient</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-028: Process Inter-County Transfers (ICT)</h4>
+                        <div class="story-text">
+                            As a caseworker, I process cases transferring to or from other counties when recipients move, so that services continue without interruption and all case information transfers properly.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>When recipient moves to my county (ICT In), I can:</h5>
+                            <ul>
+                                <li>Receive case transfer from sending county</li>
+                                <li>Review transferred case information and history</li>
+                                <li>Verify recipient has moved into my county (proof of address)</li>
+                                <li>Accept case transfer in CMIPS</li>
+                                <li>Assign case to myself or another worker</li>
+                                <li>Continue existing authorization or conduct new assessment if needed</li>
+                                <li>Ensure providers are enrolled in my county</li>
+                            </ul>
+                            <h5>When recipient moves out of my county (ICT Out), I can:</h5>
+                            <ul>
+                                <li>Document recipient is moving to another county</li>
+                                <li>Initiate case transfer to receiving county</li>
+                                <li>Ensure all case documentation is current</li>
+                                <li>Coordinate transfer date with receiving county</li>
+                                <li>Close case in my county effective transfer date</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-029: Handle Protective Supervision Cases</h4>
+                        <div class="story-text">
+                            As a caseworker, I carefully evaluate and document protective supervision cases, so that recipients with severe mental impairments receive appropriate continuous supervision services.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Identify potential protective supervision need during assessment</li>
+                                <li>Obtain detailed mental health documentation</li>
+                                <li>Evaluate if recipient meets protective supervision criteria (severe mental impairment + substantial risk of harm)</li>
+                                <li>Document specific behaviors and risks in detail</li>
+                                <li>Authorize protective supervision hours (separate from personal care)</li>
+                                <li>Explain to family that protective supervision cannot be self-directed</li>
+                                <li>Ensure protective supervision provider is not the recipient</li>
+                                <li>Conduct more frequent reassessments for protective supervision cases</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="user-story">
+                        <h4>US-030: Respond to Recipient Inquiries and Complaints</h4>
+                        <div class="story-text">
+                            As a caseworker, I respond promptly and professionally to recipient and provider inquiries and complaints, so that issues are resolved and customer service expectations are met.
+                        </div>
+                        <div class="acceptance-criteria">
+                            <h5>I can:</h5>
+                            <ul>
+                                <li>Check my phone messages and Message Center daily</li>
+                                <li>Return calls within 1 business day</li>
+                                <li>Listen to concerns and gather information</li>
+                                <li>Explain decisions and policies clearly</li>
+                                <li>Resolve issues within my authority</li>
+                                <li>Escalate to supervisor when appropriate</li>
+                                <li>Document all contacts and resolutions</li>
+                                <li>Follow up to ensure issue is resolved</li>
+                                <li>Inform recipient of appeal rights when denying requests</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="task-card">
+                        <h4><span class="task-icon">🔍</span>Daily Task: Task Queue Management</h4>
+                        <div class="task-steps">
+                            <h5>Each day I manage my task queue in My Workspace:</h5>
+                            <ol>
+                                <li><strong>Log in to CMIPS:</strong> Review My Workspace dashboard</li>
+                                <li><strong>Sort by Priority:</strong> Urgent tasks (expiring authorizations, hearings) first</li>
+                                <li><strong>Task Types I Handle:</strong>
+                                    <ul>
+                                        <li>New applications awaiting assessment</li>
+                                        <li>Assessments returned by supervisor (rejected, need corrections)</li>
+                                        <li>Timesheet exceptions requiring review</li>
+                                        <li>Overtime violations requiring determination</li>
+                                        <li>Provider enrollments awaiting approval</li>
+                                        <li>State hearing requests requiring response</li>
+                                        <li>Change requests from recipients</li>
+                                        <li>Cases due for reassessment</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Complete Tasks:</strong> Work through queue, highest priority first</li>
+                                <li><strong>Document Actions:</strong> Add notes for each task completed</li>
+                                <li><strong>Close Tasks:</strong> Mark tasks complete when resolved</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 8: Key Competencies & Skills -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">8</span>
+                    Key Competencies & Skills Required
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <h3>Technical Skills</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Skill</th>
+                                <th>Application</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>CMIPS Navigation</strong></td>
+                                <td>Navigate efficiently through complex system to access needed screens and information</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Assessment Skills</strong></td>
+                                <td>Accurately evaluate functional abilities and determine service needs</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Documentation</strong></td>
+                                <td>Write clear, detailed, objective narratives and notes</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Regulatory Knowledge</strong></td>
+                                <td>Understand and apply IHSS regulations, FLSA rules, Medi-Cal requirements</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Data Analysis</strong></td>
+                                <td>Review timesheets, identify discrepancies, make sound decisions</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Interpersonal Skills</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Skill</th>
+                                <th>Application</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Communication</strong></td>
+                                <td>Explain complex eligibility rules to recipients in understandable terms</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Active Listening</strong></td>
+                                <td>Listen to recipient concerns, understand their perspective</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cultural Sensitivity</strong></td>
+                                <td>Work respectfully with diverse populations, use interpreters appropriately</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Conflict Resolution</strong></td>
+                                <td>Handle complaints and disagreements professionally</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Empathy</strong></td>
+                                <td>Balance compassion for recipients with need to apply rules consistently</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Professional Competencies</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Competency</th>
+                                <th>Application</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Time Management</strong></td>
+                                <td>Manage caseload of 60-100+ cases, meet deadlines, prioritize effectively</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Critical Thinking</strong></td>
+                                <td>Analyze complex situations, make sound eligibility determinations</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Attention to Detail</strong></td>
+                                <td>Catch errors, ensure accuracy in assessments and data entry</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ethical Judgment</strong></td>
+                                <td>Maintain confidentiality, avoid conflicts of interest, apply rules fairly</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Stress Management</strong></td>
+                                <td>Handle demanding workload, difficult cases, maintain professionalism</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box primary">
+                        <h4>A Day in My Life as an IHSS Caseworker</h4>
+                        <p><strong>8:00 AM:</strong> Arrive at office, review My Workspace task queue, prioritize day</p>
+                        <p><strong>8:30 AM:</strong> Return urgent phone messages and emails</p>
+                        <p><strong>9:00 AM:</strong> Drive to recipient home for scheduled reassessment</p>
+                        <p><strong>11:00 AM:</strong> Return to office, enter assessment evidence into CMIPS</p>
+                        <p><strong>12:00 PM:</strong> Lunch break</p>
+                        <p><strong>1:00 PM:</strong> Review and process timesheet exceptions (15-20 timesheets)</p>
+                        <p><strong>2:30 PM:</strong> Process new provider enrollment application, initiate CORI background check</p>
+                        <p><strong>3:00 PM:</strong> Complete assessment narrative for this morning's visit</p>
+                        <p><strong>3:30 PM:</strong> Submit two completed assessments for supervisor approval</p>
+                        <p><strong>4:00 PM:</strong> Respond to recipient inquiry about changing providers</p>
+                        <p><strong>4:30 PM:</strong> Review cases due for reassessment next month, begin scheduling</p>
+                        <p><strong>5:00 PM:</strong> Complete case notes, plan tomorrow's priorities</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>IHSS Caseworker Role Documentation</strong></p>
+        <p>User Stories & Tasks Based on CMIPS DSD Sections 20-25</p>
+        <p>© 2025 - All Rights Reserved</p>
+    </div>
+
+    <script>
+        function toggleAccordion(element) {
+            const section = element.parentElement;
+            const wasActive = section.classList.contains('active');
+            
+            document.querySelectorAll('.accordion-section').forEach(s => {
+                s.classList.remove('active');
+            });
+            
+            if (!wasActive) {
+                section.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

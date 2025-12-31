@@ -1,0 +1,590 @@
+<svg width="2400" height="2500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="userGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A90E2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#357ABD;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="frontendGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2196F3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1976D2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="backendGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4CAF50;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#388E3C;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="keycloakGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F44336;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D32F2F;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="dbGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#9C27B0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7B1FA2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="kafkaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF9800;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F57C00;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="externalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E91E63;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#C2185B;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="networkGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00BCD4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0097A7;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="securityGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFC107;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFA000;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Filters -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="3" dy="3" stdDeviation="4" flood-opacity="0.3"/>
+    </filter>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Arrow markers -->
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#333" />
+    </marker>
+    <marker id="arrowhead-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#2196F3" />
+    </marker>
+    <marker id="arrowhead-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#4CAF50" />
+    </marker>
+    <marker id="arrowhead-red" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#F44336" />
+    </marker>
+    <marker id="arrowhead-orange" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#FF9800" />
+    </marker>
+    <marker id="arrowhead-purple" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#9C27B0" />
+    </marker>
+    <marker id="arrowhead-pink" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#E91E63" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="2400" height="2500" fill="#F5F5F5"/>
+  
+  <!-- Title -->
+  <text x="1200" y="40" font-family="Arial, sans-serif" font-size="36" font-weight="bold" text-anchor="middle" fill="#333">
+    CMIPS Complete Application Architecture
+  </text>
+  <text x="1200" y="70" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#666">
+    Including External CGI Payroll System Integration
+  </text>
+  
+  <!-- ========== LAYER 1: USER LAYER ========== -->
+  <rect x="50" y="100" width="2300" height="140" fill="#E3F2FD" stroke="#1976D2" stroke-width="2" rx="10" filter="url(#shadow)"/>
+  <text x="1200" y="130" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#1976D2">User Layer</text>
+  
+  <!-- Users -->
+  <rect x="150" y="150" width="140" height="70" fill="url(#userGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="220" y="175" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Admin</text>
+  <text x="220" y="195" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Role: ADMIN</text>
+  <text x="220" y="210" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="white">Full Access</text>
+  
+  <rect x="350" y="150" width="140" height="70" fill="url(#userGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="420" y="175" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Supervisor</text>
+  <text x="420" y="195" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Role: SUPERVISOR</text>
+  <text x="420" y="210" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="white">Oversight</text>
+  
+  <rect x="550" y="150" width="140" height="70" fill="url(#userGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="620" y="175" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Case Worker</text>
+  <text x="620" y="195" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Role: CASE_WORKER</text>
+  <text x="620" y="210" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="white">County: CTA/CTB/CTC</text>
+  
+  <rect x="750" y="150" width="140" height="70" fill="url(#userGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="820" y="175" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Provider</text>
+  <text x="820" y="195" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Role: PROVIDER</text>
+  <text x="820" y="210" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="white">Timesheet Entry</text>
+  
+  <rect x="950" y="150" width="140" height="70" fill="url(#userGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="1020" y="175" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Recipient</text>
+  <text x="1020" y="195" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Role: RECIPIENT</text>
+  <text x="1020" y="210" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="white">Approval</text>
+  
+  <!-- ========== LAYER 2: FRONTEND LAYER ========== -->
+  <rect x="50" y="270" width="1100" height="280" fill="#E8F5E9" stroke="#4CAF50" stroke-width="2" rx="10" filter="url(#shadow)"/>
+  <text x="600" y="300" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#388E3C">Frontend Layer (Next.js)</text>
+  
+  <!-- Next.js Frontend -->
+  <rect x="100" y="330" width="250" height="200" fill="url(#frontendGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="225" y="360" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">Next.js Application</text>
+  <text x="225" y="380" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Port: 3000</text>
+  
+  <rect x="120" y="400" width="210" height="110" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="225" y="420" font-family="Arial, sans-serif" font-size="13" font-weight="bold" text-anchor="middle" fill="white">Components</text>
+  <text x="120" y="440" font-family="Arial, sans-serif" font-size="11" fill="white">• Admin Dashboard</text>
+  <text x="120" y="455" font-family="Arial, sans-serif" font-size="11" fill="white">• Supervisor Dashboard</text>
+  <text x="120" y="470" font-family="Arial, sans-serif" font-size="11" fill="white">• Case Worker Dashboard</text>
+  <text x="120" y="485" font-family="Arial, sans-serif" font-size="11" fill="white">• Provider Dashboard</text>
+  <text x="120" y="500" font-family="Arial, sans-serif" font-size="11" fill="white">• Recipient Dashboard</text>
+  
+  <!-- Auth Context -->
+  <rect x="400" y="330" width="200" height="200" fill="url(#frontendGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="500" y="360" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">AuthContext</text>
+  <text x="500" y="380" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Authentication State</text>
+  
+  <rect x="420" y="400" width="160" height="110" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="500" y="420" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Features</text>
+  <text x="420" y="440" font-family="Arial, sans-serif" font-size="11" fill="white">• JWT Token Management</text>
+  <text x="420" y="455" font-family="Arial, sans-serif" font-size="11" fill="white">• Token Refresh</text>
+  <text x="420" y="470" font-family="Arial, sans-serif" font-size="11" fill="white">• User State</text>
+  <text x="420" y="485" font-family="Arial, sans-serif" font-size="11" fill="white">• County Extraction</text>
+  <text x="420" y="500" font-family="Arial, sans-serif" font-size="11" fill="white">• Role Extraction</text>
+  
+  <!-- API Client -->
+  <rect x="650" y="330" width="200" height="200" fill="url(#frontendGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="750" y="360" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">API Client</text>
+  <text x="750" y="380" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">HTTP Client</text>
+  
+  <rect x="670" y="400" width="160" height="110" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="750" y="420" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Features</text>
+  <text x="670" y="440" font-family="Arial, sans-serif" font-size="11" fill="white">• Request Interceptor</text>
+  <text x="670" y="455" font-family="Arial, sans-serif" font-size="11" fill="white">• JWT Injection</text>
+  <text x="670" y="470" font-family="Arial, sans-serif" font-size="11" fill="white">• Error Handling</text>
+  <text x="670" y="485" font-family="Arial, sans-serif" font-size="11" fill="white">• Auto-Logout (401)</text>
+  <text x="670" y="500" font-family="Arial, sans-serif" font-size="11" fill="white">• Retry Logic</text>
+  
+  <!-- County Theme Context -->
+  <rect x="900" y="330" width="200" height="200" fill="url(#frontendGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="1000" y="360" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">County Theme</text>
+  <text x="1000" y="380" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Dynamic Theming</text>
+  
+  <rect x="920" y="400" width="160" height="110" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="1000" y="420" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Features</text>
+  <text x="920" y="440" font-family="Arial, sans-serif" font-size="11" fill="white">• CTA → Sacramento</text>
+  <text x="920" y="455" font-family="Arial, sans-serif" font-size="11" fill="white">• CTB → Orange County</text>
+  <text x="920" y="470" font-family="Arial, sans-serif" font-size="11" fill="white">• CTC → Shasta</text>
+  <text x="920" y="485" font-family="Arial, sans-serif" font-size="11" fill="white">• CSS Dynamic Load</text>
+  <text x="920" y="500" font-family="Arial, sans-serif" font-size="11" fill="white">• CA.gov Templates</text>
+  
+  <!-- ========== LAYER 3: NETWORK SECURITY LAYER ========== -->
+  <rect x="50" y="580" width="1100" height="120" fill="#E0F7FA" stroke="#00BCD4" stroke-width="2" rx="10" filter="url(#shadow)"/>
+  <text x="600" y="610" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#0097A7">Network Security Layer</text>
+  
+  <!-- Load Balancer -->
+  <rect x="200" y="640" width="200" height="40" fill="url(#networkGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="300" y="665" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Application Load Balancer</text>
+  
+  <!-- Security Groups -->
+  <rect x="450" y="640" width="200" height="40" fill="url(#securityGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="550" y="665" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Security Groups</text>
+  
+  <!-- WAF -->
+  <rect x="700" y="640" width="200" height="40" fill="url(#securityGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="800" y="665" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">AWS WAF</text>
+  
+  <!-- ========== LAYER 4: SPRING BOOT BACKEND ========== -->
+  <rect x="50" y="730" width="1100" height="500" fill="#E8F5E9" stroke="#4CAF50" stroke-width="2" rx="10" filter="url(#shadow)"/>
+  <text x="600" y="760" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#388E3C">Spring Boot Backend (Port 8081)</text>
+  
+  <!-- Security Filter Chain -->
+  <rect x="100" y="790" width="220" height="200" fill="url(#backendGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="210" y="820" font-family="Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">Security Filter</text>
+  <text x="210" y="840" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Chain</text>
+  
+  <rect x="120" y="860" width="180" height="110" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="210" y="880" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Components</text>
+  <text x="120" y="900" font-family="Arial, sans-serif" font-size="11" fill="white">• CORS Filter</text>
+  <text x="120" y="915" font-family="Arial, sans-serif" font-size="11" fill="white">• JWT Validation</text>
+  <text x="120" y="930" font-family="Arial, sans-serif" font-size="11" fill="white">• Role Extraction</text>
+  <text x="120" y="945" font-family="Arial, sans-serif" font-size="11" fill="white">• Authorization</text>
+  <text x="120" y="960" font-family="Arial, sans-serif" font-size="11" fill="white">• Stateless Sessions</text>
+  
+  <!-- Controllers -->
+  <rect x="370" y="790" width="220" height="200" fill="url(#backendGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="480" y="820" font-family="Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">REST Controllers</text>
+  
+  <rect x="390" y="860" width="180" height="110" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="480" y="880" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Endpoints</text>
+  <text x="390" y="900" font-family="Arial, sans-serif" font-size="11" fill="white">• /api/auth/**</text>
+  <text x="390" y="915" font-family="Arial, sans-serif" font-size="11" fill="white">• /api/timesheets/**</text>
+  <text x="390" y="930" font-family="Arial, sans-serif" font-size="11" fill="white">• /api/admin/**</text>
+  <text x="390" y="945" font-family="Arial, sans-serif" font-size="11" fill="white">• /api/payroll/**</text>
+  <text x="390" y="960" font-family="Arial, sans-serif" font-size="11" fill="white">• /api/reports/**</text>
+  
+  <!-- Services -->
+  <rect x="640" y="790" width="220" height="200" fill="url(#backendGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="750" y="820" font-family="Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">Business Services</text>
+  
+  <rect x="660" y="860" width="180" height="110" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="750" y="880" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Services</text>
+  <text x="660" y="900" font-family="Arial, sans-serif" font-size="11" fill="white">• TimesheetService</text>
+  <text x="660" y="915" font-family="Arial, sans-serif" font-size="11" fill="white">• PayrollService</text>
+  <text x="660" y="930" font-family="Arial, sans-serif" font-size="11" fill="white">• ReportService</text>
+  <text x="660" y="945" font-family="Arial, sans-serif" font-size="11" fill="white">• AnalyticsService</text>
+  <text x="660" y="960" font-family="Arial, sans-serif" font-size="11" fill="white">• JobQueueService</text>
+  
+  <!-- External API Client -->
+  <rect x="910" y="790" width="200" height="200" fill="url(#externalGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="1010" y="820" font-family="Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">External API</text>
+  <text x="1010" y="840" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Client</text>
+  
+  <rect x="930" y="860" width="160" height="110" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="1010" y="880" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">CGI Payroll</text>
+  <text x="930" y="900" font-family="Arial, sans-serif" font-size="11" fill="white">• RestTemplate</text>
+  <text x="930" y="915" font-family="Arial, sans-serif" font-size="11" fill="white">• API Authentication</text>
+  <text x="930" y="930" font-family="Arial, sans-serif" font-size="11" fill="white">• Error Handling</text>
+  <text x="930" y="945" font-family="Arial, sans-serif" font-size="11" fill="white">• Retry Logic</text>
+  <text x="930" y="960" font-family="Arial, sans-serif" font-size="11" fill="white">• Circuit Breaker</text>
+  
+  <!-- Repositories -->
+  <rect x="100" y="1030" width="220" height="160" fill="url(#backendGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="210" y="1060" font-family="Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">Repositories</text>
+  
+  <rect x="120" y="1080" width="180" height="90" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="210" y="1100" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Data Access</text>
+  <text x="120" y="1120" font-family="Arial, sans-serif" font-size="11" fill="white">• TimesheetRepository</text>
+  <text x="120" y="1135" font-family="Arial, sans-serif" font-size="11" fill="white">• TaskRepository</text>
+  <text x="120" y="1150" font-family="Arial, sans-serif" font-size="11" fill="white">• ReportJobRepository</text>
+  <text x="120" y="1165" font-family="Arial, sans-serif" font-size="11" fill="white">• JPA/Hibernate</text>
+  
+  <!-- Kafka Integration -->
+  <rect x="370" y="1030" width="220" height="160" fill="url(#kafkaGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="480" y="1060" font-family="Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">Kafka Integration</text>
+  
+  <rect x="390" y="1080" width="180" height="90" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="480" y="1100" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Event Publishing</text>
+  <text x="390" y="1120" font-family="Arial, sans-serif" font-size="11" fill="white">• timesheet-events</text>
+  <text x="390" y="1135" font-family="Arial, sans-serif" font-size="11" fill="white">• task-events</text>
+  <text x="390" y="1150" font-family="Arial, sans-serif" font-size="11" fill="white">• payroll-events</text>
+  <text x="390" y="1165" font-family="Arial, sans-serif" font-size="11" fill="white">• report-events</text>
+  
+  <!-- Job Scheduling -->
+  <rect x="640" y="1030" width="220" height="160" fill="url(#backendGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="750" y="1060" font-family="Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">Job Scheduling</text>
+  
+  <rect x="660" y="1080" width="180" height="90" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="750" y="1100" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Scheduled Jobs</text>
+  <text x="660" y="1120" font-family="Arial, sans-serif" font-size="11" fill="white">• Daily Reports</text>
+  <text x="660" y="1135" font-family="Arial, sans-serif" font-size="11" fill="white">• Weekly Reports</text>
+  <text x="660" y="1150" font-family="Arial, sans-serif" font-size="11" fill="white">• Monthly Reports</text>
+  <text x="660" y="1165" font-family="Arial, sans-serif" font-size="11" fill="white">• Payroll Sync</text>
+  
+  <!-- Report Generation -->
+  <rect x="910" y="1030" width="200" height="160" fill="url(#backendGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="1010" y="1060" font-family="Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="white">Report Generation</text>
+  
+  <rect x="930" y="1080" width="160" height="90" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="1010" y="1100" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">5-Stage Pipeline</text>
+  <text x="930" y="1120" font-family="Arial, sans-serif" font-size="11" fill="white">• Parameter Extraction</text>
+  <text x="930" y="1135" font-family="Arial, sans-serif" font-size="11" fill="white">• Query Building</text>
+  <text x="930" y="1150" font-family="Arial, sans-serif" font-size="11" fill="white">• Data Fetching</text>
+  <text x="930" y="1165" font-family="Arial, sans-serif" font-size="11" fill="white">• Field Masking</text>
+  
+  <!-- ========== LAYER 5: KEYCLOAK IAM ========== -->
+  <rect x="1200" y="270" width="1150" height="280" fill="#FFEBEE" stroke="#F44336" stroke-width="2" rx="10" filter="url(#shadow)"/>
+  <text x="1775" y="300" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#D32F2F">Keycloak Identity &amp; Access Management</text>
+  
+  <!-- Keycloak Server -->
+  <rect x="1300" y="330" width="300" height="200" fill="url(#keycloakGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="1450" y="360" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="white">Keycloak Server</text>
+  <text x="1450" y="380" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="white">Port: 8080</text>
+  <text x="1450" y="400" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="white">Realm: cmips</text>
+  
+  <rect x="1320" y="420" width="260" height="90" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="1450" y="440" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Features</text>
+  <text x="1320" y="460" font-family="Arial, sans-serif" font-size="11" fill="white">• OAuth2/OIDC Authentication</text>
+  <text x="1320" y="475" font-family="Arial, sans-serif" font-size="11" fill="white">• JWT Token Generation</text>
+  <text x="1320" y="490" font-family="Arial, sans-serif" font-size="11" fill="white">• Role &amp; Group Management</text>
+  <text x="1320" y="505" font-family="Arial, sans-serif" font-size="11" fill="white">• User Management</text>
+  
+  <!-- JWT Token -->
+  <rect x="1650" y="330" width="250" height="200" fill="url(#keycloakGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="1775" y="360" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">JWT Token</text>
+  
+  <rect x="1670" y="380" width="210" height="130" fill="rgba(255,255,255,0.9)" stroke="#333" stroke-width="1" rx="3"/>
+  <text x="1775" y="400" font-family="Courier, monospace" font-size="10" text-anchor="middle" fill="#333">{</text>
+  <text x="1690" y="415" font-family="Courier, monospace" font-size="9" fill="#333">  "sub": "user-id",</text>
+  <text x="1690" y="430" font-family="Courier, monospace" font-size="9" fill="#333">  "realm_access": {</text>
+  <text x="1710" y="445" font-family="Courier, monospace" font-size="9" fill="#333">    "roles": ["ADMIN"]</text>
+  <text x="1690" y="460" font-family="Courier, monospace" font-size="9" fill="#333">  },</text>
+  <text x="1690" y="475" font-family="Courier, monospace" font-size="9" fill="#333">  "groups": ["CTA"],</text>
+  <text x="1690" y="490" font-family="Courier, monospace" font-size="9" fill="#333">  "exp": 1234567890</text>
+  <text x="1775" y="505" font-family="Courier, monospace" font-size="10" text-anchor="middle" fill="#333">}</text>
+  
+  <!-- ========== LAYER 6: DATABASE LAYER ========== -->
+  <rect x="1200" y="580" width="1150" height="200" fill="#F3E5F5" stroke="#9C27B0" stroke-width="2" rx="10" filter="url(#shadow)"/>
+  <text x="1775" y="610" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#7B1FA2">Database Layer</text>
+  
+  <!-- PostgreSQL -->
+  <rect x="1300" y="650" width="300" height="110" fill="url(#dbGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="1450" y="680" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="white">PostgreSQL</text>
+  <text x="1450" y="700" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="white">Port: 5432</text>
+  
+  <rect x="1320" y="720" width="260" height="30" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="1450" y="740" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Schemas: keycloak, application</text>
+  
+  <!-- Database Tables -->
+  <rect x="1650" y="650" width="300" height="110" fill="url(#dbGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="1800" y="680" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">Application Tables</text>
+  
+  <rect x="1670" y="700" width="260" height="50" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="1800" y="720" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="white">• timesheets • tasks • cases</text>
+  <text x="1800" y="735" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="white">• providers • recipients • report_jobs</text>
+  
+  <!-- ========== LAYER 7: KAFKA MESSAGE BROKER ========== -->
+  <rect x="1200" y="810" width="1150" height="200" fill="#FFF3E0" stroke="#FF9800" stroke-width="2" rx="10" filter="url(#shadow)"/>
+  <text x="1775" y="840" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#F57C00">Apache Kafka Message Broker</text>
+  
+  <!-- Kafka -->
+  <rect x="1300" y="880" width="300" height="110" fill="url(#kafkaGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="1450" y="910" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="white">Kafka Broker</text>
+  <text x="1450" y="930" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="white">Port: 9092</text>
+  
+  <rect x="1320" y="950" width="260" height="30" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="1450" y="970" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Event-Driven Architecture</text>
+  
+  <!-- Kafka Topics -->
+  <rect x="1650" y="880" width="300" height="110" fill="url(#kafkaGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="1800" y="910" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">Kafka Topics</text>
+  
+  <rect x="1670" y="930" width="260" height="50" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="1800" y="950" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="white">• timesheet-events</text>
+  <text x="1800" y="965" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="white">• task-events • payroll-events</text>
+  <text x="1800" y="980" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="white">• report-jobs • notification-events</text>
+  
+  <!-- Zookeeper -->
+  <rect x="2000" y="880" width="200" height="110" fill="url(#kafkaGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="2100" y="910" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">Zookeeper</text>
+  <text x="2100" y="930" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="white">Port: 2181</text>
+  <text x="2100" y="950" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Coordination</text>
+  <text x="2100" y="970" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">Service</text>
+  
+  <!-- ========== LAYER 8: EXTERNAL CGI PAYROLL SYSTEM ========== -->
+  <rect x="1200" y="1040" width="1150" height="190" fill="#FCE4EC" stroke="#E91E63" stroke-width="2" rx="10" filter="url(#shadow)"/>
+  <text x="1775" y="1070" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#C2185B">External CGI Payroll System</text>
+  
+  <!-- CGI Payroll API -->
+  <rect x="1300" y="1100" width="350" height="110" fill="url(#externalGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="1475" y="1130" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="white">CGI Payroll API</text>
+  <text x="1475" y="1150" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="white">External System</text>
+  
+  <rect x="1320" y="1170" width="310" height="30" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="1475" y="1190" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">REST API Integration</text>
+  
+  <!-- API Endpoints -->
+  <rect x="1700" y="1100" width="350" height="110" fill="url(#externalGrad)" stroke="#333" stroke-width="2" rx="5" filter="url(#shadow)"/>
+  <text x="1875" y="1130" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">API Endpoints</text>
+  
+  <rect x="1720" y="1150" width="310" height="50" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1" rx="3"/>
+  <text x="1875" y="1170" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="white">• POST /api/payroll/submit</text>
+  <text x="1875" y="1185" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="white">• GET /api/payroll/status/{id}</text>
+  <text x="1875" y="1200" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="white">• GET /api/payroll/history</text>
+  
+  <!-- ========== FLOW ARROWS ========== -->
+  
+  <!-- User to Frontend -->
+  <line x1="220" y1="150" x2="225" y2="330" stroke="#2196F3" stroke-width="3" marker-end="url(#arrowhead-blue)"/>
+  <line x1="420" y1="150" x2="225" y2="330" stroke="#2196F3" stroke-width="3" marker-end="url(#arrowhead-blue)"/>
+  <line x1="620" y1="150" x2="225" y2="330" stroke="#2196F3" stroke-width="3" marker-end="url(#arrowhead-blue)"/>
+  <line x1="820" y1="150" x2="225" y2="330" stroke="#2196F3" stroke-width="3" marker-end="url(#arrowhead-blue)"/>
+  <line x1="1020" y1="150" x2="225" y2="330" stroke="#2196F3" stroke-width="3" marker-end="url(#arrowhead-blue)"/>
+  
+  <!-- Frontend to Backend -->
+  <line x1="750" y1="550" x2="480" y2="730" stroke="#4CAF50" stroke-width="3" marker-end="url(#arrowhead-green)"/>
+  <text x="600" y="640" font-family="Arial, sans-serif" font-size="12" fill="#4CAF50" font-weight="bold">HTTP + JWT</text>
+  
+  <!-- Frontend to Keycloak -->
+  <line x1="500" y1="550" x2="1450" y2="330" stroke="#F44336" stroke-width="3" marker-end="url(#arrowhead-red)"/>
+  <text x="900" y="440" font-family="Arial, sans-serif" font-size="12" fill="#F44336" font-weight="bold">1. Login Request</text>
+  
+  <!-- Keycloak to Frontend -->
+  <line x1="1450" y1="530" x2="500" y2="550" stroke="#F44336" stroke-width="3" marker-end="url(#arrowhead-red)"/>
+  <text x="1000" y="540" font-family="Arial, sans-serif" font-size="12" fill="#F44336" font-weight="bold">2. JWT Token</text>
+  
+  <!-- Backend to Keycloak -->
+  <line x1="210" y1="730" x2="1450" y2="530" stroke="#FF9800" stroke-width="3" marker-end="url(#arrowhead-orange)"/>
+  <text x="800" y="630" font-family="Arial, sans-serif" font-size="12" fill="#FF9800" font-weight="bold">3. Validate JWT</text>
+  
+  <!-- Backend to Database -->
+  <line x1="210" y1="1230" x2="1450" y2="650" stroke="#9C27B0" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead-purple)"/>
+  <line x1="480" y1="1230" x2="1450" y2="650" stroke="#9C27B0" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead-purple)"/>
+  <line x1="750" y1="1230" x2="1450" y2="650" stroke="#9C27B0" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead-purple)"/>
+  
+  <!-- Backend to Kafka -->
+  <line x1="480" y1="1230" x2="1450" y2="880" stroke="#FF9800" stroke-width="3" marker-end="url(#arrowhead-orange)"/>
+  <text x="950" y="1055" font-family="Arial, sans-serif" font-size="12" fill="#FF9800" font-weight="bold">4. Publish Events</text>
+  
+  <!-- Backend to External CGI Payroll -->
+  <line x1="1010" y1="990" x2="1475" y2="1100" stroke="#E91E63" stroke-width="4" marker-end="url(#arrowhead-pink)"/>
+  <text x="1240" y="1040" font-family="Arial, sans-serif" font-size="14" fill="#E91E63" font-weight="bold">6. Payroll API Calls</text>
+  <text x="1240" y="1055" font-family="Arial, sans-serif" font-size="12" fill="#E91E63">(HTTPS/REST)</text>
+  
+  <!-- External CGI Payroll to Backend -->
+  <line x1="1475" y1="1210" x2="1010" y2="990" stroke="#E91E63" stroke-width="4" marker-end="url(#arrowhead-pink)"/>
+  <text x="1240" y="1100" font-family="Arial, sans-serif" font-size="12" fill="#E91E63" font-weight="bold">5. Payroll Response</text>
+  
+  <!-- Keycloak to Database -->
+  <line x1="1450" y1="530" x2="1450" y2="650" stroke="#9C27B0" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead-purple)"/>
+  
+  <!-- Security Boundaries -->
+  <rect x="40" y="90" width="1120" height="1190" fill="none" stroke="#4CAF50" stroke-width="3" stroke-dasharray="10,5" opacity="0.5"/>
+  <text x="60" y="110" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#4CAF50">CMIPS Application Boundary</text>
+  
+  <rect x="1190" y="260" width="1170" height="980" fill="none" stroke="#F44336" stroke-width="3" stroke-dasharray="10,5" opacity="0.5"/>
+  <text x="1210" y="280" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#F44336">Infrastructure Services</text>
+  
+  <rect x="1190" y="1030" width="1170" height="210" fill="none" stroke="#E91E63" stroke-width="3" stroke-dasharray="10,5" opacity="0.5"/>
+  <text x="1210" y="1050" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#E91E63">External System</text>
+  
+  <!-- ========== LEGEND ========== -->
+  <rect x="50" y="1300" width="2300" height="200" fill="white" stroke="#333" stroke-width="2" rx="10" filter="url(#shadow)"/>
+  <text x="1200" y="1330" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#333">Legend</text>
+  
+  <line x1="100" y1="1360" x2="150" y2="1360" stroke="#2196F3" stroke-width="3" marker-end="url(#arrowhead-blue)"/>
+  <text x="160" y="1365" font-family="Arial, sans-serif" font-size="14" fill="#333">User → Frontend Flow</text>
+  
+  <line x1="400" y1="1360" x2="450" y2="1360" stroke="#4CAF50" stroke-width="3" marker-end="url(#arrowhead-green)"/>
+  <text x="460" y="1365" font-family="Arial, sans-serif" font-size="14" fill="#333">Frontend → Backend (HTTP + JWT)</text>
+  
+  <line x1="750" y1="1360" x2="800" y2="1360" stroke="#F44336" stroke-width="3" marker-end="url(#arrowhead-red)"/>
+  <text x="810" y="1365" font-family="Arial, sans-serif" font-size="14" fill="#333">Authentication Flow</text>
+  
+  <line x1="1100" y1="1360" x2="1150" y2="1360" stroke="#FF9800" stroke-width="3" marker-end="url(#arrowhead-orange)"/>
+  <text x="1160" y="1365" font-family="Arial, sans-serif" font-size="14" fill="#333">Kafka Events</text>
+  
+  <line x1="1450" y1="1360" x2="1500" y2="1360" stroke="#E91E63" stroke-width="4" marker-end="url(#arrowhead-pink)"/>
+  <text x="1510" y="1365" font-family="Arial, sans-serif" font-size="14" fill="#333">External API (CGI Payroll)</text>
+  
+  <line x1="1800" y1="1360" x2="1850" y2="1360" stroke="#9C27B0" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead-purple)"/>
+  <text x="1860" y="1365" font-family="Arial, sans-serif" font-size="14" fill="#333">Database Access</text>
+  
+  <rect x="100" y="1390" width="30" height="20" fill="url(#frontendGrad)" stroke="#333" stroke-width="1"/>
+  <text x="140" y="1405" font-family="Arial, sans-serif" font-size="14" fill="#333">Frontend Component</text>
+  
+  <rect x="400" y="1390" width="30" height="20" fill="url(#backendGrad)" stroke="#333" stroke-width="1"/>
+  <text x="440" y="1405" font-family="Arial, sans-serif" font-size="14" fill="#333">Backend Component</text>
+  
+  <rect x="750" y="1390" width="30" height="20" fill="url(#keycloakGrad)" stroke="#333" stroke-width="1"/>
+  <text x="790" y="1405" font-family="Arial, sans-serif" font-size="14" fill="#333">Keycloak IAM</text>
+  
+  <rect x="1100" y="1390" width="30" height="20" fill="url(#dbGrad)" stroke="#333" stroke-width="1"/>
+  <text x="1140" y="1405" font-family="Arial, sans-serif" font-size="14" fill="#333">Database</text>
+  
+  <rect x="1450" y="1390" width="30" height="20" fill="url(#kafkaGrad)" stroke="#333" stroke-width="1"/>
+  <text x="1490" y="1405" font-family="Arial, sans-serif" font-size="14" fill="#333">Kafka</text>
+  
+  <rect x="1800" y="1390" width="30" height="20" fill="url(#externalGrad)" stroke="#333" stroke-width="1"/>
+  <text x="1840" y="1405" font-family="Arial, sans-serif" font-size="14" fill="#333">External System</text>
+  
+  <!-- ========== ARCHITECTURE SUMMARY ========== -->
+  <rect x="50" y="1550" width="2300" height="900" fill="white" stroke="#333" stroke-width="2" rx="10" filter="url(#shadow)"/>
+  <text x="1200" y="1880" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">Architecture Summary</text>
+  
+  <!-- Request Flow -->
+  <rect x="100" y="1920" width="500" height="380" fill="#E3F2FD" stroke="#1976D2" stroke-width="2" rx="5"/>
+  <text x="350" y="1950" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#1976D2">Request Flow</text>
+  
+  <text x="120" y="1980" font-family="Arial, sans-serif" font-size="14" fill="#333" font-weight="bold">1. User Authentication:</text>
+  <text x="120" y="2000" font-family="Arial, sans-serif" font-size="12" fill="#333">   User → Frontend → Keycloak</text>
+  <text x="120" y="2015" font-family="Arial, sans-serif" font-size="12" fill="#333">   Keycloak → JWT Token → Frontend</text>
+  
+  <text x="120" y="2045" font-family="Arial, sans-serif" font-size="14" fill="#333" font-weight="bold">2. API Request:</text>
+  <text x="120" y="2065" font-family="Arial, sans-serif" font-size="12" fill="#333">   Frontend → Backend (HTTP + JWT)</text>
+  <text x="120" y="2080" font-family="Arial, sans-serif" font-size="12" fill="#333">   Security Filter → JWT Validation</text>
+  
+  <text x="120" y="2110" font-family="Arial, sans-serif" font-size="14" fill="#333" font-weight="bold">3. Business Logic:</text>
+  <text x="120" y="2130" font-family="Arial, sans-serif" font-size="12" fill="#333">   Controller → Service → Repository</text>
+  <text x="120" y="2145" font-family="Arial, sans-serif" font-size="12" fill="#333">   Repository → Database Query</text>
+  
+  <text x="120" y="2175" font-family="Arial, sans-serif" font-size="14" fill="#333" font-weight="bold">4. External Integration:</text>
+  <text x="120" y="2195" font-family="Arial, sans-serif" font-size="12" fill="#333">   Service → External API Client</text>
+  <text x="120" y="2210" font-family="Arial, sans-serif" font-size="12" fill="#333">   External API Client → CGI Payroll</text>
+  <text x="120" y="2225" font-family="Arial, sans-serif" font-size="12" fill="#333">   CGI Payroll → Response → Service</text>
+  
+  <text x="120" y="2255" font-family="Arial, sans-serif" font-size="14" fill="#333" font-weight="bold">5. Event Publishing:</text>
+  <text x="120" y="2275" font-family="Arial, sans-serif" font-size="12" fill="#333">   Service → Kafka Producer</text>
+  <text x="120" y="2290" font-family="Arial, sans-serif" font-size="12" fill="#333">   Kafka → Event Consumers</text>
+  
+  <!-- Components -->
+  <rect x="650" y="1920" width="500" height="380" fill="#E8F5E9" stroke="#4CAF50" stroke-width="2" rx="5"/>
+  <text x="900" y="1950" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#388E3C">Key Components</text>
+  
+  <text x="670" y="1980" font-family="Arial, sans-serif" font-size="14" fill="#333" font-weight="bold">Frontend (Next.js):</text>
+  <text x="670" y="2000" font-family="Arial, sans-serif" font-size="12" fill="#333">   • Admin, Supervisor, Case Worker Dashboards</text>
+  <text x="670" y="2015" font-family="Arial, sans-serif" font-size="12" fill="#333">   • AuthContext, API Client, County Theme</text>
+  <text x="670" y="2030" font-family="Arial, sans-serif" font-size="12" fill="#333">   • JWT Token Management</text>
+  
+  <text x="670" y="2060" font-family="Arial, sans-serif" font-size="14" fill="#333" font-weight="bold">Backend (Spring Boot):</text>
+  <text x="670" y="2080" font-family="Arial, sans-serif" font-size="12" fill="#333">   • REST Controllers (11 Controllers)</text>
+  <text x="670" y="2095" font-family="Arial, sans-serif" font-size="12" fill="#333">   • Business Services (11 Services)</text>
+  <text x="670" y="2110" font-family="Arial, sans-serif" font-size="12" fill="#333">   • JPA Repositories</text>
+  <text x="670" y="2125" font-family="Arial, sans-serif" font-size="12" fill="#333">   • External API Client (CGI Payroll)</text>
+  
+  <text x="670" y="2155" font-family="Arial, sans-serif" font-size="14" fill="#333" font-weight="bold">Infrastructure:</text>
+  <text x="670" y="2175" font-family="Arial, sans-serif" font-size="12" fill="#333">   • Keycloak 23.0.0 (IAM)</text>
+  <text x="670" y="2190" font-family="Arial, sans-serif" font-size="12" fill="#333">   • PostgreSQL 15 (Database)</text>
+  <text x="670" y="2205" font-family="Arial, sans-serif" font-size="12" fill="#333">   • Apache Kafka 7.5.0 (Events)</text>
+  <text x="670" y="2220" font-family="Arial, sans-serif" font-size="12" fill="#333">   • Zookeeper (Coordination)</text>
+  
+  <text x="670" y="2250" font-family="Arial, sans-serif" font-size="14" fill="#333" font-weight="bold">External System:</text>
+  <text x="670" y="2270" font-family="Arial, sans-serif" font-size="12" fill="#333">   • CGI Payroll System (REST API)</text>
+  <text x="670" y="2285" font-family="Arial, sans-serif" font-size="12" fill="#333">   • Payroll Submission &amp; Status</text>
+  
+  <!-- Integration Points -->
+  <rect x="1200" y="1920" width="500" height="380" fill="#FFF3E0" stroke="#FF9800" stroke-width="2" rx="5"/>
+  <text x="1450" y="1950" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#F57C00">Integration Points</text>
+  
+  <text x="1220" y="1980" font-family="Arial, sans-serif" font-size="14" fill="#333" font-weight="bold">CGI Payroll Integration:</text>
+  <text x="1220" y="2000" font-family="Arial, sans-serif" font-size="12" fill="#333">   • POST /api/payroll/submit</text>
+  <text x="1220" y="2015" font-family="Arial, sans-serif" font-size="12" fill="#333">   • GET /api/payroll/status/{id}</text>
+  <text x="1220" y="2030" font-family="Arial, sans-serif" font-size="12" fill="#333">   • GET /api/payroll/history</text>
+  <text x="1220" y="2045" font-family="Arial, sans-serif" font-size="12" fill="#333">   • Authentication (API Key/OAuth)</text>
+  <text x="1220" y="2060" font-family="Arial, sans-serif" font-size="12" fill="#333">   • Error Handling &amp; Retry</text>
+  <text x="1220" y="2075" font-family="Arial, sans-serif" font-size="12" fill="#333">   • Circuit Breaker Pattern</text>
+  
+  <text x="1220" y="2105" font-family="Arial, sans-serif" font-size="14" fill="#333" font-weight="bold">Kafka Events:</text>
+  <text x="1220" y="2125" font-family="Arial, sans-serif" font-size="12" fill="#333">   • timesheet-events</text>
+  <text x="1220" y="2140" font-family="Arial, sans-serif" font-size="12" fill="#333">   • task-events</text>
+  <text x="1220" y="2155" font-family="Arial, sans-serif" font-size="12" fill="#333">   • payroll-events</text>
+  <text x="1220" y="2170" font-family="Arial, sans-serif" font-size="12" fill="#333">   • report-jobs</text>
+  <text x="1220" y="2185" font-family="Arial, sans-serif" font-size="12" fill="#333">   • notification-events</text>
+  
+  <!-- Technology Stack -->
+  <rect x="1750" y="1920" width="550" height="380" fill="#F3E5F5" stroke="#9C27B0" stroke-width="2" rx="5"/>
+  <text x="2025" y="1950" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#7B1FA2">Technology Stack</text>
+  
+  <text x="1770" y="1980" font-family="Arial, sans-serif" font-size="14" fill="#333" font-weight="bold">Frontend:</text>
+  <text x="1770" y="2000" font-family="Arial, sans-serif" font-size="12" fill="#333">   • Next.js 16.0.3</text>
+  <text x="1770" y="2015" font-family="Arial, sans-serif" font-size="12" fill="#333">   • React 19.2.0, TypeScript 5</text>
+  <text x="1770" y="2030" font-family="Arial, sans-serif" font-size="12" fill="#333">   • Tailwind CSS 4</text>
+  
+  <text x="1770" y="2060" font-family="Arial, sans-serif" font-size="14" fill="#333" font-weight="bold">Backend:</text>
+  <text x="1770" y="2080" font-family="Arial, sans-serif" font-size="12" fill="#333">   • Spring Boot 3.2.0</text>
+  <text x="1770" y="2095" font-family="Arial, sans-serif" font-size="12" fill="#333">   • Java 17, Spring Security</text>
+  <text x="1770" y="2110" font-family="Arial, sans-serif" font-size="12" fill="#333">   • Spring Data JPA</text>
+  <text x="1770" y="2125" font-family="Arial, sans-serif" font-size="12" fill="#333">   • RestTemplate (External API)</text>
+  
+  <text x="1770" y="2155" font-family="Arial, sans-serif" font-size="14" fill="#333" font-weight="bold">Infrastructure:</text>
+  <text x="1770" y="2175" font-family="Arial, sans-serif" font-size="12" fill="#333">   • Keycloak 23.0.0</text>
+  <text x="1770" y="2190" font-family="Arial, sans-serif" font-size="12" fill="#333">   • PostgreSQL 15</text>
+  <text x="1770" y="2205" font-family="Arial, sans-serif" font-size="12" fill="#333">   • Apache Kafka 7.5.0</text>
+  <text x="1770" y="2220" font-family="Arial, sans-serif" font-size="12" fill="#333">   • Docker &amp; Docker Compose</text>
+  
+  <text x="1770" y="2250" font-family="Arial, sans-serif" font-size="14" fill="#333" font-weight="bold">External:</text>
+  <text x="1770" y="2270" font-family="Arial, sans-serif" font-size="12" fill="#333">   • CGI Payroll System (REST API)</text>
+  <text x="1770" y="2285" font-family="Arial, sans-serif" font-size="12" fill="#333">   • HTTPS/TLS Communication</text>
+  
+  <!-- Footer -->
+  <text x="1200" y="2480" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#666">
+    CMIPS Complete Application Architecture - Including External CGI Payroll System Integration
+  </text>
+  <text x="1200" y="2500" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#999">
+    Frontend | Backend | Keycloak | Database | Kafka | External API
+  </text>
+</svg>
+

@@ -1,0 +1,438 @@
+.pageContainer {
+  padding: 2rem 0;
+  background-color: #f9f9f9;
+  min-height: calc(100vh - 200px);
+}
+
+.workspaceContent h1 {
+  color: var(--theme-primary, #1e3a8a);
+  margin-bottom: 1rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.workspaceHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.workspaceTitle h1 {
+  margin: 0 0 0.5rem 0;
+  color: var(--theme-primary, #1e3a8a);
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.workspaceTitle p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.helpBtn {
+  background: white;
+  color: var(--theme-primary, #1e3a8a);
+  border: 2px solid var(--theme-primary, #1e3a8a);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.helpBtn:hover {
+  background: #f8fafc;
+  border-color: var(--theme-secondary, #1e40af);
+  color: var(--theme-secondary, #1e40af);
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.workspaceGrid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+  align-items: start;
+}
+
+.tasksSection {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.tasksHeader {
+  background: var(--theme-primary, #1e3a8a);
+  color: white;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.2s ease;
+}
+
+.tasksHeader:hover {
+  background: var(--theme-secondary, #1e40af);
+}
+
+.headerControls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.tasksHeader h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.markdownIconBtn,
+.refreshBtn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  min-height: 36px;
+}
+
+.markdownIconBtn:hover,
+.refreshBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.tasksContainer {
+  padding: 2rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.markdownEditorSection {
+  margin-bottom: 2rem;
+}
+
+.markdownEditorSection h3 {
+  color: #1e3a8a;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.markdownEditor {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.markdownTextarea {
+  width: 100%;
+  min-height: 150px;
+  padding: 1rem;
+  border: none;
+  resize: vertical;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.markdownTextarea:focus {
+  outline: none;
+  background-color: #f9fafb;
+}
+
+.editorToolbar {
+  background: #f9fafb;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.toolbarBtn {
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toolbarBtn:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.shortcutsSection {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.shortcutsHeader {
+  background: var(--theme-primary, #1e3a8a);
+  color: white;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.shortcutsHeader h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.shortcutsContainer {
+  padding: 2rem;
+}
+
+.shortcutsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.shortcutLink {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.shortcutLink:hover {
+  background: #f3f4f6;
+  border-color: #1e3a8a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.shortcutIcon {
+  font-size: 1.5rem;
+  width: 2rem;
+  text-align: center;
+}
+
+.shortcutText {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.tasksTableSection h3 {
+  color: #1e3a8a;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.tableContainer {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.tasksTable {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.tasksTable th {
+  background: #f9fafb;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tasksTable td {
+  padding: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151;
+}
+
+.tasksTable tr:hover {
+  background: #f9fafb;
+}
+
+.priorityBadge,
+.statusBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.priorityUrgent {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.priorityHigh {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.priorityNormal {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.priorityLow {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.statusCompleted {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.statusInProgress {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.statusPending {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.statusCancelled {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.tasksToggleContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.tasksToggleBtn {
+  background: #1e3a8a;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tasksToggleBtn:hover {
+  background: #1e40af;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.loading,
+.error,
+.noTasks {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+.error {
+  color: #dc2626;
+}
+
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 1rem 0;
+  }
+
+  .workspaceHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .workspaceTitle h1 {
+    font-size: 2rem;
+  }
+
+  .helpBtn {
+    align-self: flex-end;
+  }
+
+  .workspaceGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .tasksContainer {
+    padding: 1rem;
+  }
+
+  .shortcutsContainer {
+    padding: 1rem;
+  }
+
+  .shortcutLink {
+    padding: 0.75rem;
+  }
+
+  .shortcutText {
+    font-size: 0.9rem;
+  }
+
+  .tasksToggleBtn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .tasksTable th,
+  .tasksTable td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.85rem;
+  }
+}
+

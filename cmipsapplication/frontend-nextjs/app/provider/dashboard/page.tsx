@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
-import WorkView from '@/components/WorkView';
 import NotificationCenter from '@/components/NotificationCenter';
 import apiClient from '@/lib/api';
+import { FieldAuthorizedValue, ActionButtons } from '@/components/FieldAuthorizedValue';
+import { isFieldVisible } from '@/hooks/useFieldAuthorization';
 
 type Recipient = {
   id: number;
@@ -16,21 +16,56 @@ type Recipient = {
   caseNumber: string;
 };
 
-function ProviderDashboardComponent() {
-  const { user, logout, loading: authLoading } = useAuth();
+type Timesheet = {
+  id: number;
+  userId?: string;
+  employeeId?: string;
+  employeeName?: string;
+  department?: string;
+  location?: string;
+  payPeriodStart?: string;
+  payPeriodEnd?: string;
+  regularHours?: number;
+  overtimeHours?: number;
+  totalHours?: number;
+  status?: string;
+  comments?: string;
+  supervisorComments?: string;
+  approvedBy?: string;
+  submittedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+type TimesheetResponse = {
+  content: Timesheet[];
+  totalElements: number;
+  numberOfElements: number;
+  allowedActions: string[];
+};
+
+export default function ProviderDashboard() {
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [pendingActions, setPendingActions] = useState<Array<{ type: string; message: string; priority: string }>>([]);
+  const [myTimesheets, setMyTimesheets] = useState<Timesheet[]>([]);
+  const [allowedActions, setAllowedActions] = useState<string[]>([]);
 
   useEffect(() => {
-    if (authLoading) return;
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || authLoading) return;
     if (!user || (user.role !== 'PROVIDER' && !user.roles?.includes('PROVIDER'))) {
       window.location.href = '/login';
       return;
     }
     fetchDashboardData();
-  }, [user, authLoading]);
+  }, [user, authLoading, mounted]);
 
   const fetchDashboardData = async () => {
     try {
@@ -66,11 +101,32 @@ function ProviderDashboardComponent() {
           caseNumber: 'CASE-001',
         }]);
       }
-      
-      setPendingActions([
-        { type: 'timesheet', message: 'Submit timesheet for Sep 15-30 (Due: Oct 5)', priority: 'high' },
-        { type: 'review', message: 'Review rejected timesheet for Aug 2025', priority: 'medium' }
-      ]);
+
+      // Fetch my timesheets with field-level authorization
+      try {
+        const timesheetsResponse = await apiClient.get<TimesheetResponse>('/timesheets');
+        const responseData = timesheetsResponse.data;
+        setMyTimesheets(responseData.content || []);
+        setAllowedActions(responseData.allowedActions || []);
+
+        // Update pending actions based on timesheet status
+        const drafts = (responseData.content || []).filter(ts => ts.status === 'DRAFT');
+        const rejected = (responseData.content || []).filter(ts => ts.status === 'REJECTED');
+        const actions: Array<{ type: string; message: string; priority: string }> = [];
+
+        if (drafts.length > 0) {
+          actions.push({ type: 'timesheet', message: `${drafts.length} draft timesheet(s) ready to submit`, priority: 'high' });
+        }
+        if (rejected.length > 0) {
+          actions.push({ type: 'review', message: `${rejected.length} rejected timesheet(s) need revision`, priority: 'medium' });
+        }
+        setPendingActions(actions.length > 0 ? actions : []);
+      } catch (err) {
+        console.error('Error fetching timesheets:', err);
+        setMyTimesheets([]);
+        setAllowedActions([]);
+        setPendingActions([]);
+      }
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
     } finally {
@@ -78,113 +134,115 @@ function ProviderDashboardComponent() {
     }
   };
 
-  if (loading || authLoading || !user) {
+  if (!mounted || loading || authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1e3a8a] mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading Provider Dashboard...</p>
+      <div className="min-h-screen d-flex align-items-center justify-content-center" style={{ backgroundColor: 'var(--gray-50, #fafafa)' }}>
+        <div className="text-center card p-5">
+          <div className="spinner-border text-primary mb-3" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="text-muted mb-0">Loading Provider Dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-[#1e3a8a] text-white px-6 py-4 shadow-lg">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <div className="inline-flex w-10 h-8 bg-white rounded-md text-[#1e3a8a] text-xs font-bold items-center justify-center">CA</div>
-            <div>
-              <h1 className="text-xl font-bold">IHSS Electronic Services Portal</h1>
-              <p className="text-sm text-gray-200">In-Home Supportive Services</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <NotificationCenter userId={user?.username || ''} />
-            <span className="text-sm">
-              Welcome, <strong>{user?.username}</strong> (Provider)
-            </span>
-            <button onClick={logout} className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-medium">
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
+    <div>
+      {/* Notification Center */}
+      <div className="mb-3 d-flex justify-content-end">
+        <NotificationCenter userId={user?.username || ''} />
+      </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div>
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div
-            className="bg-white border border-gray-300 rounded-lg shadow-sm p-6 text-center cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => router.push('/provider/evv-checkin')}
-          >
-            <div className="text-4xl mb-2">📍</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">EVV CHECK-IN</h3>
-            <p className="text-sm text-gray-600">Start your service visit</p>
+        <div className="row mb-4">
+          <div className="col-lg-3 col-md-6 mb-3">
+            <div
+              className="card h-100"
+              style={{ cursor: 'pointer' }}
+              onClick={() => router.push('/provider/evv-checkin')}
+            >
+              <div className="card-body text-center">
+                <div className="mb-3" style={{ fontSize: '3rem' }}>📍</div>
+                <h3 className="card-title">EVV CHECK-IN</h3>
+                <p className="text-muted small mb-0">Start your service visit</p>
+              </div>
+            </div>
           </div>
 
-          <div
-            className="bg-white border border-gray-300 rounded-lg shadow-sm p-6 text-center cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => router.push('/provider/timesheets')}
-          >
-            <div className="text-4xl mb-2">📋</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">TIMESHEETS</h3>
-            <p className="text-sm text-gray-600">Submit & view timesheets</p>
+          <div className="col-lg-3 col-md-6 mb-3">
+            <div
+              className="card h-100"
+              style={{ cursor: 'pointer' }}
+              onClick={() => router.push('/provider/timesheets')}
+            >
+              <div className="card-body text-center">
+                <div className="mb-3" style={{ fontSize: '3rem' }}>📋</div>
+                <h3 className="card-title">TIMESHEETS</h3>
+                <p className="text-muted small mb-0">Submit & view timesheets</p>
+              </div>
+            </div>
           </div>
 
-          <div
-            className="bg-white border border-gray-300 rounded-lg shadow-sm p-6 text-center cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => router.push('/provider/payments')}
-          >
-            <div className="text-4xl mb-2">💰</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">PAYMENT HISTORY</h3>
-            <p className="text-sm text-gray-600">View your payments</p>
+          <div className="col-lg-3 col-md-6 mb-3">
+            <div
+              className="card h-100"
+              style={{ cursor: 'pointer' }}
+              onClick={() => router.push('/provider/payments')}
+            >
+              <div className="card-body text-center">
+                <div className="mb-3" style={{ fontSize: '3rem' }}>💰</div>
+                <h3 className="card-title">PAYMENT HISTORY</h3>
+                <p className="text-muted small mb-0">View your payments</p>
+              </div>
+            </div>
           </div>
 
-          <div
-            className="bg-white border border-gray-300 rounded-lg shadow-sm p-6 text-center cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => router.push('/provider/profile')}
-          >
-            <div className="text-4xl mb-2">👤</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">MY PROFILE</h3>
-            <p className="text-sm text-gray-600">Update my address & details</p>
+          <div className="col-lg-3 col-md-6 mb-3">
+            <div
+              className="card h-100"
+              style={{ cursor: 'pointer' }}
+              onClick={() => router.push('/provider/profile')}
+            >
+              <div className="card-body text-center">
+                <div className="mb-3" style={{ fontSize: '3rem' }}>👤</div>
+                <h3 className="card-title">MY PROFILE</h3>
+                <p className="text-muted small mb-0">Update my address & details</p>
+              </div>
+            </div>
           </div>
-        </div>
-
-        {/* WorkView - Tasks */}
-        <div className="mb-6">
-          <WorkView username={user?.username || ''} />
         </div>
 
         {/* My Recipients */}
-        <div className="bg-white border border-gray-300 rounded-lg shadow-sm mb-6">
-          <div className="bg-[#1e3a8a] px-6 py-4 rounded-t-lg">
-            <h2 className="text-lg font-semibold text-white">📋 MY RECIPIENTS</h2>
+        <div className="card mb-4">
+          <div className="card-header" style={{ backgroundColor: 'var(--color-p2, #046b99)', color: 'white' }}>
+            <h2 className="card-title mb-0" style={{ color: 'white' }}>📋 MY RECIPIENTS</h2>
           </div>
-          <div className="p-6">
+          <div className="card-body">
             {recipients.length === 0 ? (
-              <p className="text-center text-gray-600 py-4">No recipients assigned</p>
+              <p className="text-center text-muted py-4">No recipients assigned</p>
             ) : (
-              <div className="space-y-3">
+              <div>
                 {recipients.map((recipient) => (
-                  <div key={recipient.id} className="flex justify-between items-center p-4 bg-gray-50 rounded border border-gray-200">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{recipient.name}</h3>
-                      <p className="text-sm text-gray-600">
-                        Status: <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">{recipient.status}</span>
-                        {' • '} Authorized: {recipient.authorizedHours} hours/month
-                      </p>
-                    </div>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => router.push(`/provider/timesheet/new/${recipient.id}`)}
-                        className="px-4 py-2 bg-[#1e3a8a] text-white rounded hover:bg-[#1e40af] font-medium"
-                      >
-                        Submit Timesheet
-                      </button>
+                  <div key={recipient.id} className="card mb-3">
+                    <div className="card-body">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <div>
+                          <h5 className="fw-semibold mb-1">{recipient.name}</h5>
+                          <p className="text-muted small mb-0">
+                            Status: <span className="badge bg-success">{recipient.status}</span>
+                            {' • '} Authorized: {recipient.authorizedHours} hours/month
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => router.push(`/provider/timesheet/new/${recipient.id}`)}
+                          className="btn btn-primary"
+                        >
+                          Submit Timesheet
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -194,27 +252,104 @@ function ProviderDashboardComponent() {
         </div>
 
         {/* Pending Actions */}
-        <div className="bg-white border border-gray-300 rounded-lg shadow-sm">
-          <div className="bg-[#1e3a8a] px-6 py-4 rounded-t-lg">
-            <h2 className="text-lg font-semibold text-white">⏰ PENDING ACTIONS</h2>
-          </div>
-          <div className="p-6">
-            {pendingActions.length === 0 ? (
-              <p className="text-center text-gray-600 py-4">No pending actions</p>
-            ) : (
-              <div className="space-y-3">
+        {pendingActions.length > 0 && (
+          <div className="card mb-4">
+            <div className="card-header" style={{ backgroundColor: 'var(--color-p2, #046b99)', color: 'white' }}>
+              <h2 className="card-title mb-0" style={{ color: 'white' }}>⏰ PENDING ACTIONS</h2>
+            </div>
+            <div className="card-body">
+              <div>
                 {pendingActions.map((action, index) => (
                   <div
                     key={index}
-                    className={`p-4 rounded border-l-4 ${
-                      action.priority === 'high'
-                        ? 'bg-red-50 border-red-500'
-                        : 'bg-yellow-50 border-yellow-500'
-                    }`}
+                    className={`alert mb-3 ${action.priority === 'high' ? 'alert-danger' : 'alert-warning'}`}
+                    style={{ borderLeft: '4px solid ' + (action.priority === 'high' ? '#dc3545' : '#ffc107') }}
                   >
-                    <p className="text-gray-900">{action.message}</p>
+                    <p className="mb-0">{action.message}</p>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* My Timesheets */}
+        <div className="card">
+          <div className="card-header d-flex justify-content-between align-items-center" style={{ backgroundColor: 'var(--color-p2, #046b99)', color: 'white' }}>
+            <h2 className="card-title mb-0" style={{ color: 'white' }}>📊 MY TIMESHEETS</h2>
+            {allowedActions.length > 0 && (
+              <small className="text-white-50">
+                Available actions: {allowedActions.join(', ')}
+              </small>
+            )}
+          </div>
+          <div className="card-body">
+            {myTimesheets.length === 0 ? (
+              <p className="text-center text-muted py-4">No timesheets found</p>
+            ) : (
+              <div className="table-responsive">
+                <table className="table table-striped table-hover">
+                  <thead>
+                    <tr>
+                      <th>Pay Period</th>
+                      <th>Hours</th>
+                      <th>Status</th>
+                      {myTimesheets[0] && isFieldVisible(myTimesheets[0], 'submittedAt') && (
+                        <th>Submitted</th>
+                      )}
+                      {myTimesheets[0] && isFieldVisible(myTimesheets[0], 'comments') && (
+                        <th>Comments</th>
+                      )}
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {myTimesheets.slice(0, 10).map((timesheet) => (
+                      <tr key={timesheet.id}>
+                        <td>
+                          <FieldAuthorizedValue data={timesheet} field="payPeriodStart" type="date" />
+                          {' - '}
+                          <FieldAuthorizedValue data={timesheet} field="payPeriodEnd" type="date" />
+                        </td>
+                        <td className="fw-bold">
+                          <FieldAuthorizedValue data={timesheet} field="totalHours" type="number" />
+                        </td>
+                        <td>
+                          <FieldAuthorizedValue data={timesheet} field="status" type="badge" />
+                        </td>
+                        {isFieldVisible(myTimesheets[0], 'submittedAt') && (
+                          <td>
+                            <FieldAuthorizedValue data={timesheet} field="submittedAt" type="date" />
+                          </td>
+                        )}
+                        {isFieldVisible(myTimesheets[0], 'comments') && (
+                          <td>
+                            <FieldAuthorizedValue data={timesheet} field="comments" placeholder="" />
+                          </td>
+                        )}
+                        <td>
+                          <ActionButtons
+                            allowedActions={allowedActions}
+                            onView={() => router.push(`/provider/timesheet/${timesheet.id}`)}
+                            onEdit={timesheet.status === 'DRAFT' || timesheet.status === 'REJECTED' ? () => router.push(`/provider/timesheet/${timesheet.id}/edit`) : undefined}
+                            onSubmit={timesheet.status === 'DRAFT' ? () => handleSubmitTimesheet(timesheet.id) : undefined}
+                            size="sm"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {myTimesheets.length > 10 && (
+                  <div className="text-center mt-3">
+                    <button
+                      onClick={() => router.push('/provider/timesheets')}
+                      className="btn btn-outline-primary"
+                    >
+                      View All Timesheets ({myTimesheets.length})
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -222,7 +357,15 @@ function ProviderDashboardComponent() {
       </div>
     </div>
   );
-}
 
-export default dynamic(() => Promise.resolve(ProviderDashboardComponent), { ssr: false });
+  async function handleSubmitTimesheet(id: number) {
+    try {
+      await apiClient.post(`/timesheets/${id}/submit`);
+      fetchDashboardData();
+    } catch (err) {
+      console.error('Error submitting timesheet:', err);
+      alert('Failed to submit timesheet');
+    }
+  }
+}
 

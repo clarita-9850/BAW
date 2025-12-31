@@ -1,8 +1,8 @@
 package com.cmips.controller;
 
 import com.cmips.event.BaseEvent;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.Authentication;
@@ -18,12 +18,18 @@ import com.cmips.entity.Notification;
 @RestController
 @RequestMapping("/api/cases")
 @CrossOrigin(origins = "*")
-@RequiredArgsConstructor
-@Slf4j
 public class CaseController {
-    
+
+    private static final Logger log = LoggerFactory.getLogger(CaseController.class);
+
     private final KafkaTemplate<String, BaseEvent> kafkaTemplate;
     private final com.cmips.service.NotificationService notificationService;
+
+    public CaseController(KafkaTemplate<String, BaseEvent> kafkaTemplate,
+                          com.cmips.service.NotificationService notificationService) {
+        this.kafkaTemplate = kafkaTemplate;
+        this.notificationService = notificationService;
+    }
     
     @PostMapping("/address-change")
     public ResponseEntity<Map<String, String>> submitAddressChange(@RequestBody Map<String, Object> request) {

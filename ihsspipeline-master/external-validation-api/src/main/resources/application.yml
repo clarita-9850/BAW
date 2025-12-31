@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: external-validation-api
+
+server:
+  port: 8082
+
+# Logging Configuration
+logging:
+  level:
+    com.example.externalvalidationapi: DEBUG
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Service Information
+info:
+  app:
+    name: External Validation API
+    description: 3rd Party Timesheet Validation Service
+    version: 1.0.0
+    company: External Validation Corp

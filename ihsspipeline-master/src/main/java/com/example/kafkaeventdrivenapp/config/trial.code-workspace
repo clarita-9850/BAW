@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "../../../../../../.."
+		},
+		{
+			"path": "../../../../../../../../sajeevs-codebase-main"
+		},
+		{
+			"path": "../../../../../../../../timesheet-frontend"
+		},
+		{
+			"path": "../../../../../../../../api-gateway"
+		}
+	],
+	"settings": {
+		"java.compile.nullAnalysis.mode": "automatic",
+		"java.configuration.updateBuildConfiguration": "interactive"
+	}
+}

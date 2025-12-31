@@ -1,0 +1,448 @@
+<svg width="1600" height="2200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Title -->
+  <text x="800" y="30" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#1e3a8a">
+    CMIPS Security Architecture
+  </text>
+  
+  <!-- AWS Cloud Container -->
+  <rect x="50" y="60" width="1500" height="2100" fill="#f0f8ff" stroke="#1e3a8a" stroke-width="2" rx="10"/>
+  <text x="800" y="85" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#1e3a8a">
+    AWS Cloud Security Infrastructure
+  </text>
+  
+  <!-- Internet -->
+  <rect x="100" y="110" width="1400" height="80" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="5"/>
+  <text x="800" y="140" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#1976d2">
+    Internet (HTTPS Only)
+  </text>
+  <text x="800" y="160" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#333">
+    TLS 1.2+ Encryption | Certificate Authority (CA) Signed Certificates
+  </text>
+  <text x="800" y="175" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#333">
+    DDoS Protection: AWS Shield | WAF Rules for SQL Injection, XSS Protection
+  </text>
+  
+  <!-- AWS WAF -->
+  <rect x="100" y="210" width="1400" height="60" fill="#fff3e0" stroke="#e65100" stroke-width="2" rx="5"/>
+  <text x="800" y="235" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#e65100">
+    AWS WAF (Web Application Firewall)
+  </text>
+  <text x="800" y="255" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#333">
+    Rate Limiting | SQL Injection Protection | XSS Protection | IP Whitelisting/Blacklisting | Geographic Restrictions
+  </text>
+  
+  <!-- Application Load Balancer -->
+  <rect x="100" y="290" width="1400" height="80" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="5"/>
+  <text x="800" y="315" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#2e7d32">
+    Application Load Balancer (ALB) - SSL Termination
+  </text>
+  <text x="800" y="335" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#333">
+    ACM Certificate (SSL/TLS) | HTTPS (443) → HTTP (80) Internal | Health Checks | Sticky Sessions (if needed)
+  </text>
+  <text x="800" y="350" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#333">
+    Security Group: Allow HTTPS (443) from Internet, Allow HTTP (80) to Frontend
+  </text>
+  
+  <!-- VPC -->
+  <rect x="150" y="390" width="1300" height="1700" fill="#e6f2ff" stroke="#1e40af" stroke-width="2" stroke-dasharray="5,5" rx="8"/>
+  <text x="800" y="415" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#1e40af">
+    VPC (Virtual Private Cloud) - 10.0.0.0/16
+  </text>
+  
+  <!-- Public Subnet -->
+  <rect x="200" y="440" width="600" height="400" fill="#ffffff" stroke="#28a745" stroke-width="2" rx="5"/>
+  <text x="500" y="465" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#28a745">
+    Public Subnet (10.0.1.0/24)
+  </text>
+  <text x="500" y="485" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#666">
+    Internet Gateway | Route Table: 0.0.0.0/0 → IGW
+  </text>
+  
+  <!-- Frontend Security -->
+  <rect x="230" y="510" width="250" height="140" fill="#4a90e2" stroke="#1e3a8a" stroke-width="2" rx="5"/>
+  <text x="355" y="535" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">
+    Frontend (Next.js)
+  </text>
+  <text x="355" y="555" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+    Security Group: SG-Frontend
+  </text>
+  <text x="355" y="570" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Inbound: HTTP (80) from ALB
+  </text>
+  <text x="355" y="585" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Outbound: HTTPS (443) to Backend
+  </text>
+  <text x="355" y="600" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • JWT Token Storage: localStorage
+  </text>
+  <text x="355" y="615" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • XSS Protection: React auto-escaping
+  </text>
+  <text x="355" y="630" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • CSRF: SameSite cookies
+  </text>
+  
+  <!-- Keycloak Security -->
+  <rect x="520" y="510" width="250" height="140" fill="#ff6b6b" stroke="#c92a2a" stroke-width="2" rx="5"/>
+  <text x="645" y="535" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">
+    Keycloak
+  </text>
+  <text x="645" y="555" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+    Security Group: SG-Keycloak
+  </text>
+  <text x="645" y="570" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Inbound: HTTPS (443) from Frontend
+  </text>
+  <text x="645" y="585" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Outbound: HTTPS (443) to Backend
+  </text>
+  <text x="645" y="600" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • JWT Signing: RSA-256 Private Key
+  </text>
+  <text x="645" y="615" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Password Hashing: bcrypt
+  </text>
+  <text x="645" y="630" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • MFA Support: TOTP, SMS
+  </text>
+  
+  <!-- NAT Gateway -->
+  <rect x="230" y="670" width="540" height="50" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2" rx="5"/>
+  <text x="500" y="695" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#7b1fa2">
+    NAT Gateway (High Availability)
+  </text>
+  <text x="500" y="710" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#333">
+    Allows Private Subnet resources to access Internet for updates, without exposing them to inbound traffic
+  </text>
+  
+  <!-- Private Subnet -->
+  <rect x="850" y="440" width="550" height="800" fill="#fff5f5" stroke="#dc3545" stroke-width="2" rx="5"/>
+  <text x="1125" y="465" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#dc3545">
+    Private Subnet (10.0.2.0/24)
+  </text>
+  <text x="1125" y="485" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#666">
+    NAT Gateway | Route Table: 0.0.0.0/0 → NAT Gateway
+  </text>
+  
+  <!-- Backend Security -->
+  <rect x="880" y="510" width="250" height="180" fill="#51cf66" stroke="#2b8a3e" stroke-width="2" rx="5"/>
+  <text x="1005" y="535" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">
+    Backend (Spring Boot)
+  </text>
+  <text x="1005" y="555" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+    Security Group: SG-Backend
+  </text>
+  <text x="1005" y="570" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Inbound: HTTPS (443) from Frontend
+  </text>
+  <text x="1005" y="585" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Outbound: PostgreSQL (5432), MSK (9092)
+  </text>
+  <text x="1005" y="600" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • JWT Validation: OAuth2 Resource Server
+  </text>
+  <text x="1005" y="615" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Role-Based Access: @PreAuthorize
+  </text>
+  <text x="1005" y="630" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Input Validation: @Valid, @NotNull
+  </text>
+  <text x="1005" y="645" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • SQL Injection: Parameterized Queries
+  </text>
+  <text x="1005" y="660" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • IAM Role: BackendExecutionRole
+  </text>
+  <text x="1005" y="675" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Secrets: AWS Secrets Manager
+  </text>
+  
+  <!-- PostgreSQL Security -->
+  <rect x="1180" y="510" width="180" height="180" fill="#339af0" stroke="#1c7ed6" stroke-width="2" rx="5"/>
+  <text x="1270" y="535" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">
+    PostgreSQL (RDS)
+  </text>
+  <text x="1270" y="555" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+    Security Group: SG-RDS
+  </text>
+  <text x="1270" y="570" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Inbound: 5432 from SG-Backend
+  </text>
+  <text x="1270" y="585" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Encryption: At Rest (AES-256)
+  </text>
+  <text x="1270" y="600" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Encryption: In Transit (SSL)
+  </text>
+  <text x="1270" y="615" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Authentication: IAM Database Auth
+  </text>
+  <text x="1270" y="630" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Multi-AZ: High Availability
+  </text>
+  <text x="1270" y="645" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Automated Backups: Encrypted
+  </text>
+  <text x="1270" y="660" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • VPC Endpoint: Private Access
+  </text>
+  <text x="1270" y="675" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Network Isolation: Private Subnet
+  </text>
+  
+  <!-- Kafka Security -->
+  <rect x="880" y="720" width="250" height="140" fill="#ffd43b" stroke="#f59f00" stroke-width="2" rx="5"/>
+  <text x="1005" y="745" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#333">
+    Kafka (MSK)
+  </text>
+  <text x="1005" y="765" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#333">
+    Security Group: SG-MSK
+  </text>
+  <text x="1005" y="780" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Inbound: 9092 from SG-Backend
+  </text>
+  <text x="1005" y="795" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Encryption: TLS (In Transit)
+  </text>
+  <text x="1005" y="810" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Encryption: At Rest (EBS)
+  </text>
+  <text x="1005" y="825" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • SASL/SCRAM Auth: Client Certificates
+  </text>
+  <text x="1005" y="840" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • ACLs: Topic-level Permissions
+  </text>
+  <text x="1005" y="855" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • VPC Endpoint: Private Access
+  </text>
+  
+  <!-- Zookeeper Security -->
+  <rect x="1180" y="720" width="180" height="140" fill="#ff922b" stroke="#e67700" stroke-width="2" rx="5"/>
+  <text x="1270" y="745" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">
+    Zookeeper
+  </text>
+  <text x="1270" y="765" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+    Security Group: SG-ZK
+  </text>
+  <text x="1270" y="780" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Inbound: 2181 from Kafka
+  </text>
+  <text x="1270" y="795" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Encryption: TLS
+  </text>
+  <text x="1270" y="810" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Authentication: SASL
+  </text>
+  <text x="1270" y="825" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Network Isolation: Private
+  </text>
+  <text x="1270" y="840" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#333">
+    • Managed by MSK
+  </text>
+  
+  <!-- Authentication Flow Section -->
+  <text x="800" y="920" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#1e3a8a">
+    Authentication &amp; Authorization Flow
+  </text>
+  
+  <!-- Step 1: Login -->
+  <rect x="200" y="950" width="1200" height="60" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="5"/>
+  <text x="250" y="975" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1976d2">
+    Step 1: User Login
+  </text>
+  <text x="250" y="995" font-family="Arial, sans-serif" font-size="11" fill="#333">
+    Frontend → Keycloak (POST /realms/cmips/protocol/openid-connect/token) | Credentials: username + password (HTTPS)
+  </text>
+  
+  <!-- Step 2: Token Issuance -->
+  <rect x="200" y="1030" width="1200" height="60" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2" rx="5"/>
+  <text x="250" y="1055" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#7b1fa2">
+    Step 2: JWT Token Issuance
+  </text>
+  <text x="250" y="1075" font-family="Arial, sans-serif" font-size="11" fill="#333">
+    Keycloak validates credentials → Generates JWT (RSA-256 signed) → Token contains: userId, username, roles, exp, iat, iss
+  </text>
+  
+  <!-- Step 3: Token Storage -->
+  <rect x="200" y="1110" width="1200" height="60" fill="#fff3e0" stroke="#e65100" stroke-width="2" rx="5"/>
+  <text x="250" y="1135" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#e65100">
+    Step 3: Token Storage
+  </text>
+  <text x="250" y="1155" font-family="Arial, sans-serif" font-size="11" fill="#333">
+    Frontend stores JWT in localStorage (HttpOnly cookies recommended for production) | Token included in Authorization header
+  </text>
+  
+  <!-- Step 4: API Request -->
+  <rect x="200" y="1190" width="1200" height="60" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="5"/>
+  <text x="250" y="1215" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2e7d32">
+    Step 4: API Request with Token
+  </text>
+  <text x="250" y="1235" font-family="Arial, sans-serif" font-size="11" fill="#333">
+    Frontend → Backend (GET /api/tasks, Authorization: Bearer &lt;JWT&gt;) | HTTPS encrypted | Token in header
+  </text>
+  
+  <!-- Step 5: Token Validation -->
+  <rect x="200" y="1270" width="1200" height="60" fill="#fce4ec" stroke="#c2185b" stroke-width="2" rx="5"/>
+  <text x="250" y="1295" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#c2185b">
+    Step 5: Token Validation
+  </text>
+  <text x="250" y="1315" font-family="Arial, sans-serif" font-size="11" fill="#333">
+    Backend → Keycloak (GET /realms/cmips/protocol/openid-connect/certs) | Validates signature, expiration, issuer | Extracts user roles
+  </text>
+  
+  <!-- Step 6: Authorization Check -->
+  <rect x="200" y="1350" width="1200" height="60" fill="#e0f2f1" stroke="#00695c" stroke-width="2" rx="5"/>
+  <text x="250" y="1375" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#00695c">
+    Step 6: Role-Based Authorization
+  </text>
+  <text x="250" y="1395" font-family="Arial, sans-serif" font-size="11" fill="#333">
+    Backend checks @PreAuthorize("hasRole('CASE_WORKER')") | If authorized → Process request | If not → 403 Forbidden
+  </text>
+  
+  <!-- Security Layers Section -->
+  <text x="800" y="1460" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#1e3a8a">
+    Security Layers &amp; Controls
+  </text>
+  
+  <!-- Layer 1 -->
+  <rect x="200" y="1490" width="1200" height="50" fill="#ffebee" stroke="#c62828" stroke-width="2" rx="5"/>
+  <text x="250" y="1515" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#c62828">
+    Layer 1: Network Security
+  </text>
+  <text x="250" y="1530" font-family="Arial, sans-serif" font-size="11" fill="#333">
+    VPC Isolation | Security Groups (Least Privilege) | Network ACLs | Private Subnets | NAT Gateway | No Direct Internet Access
+  </text>
+  
+  <!-- Layer 2 -->
+  <rect x="200" y="1560" width="1200" height="50" fill="#fff3e0" stroke="#e65100" stroke-width="2" rx="5"/>
+  <text x="250" y="1585" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#e65100">
+    Layer 2: Application Security
+  </text>
+  <text x="250" y="1600" font-family="Arial, sans-serif" font-size="11" fill="#333">
+    AWS WAF | Rate Limiting | Input Validation | SQL Injection Prevention | XSS Protection | CSRF Tokens | HTTPS Only
+  </text>
+  
+  <!-- Layer 3 -->
+  <rect x="200" y="1630" width="1200" height="50" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="5"/>
+  <text x="250" y="1655" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2e7d32">
+    Layer 3: Authentication &amp; Authorization
+  </text>
+  <text x="250" y="1670" font-family="Arial, sans-serif" font-size="11" fill="#333">
+    Keycloak (OAuth2/OIDC) | JWT Tokens (RSA-256) | Role-Based Access Control (RBAC) | Password Policies | MFA Support
+  </text>
+  
+  <!-- Layer 4 -->
+  <rect x="200" y="1700" width="1200" height="50" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="5"/>
+  <text x="250" y="1725" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1976d2">
+    Layer 4: Data Encryption
+  </text>
+  <text x="250" y="1740" font-family="Arial, sans-serif" font-size="11" fill="#333">
+    TLS 1.2+ (In Transit) | AES-256 (At Rest) | Encrypted Backups | SSL/TLS for Database | Encrypted EBS Volumes
+  </text>
+  
+  <!-- Layer 5 -->
+  <rect x="200" y="1770" width="1200" height="50" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2" rx="5"/>
+  <text x="250" y="1795" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#7b1fa2">
+    Layer 5: Secrets Management
+  </text>
+  <text x="250" y="1810" font-family="Arial, sans-serif" font-size="11" fill="#333">
+    AWS Secrets Manager | IAM Roles (No Hardcoded Credentials) | Database Passwords | API Keys | Encryption Keys
+  </text>
+  
+  <!-- Layer 6 -->
+  <rect x="200" y="1840" width="1200" height="50" fill="#fff8e1" stroke="#f57f17" stroke-width="2" rx="5"/>
+  <text x="250" y="1865" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#f57f17">
+    Layer 6: Monitoring &amp; Auditing
+  </text>
+  <text x="250" y="1880" font-family="Arial, sans-serif" font-size="11" fill="#333">
+    CloudWatch Logs | CloudTrail (API Auditing) | VPC Flow Logs | Security Alerts | Failed Login Attempts | Anomaly Detection
+  </text>
+  
+  <!-- IAM Roles Section -->
+  <text x="800" y="1940" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#1e3a8a">
+    IAM Roles &amp; Permissions
+  </text>
+  
+  <rect x="200" y="1970" width="1200" height="150" fill="#ffffff" stroke="#1e3a8a" stroke-width="2" rx="5"/>
+  <text x="250" y="1995" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1e3a8a">
+    BackendExecutionRole:
+  </text>
+  <text x="250" y="2015" font-family="Arial, sans-serif" font-size="10" fill="#333">
+    • SecretsManager: GetSecretValue (Database passwords, API keys)
+  </text>
+  <text x="250" y="2030" font-family="Arial, sans-serif" font-size="10" fill="#333">
+    • RDS: Connect (IAM Database Authentication)
+  </text>
+  <text x="250" y="2045" font-family="Arial, sans-serif" font-size="10" fill="#333">
+    • MSK: DescribeCluster, Read/Write Topics
+  </text>
+  <text x="250" y="2060" font-family="Arial, sans-serif" font-size="10" fill="#333">
+    • CloudWatch: PutLogEvents, PutMetricData
+  </text>
+  
+  <text x="700" y="1995" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1e3a8a">
+    FrontendExecutionRole:
+  </text>
+  <text x="700" y="2015" font-family="Arial, sans-serif" font-size="10" fill="#333">
+    • CloudWatch: PutLogEvents
+  </text>
+  <text x="700" y="2030" font-family="Arial, sans-serif" font-size="10" fill="#333">
+    • S3: GetObject (Static assets, if used)
+  </text>
+  
+  <text x="250" y="2085" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1e3a8a">
+    RDSInstanceRole:
+  </text>
+  <text x="250" y="2105" font-family="Arial, sans-serif" font-size="10" fill="#333">
+    • Automated Backups | Encryption Key Access | Multi-AZ Failover
+  </text>
+  
+  <!-- Security Best Practices -->
+  <text x="800" y="2140" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#1e3a8a">
+    Security Best Practices Implemented
+  </text>
+  
+  <rect x="200" y="2160" width="1200" height="30" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1" rx="3"/>
+  <text x="250" y="2180" font-family="Arial, sans-serif" font-size="10" fill="#333">
+    ✓ Defense in Depth | ✓ Least Privilege | ✓ Zero Trust Network | ✓ Encryption Everywhere | ✓ Regular Security Audits | ✓ Automated Patching
+  </text>
+  
+  <!-- Arrows for Authentication Flow -->
+  <path d="M 355 650 L 645 650" stroke="#1976d2" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="500" y="640" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#666">
+    Login Request
+  </text>
+  
+  <path d="M 645 650 L 355 650" stroke="#7b1fa2" stroke-width="2" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="3,3"/>
+  <text x="500" y="665" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#666">
+    JWT Token
+  </text>
+  
+  <path d="M 355 650 L 1005 650" stroke="#2e7d32" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="680" y="640" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#666">
+    API Request
+  </text>
+  
+  <path d="M 1005 690 L 1270 690" stroke="#00695c" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="1137" y="680" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#666">
+    DB Query
+  </text>
+  
+  <path d="M 1005 840 L 1270 840" stroke="#f59f00" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="1137" y="830" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#666">
+    Event Publish
+  </text>
+  
+  <!-- Arrow marker definition -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#333"/>
+    </marker>
+  </defs>
+</svg>
+
+
+
+
+

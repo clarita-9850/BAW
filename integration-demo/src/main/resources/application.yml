@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: integration-demo
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+server:
+  port: 8081
+
+# Integration Hub Framework configuration
+integration:
+  enabled: true
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.example.demo: DEBUG
+    com.cmips.integration.framework: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

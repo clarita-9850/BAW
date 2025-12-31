@@ -3,7 +3,38 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import apiClient from '@/lib/api';
-import dynamic from 'next/dynamic';
+import AnalyticsTab from './components/AnalyticsTab';
+import BatchJobsTab from './components/BatchJobsTab';
+import { FieldAuthorizedValue, ActionButtons } from '@/components/FieldAuthorizedValue';
+import { isFieldVisible } from '@/hooks/useFieldAuthorization';
+
+type Timesheet = {
+  id: number;
+  userId?: string;
+  employeeId?: string;
+  employeeName?: string;
+  department?: string;
+  location?: string;
+  payPeriodStart?: string;
+  payPeriodEnd?: string;
+  regularHours?: number;
+  overtimeHours?: number;
+  totalHours?: number;
+  status?: string;
+  comments?: string;
+  supervisorComments?: string;
+  approvedBy?: string;
+  submittedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+type TimesheetResponse = {
+  content: Timesheet[];
+  totalElements: number;
+  numberOfElements: number;
+  allowedActions: string[];
+};
 
 type Task = {
   id: number;
@@ -51,14 +82,19 @@ type UserQueueData = {
 
 type ViewType = 'myWorkspace' | 'workQueues' | 'queueTasks' | 'queueSubscriptions';
 
-function SupervisorDashboardComponent() {
-  const { user, logout, loading: authLoading } = useAuth();
+export default function SupervisorDashboard() {
+  const { user, logout, loading: authLoading, isAuthenticated } = useAuth();
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
-  
+
   // Navigation state
-  const [activeTab, setActiveTab] = useState<'myWorkspace' | 'workQueues'>('myWorkspace');
+  const [activeTab, setActiveTab] = useState<'myWorkspace' | 'workQueues' | 'timesheets' | 'analytics' | 'batchJobs'>('myWorkspace');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Timesheets state
+  const [pendingTimesheets, setPendingTimesheets] = useState<Timesheet[]>([]);
+  const [timesheetAllowedActions, setTimesheetAllowedActions] = useState<string[]>([]);
   
   // Work Queues state
   const [queues, setQueues] = useState<QueueInfo[]>([]);
@@ -81,17 +117,46 @@ function SupervisorDashboardComponent() {
   const [selectedUserToAdd, setSelectedUserToAdd] = useState<string>('');
 
   useEffect(() => {
-    if (authLoading) return;
-    if (!user || (user.role !== 'SUPERVISOR' && !user.roles?.includes('SUPERVISOR'))) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    // Wait for mount and auth to finish loading
+    if (!mounted || authLoading) {
+      return;
+    }
+
+    // If no user after auth loads, redirect to login
+    if (!user) {
       window.location.href = '/login';
       return;
     }
+
+    // Allow both ADMIN and SUPERVISOR roles
+    const isSupervisor =
+      user?.role === 'SUPERVISOR' ||
+      user?.roles?.includes('SUPERVISOR') ||
+      user?.roles?.some((r: string) => r.toUpperCase() === 'SUPERVISOR');
+
+    const isAdmin =
+      user?.role === 'ADMIN' ||
+      user?.roles?.includes('ADMIN') ||
+      user?.roles?.some((r: string) => r.toUpperCase() === 'ADMIN');
+
+    if (!isSupervisor && !isAdmin) {
+      window.location.href = '/login';
+      return;
+    }
+
+    // Load dashboard data for both roles
     loadDashboardData();
-  }, [user, authLoading]);
+  }, [user, authLoading, mounted]);
 
   useEffect(() => {
     if (activeTab === 'myWorkspace') {
       loadMyWorkspaceData();
+    } else if (activeTab === 'timesheets') {
+      loadTimesheetsData();
     } else if (selectedQueue) {
       loadQueueTasks();
       loadQueueSubscriptions();
@@ -105,10 +170,10 @@ function SupervisorDashboardComponent() {
       const catalogRes = await apiClient.get('/work-queues/catalog');
       const catalog: QueueInfo[] = catalogRes.data || [];
       setQueues(catalog);
-      
+
       const usersRes = await apiClient.get('/work-queues/users');
       setAllUsers(usersRes.data || []);
-      
+
       if (activeTab === 'myWorkspace') {
         await loadMyWorkspaceData();
       }
@@ -117,6 +182,44 @@ function SupervisorDashboardComponent() {
       setError(err?.response?.data?.error || err.message || 'Failed to load dashboard data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadTimesheetsData = async () => {
+    try {
+      const timesheetsResponse = await apiClient.get<TimesheetResponse>('/timesheets');
+      const responseData = timesheetsResponse.data;
+      // Show submitted timesheets pending review
+      const submitted = (responseData.content || []).filter(ts => ts.status === 'SUBMITTED');
+      setPendingTimesheets(submitted);
+      setTimesheetAllowedActions(responseData.allowedActions || []);
+    } catch (err: any) {
+      console.error('Error loading timesheets:', err);
+      setPendingTimesheets([]);
+      setTimesheetAllowedActions([]);
+    }
+  };
+
+  const handleApproveTimesheet = async (id: number) => {
+    try {
+      await apiClient.post(`/timesheets/${id}/approve`);
+      alert('Timesheet approved successfully!');
+      loadTimesheetsData();
+    } catch (err: any) {
+      console.error('Error approving timesheet:', err);
+      alert('Failed to approve timesheet: ' + (err?.response?.data?.error || err.message));
+    }
+  };
+
+  const handleRejectTimesheet = async (id: number) => {
+    const reason = prompt('Enter rejection reason (optional):');
+    try {
+      await apiClient.post(`/timesheets/${id}/reject`, { reason });
+      alert('Timesheet rejected.');
+      loadTimesheetsData();
+    } catch (err: any) {
+      console.error('Error rejecting timesheet:', err);
+      alert('Failed to reject timesheet: ' + (err?.response?.data?.error || err.message));
     }
   };
 
@@ -353,198 +456,141 @@ function SupervisorDashboardComponent() {
     }
   };
 
-  if (loading || authLoading || !user) {
+  if (!mounted || loading || authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1e3a8a] mx-auto"></div>
-          <p className="mt-4 text-gray-600 font-medium">Loading Supervisor Dashboard...</p>
+      <div className="min-h-screen d-flex align-items-center justify-content-center" style={{ backgroundColor: 'var(--gray-50, #fafafa)' }}>
+        <div className="text-center card p-5">
+          <div className="spinner-border text-primary mb-3" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="text-muted mb-0">Loading Supervisor Dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white flex">
-      {/* Left Sidebar */}
-      <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-[#1e3a8a] text-white transition-all duration-300 flex flex-col shadow-xl`}>
-        <div className="p-4 flex items-center justify-between border-b border-[#1e40af]">
-          <h2 className={`${sidebarCollapsed ? 'hidden' : 'block'} font-bold text-lg`}>SHORTCUTS</h2>
-          <button
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="text-white hover:text-gray-300 transition-colors"
-          >
-            {sidebarCollapsed ? '→' : '←'}
-          </button>
-        </div>
-        
-        <nav className="flex-1 px-4 py-4">
-          <div className="space-y-1">
-            <div 
-              className={`py-2 px-3 cursor-pointer transition-colors ${
-                activeTab === 'myWorkspace' ? 'bg-[#1e40af]' : 'hover:bg-[#1e40af]/50'
-              }`}
+    <div>
+      {/* Dashboard Navigation Tabs */}
+      <div className="mb-4">
+        <ul className="nav nav-tabs" role="tablist">
+          <li className="nav-item" role="presentation">
+            <button
+              className={`nav-link ${activeTab === 'myWorkspace' ? 'active' : ''}`}
               onClick={() => {
                 setActiveTab('myWorkspace');
                 setQueueView('myWorkspace' as ViewType);
               }}
+              type="button"
             >
-              <div className="flex items-center justify-between">
-                <span className={sidebarCollapsed ? 'hidden' : 'block text-sm'}>My Workspace</span>
-                {!sidebarCollapsed && <span className="text-xs">▼</span>}
-              </div>
-            </div>
-            <div className="py-2 px-3 cursor-pointer hover:bg-[#1e40af]/50">
-              <div className="flex items-center justify-between">
-                <span className={sidebarCollapsed ? 'hidden' : 'block text-sm'}>Organization</span>
-                {!sidebarCollapsed && <span className="text-xs">▼</span>}
-              </div>
-            </div>
-            <div className="py-2 px-3 cursor-pointer hover:bg-[#1e40af]/50">
-              <div className="flex items-center justify-between">
-                <span className={sidebarCollapsed ? 'hidden' : 'block text-sm'}>User Search</span>
-                {!sidebarCollapsed && <span className="text-xs">▼</span>}
-              </div>
-            </div>
-            <div 
-              className={`py-2 px-3 cursor-pointer transition-colors ${
-                activeTab === 'workQueues' ? 'bg-[#1e40af]' : 'hover:bg-[#1e40af]/50'
-              }`}
+              My Workspace
+            </button>
+          </li>
+          <li className="nav-item" role="presentation">
+            <button
+              className={`nav-link ${activeTab === 'workQueues' ? 'active' : ''}`}
               onClick={() => {
                 setActiveTab('workQueues');
                 setQueueView('workQueues' as ViewType);
               }}
+              type="button"
             >
-              <div className="flex items-center justify-between">
-                <span className={sidebarCollapsed ? 'hidden' : 'block text-sm'}>Work Queues</span>
-                {!sidebarCollapsed && <span className="text-xs">▲</span>}
-              </div>
-              {!sidebarCollapsed && activeTab === 'workQueues' && (
-                <div className="mt-1 ml-4 py-1 px-2 bg-[#1e40af]">
-                  <span className="text-sm">Work Queues</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </nav>
+              Work Queues
+            </button>
+          </li>
+          <li className="nav-item" role="presentation">
+            <button
+              className={`nav-link ${activeTab === 'timesheets' ? 'active' : ''}`}
+              onClick={() => setActiveTab('timesheets')}
+              type="button"
+            >
+              Timesheets
+            </button>
+          </li>
+          <li className="nav-item" role="presentation">
+            <button
+              className={`nav-link ${activeTab === 'analytics' ? 'active' : ''}`}
+              onClick={() => setActiveTab('analytics')}
+              type="button"
+            >
+              Analytics
+            </button>
+          </li>
+          <li className="nav-item" role="presentation">
+            <button
+              className={`nav-link ${activeTab === 'batchJobs' ? 'active' : ''}`}
+              onClick={() => setActiveTab('batchJobs')}
+              type="button"
+            >
+              Batch Jobs
+            </button>
+          </li>
+        </ul>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Top Header */}
-        <header className="bg-[#1e3a8a] text-white px-6 py-4 flex justify-between items-center shadow-lg">
-          <h1 className="text-xl font-bold">CMIPSII Case Management Information Payroll System II</h1>
-          <div className="flex items-center gap-4">
-            <span className="font-medium">Welcome, {user?.username}</span>
-            <button onClick={logout} className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors font-medium shadow-md">
-              Logout
-            </button>
-          </div>
-        </header>
-
-        {/* Main Content Area */}
-        <main className="flex-1 bg-white overflow-auto">
-          {/* Top Tabs */}
-          <div className="border-b border-gray-300 bg-gray-100 px-4">
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => {
-                  setActiveTab('myWorkspace');
-                  setQueueView('myWorkspace' as ViewType);
-                }}
-                className={`px-4 py-2 text-sm font-medium border-t border-l border-r rounded-t ${
-                  activeTab === 'myWorkspace'
-                    ? 'bg-white border-gray-300 text-gray-900'
-                    : 'bg-gray-200 border-gray-300 text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                My Workspace
-              </button>
-              <button
-                onClick={() => {
-                  setActiveTab('workQueues');
-                  setQueueView('workQueues' as ViewType);
-                }}
-                className={`px-4 py-2 text-sm font-medium border-t border-l border-r rounded-t relative ${
-                  activeTab === 'workQueues'
-                    ? 'bg-white border-gray-300 text-gray-900'
-                    : 'bg-gray-200 border-gray-300 text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Work Queues
-                {activeTab === 'workQueues' && (
-                  <span className="ml-2 text-gray-500 text-xs">×</span>
-                )}
-              </button>
-            </div>
-          </div>
-          
-          <div className="p-6">
+      <div>
+        <div>
           {activeTab === 'myWorkspace' && (
-            <div className="space-y-6">
+            <div>
               {/* Header */}
-              <div className="flex justify-between items-center">
+              <div className="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900">My Workspace</h2>
-                  <p className="text-gray-600 mt-1">Overview of users, queues, and tasks</p>
+                  <h2 className="card-title mb-1">My Workspace</h2>
+                  <p className="text-muted">Overview of users, queues, and tasks</p>
                 </div>
                 <button
                   onClick={loadMyWorkspaceData}
-                  className="px-5 py-2.5 bg-[#1e3a8a] text-white rounded-lg hover:bg-[#1e40af] transition-colors font-medium shadow-md flex items-center gap-2"
+                  className="btn btn-primary"
                 >
-                  <span>🔄</span> Refresh
+                  🔄 Refresh
                 </button>
               </div>
 
               {error && (
-                <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-md shadow-sm">
+                <div className="alert alert-danger mb-4">
                   {error}
                 </div>
               )}
 
               {/* Escalated Tasks Section */}
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-                <div className="bg-[#1e3a8a] px-6 py-4">
-                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                    <span>⚠️</span> Escalated Tasks (Supervisor Only)
-                  </h3>
-                  <p className="text-gray-200 text-sm mt-1">Tasks requiring immediate supervisor attention</p>
+              <div className="card mb-4">
+                <div className="card-header" style={{ backgroundColor: 'var(--color-p2, #046b99)', color: 'white' }}>
+                  <h3 className="card-title mb-0" style={{ color: 'white' }}>⚠️ Escalated Tasks (Supervisor Only)</h3>
+                  <p className="text-muted mb-0" style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.875rem' }}>Tasks requiring immediate supervisor attention</p>
                 </div>
-                <div className="p-6">
+                <div className="card-body">
                   {escalatedTasks.length === 0 ? (
-                    <p className="text-gray-500 text-center py-8">No escalated tasks at this time</p>
+                    <p className="text-center text-muted py-4">No escalated tasks at this time</p>
                   ) : (
-                    <div className="space-y-3">
+                    <div>
                       {escalatedTasks.map((task) => (
                         <div
                           key={task.id}
-                          className="border border-gray-300 rounded-lg p-4 hover:border-gray-400 transition-all bg-white"
+                          className="card mb-3"
+                          style={{ borderLeft: '4px solid ' + getStatusColor(task.status) }}
                         >
-                          <div className="flex justify-between items-start mb-2">
-                            <h4 className="font-semibold text-gray-900">{task.title}</h4>
-                            <div className="flex gap-2">
-                              <span
-                                className="px-3 py-1 rounded-full text-xs font-semibold text-white"
-                                style={{ backgroundColor: getStatusColor(task.status) }}
-                              >
-                                {task.status}
-                              </span>
-                              <span
-                                className="px-3 py-1 rounded-full text-xs font-semibold text-white"
-                                style={{ backgroundColor: getPriorityColor(task.priority) }}
-                              >
-                                {task.priority}
-                              </span>
+                          <div className="card-body">
+                            <div className="d-flex justify-content-between align-items-start mb-2">
+                              <h5 className="fw-semibold mb-0">{task.title}</h5>
+                              <div className="d-flex gap-2">
+                                <span className="badge" style={{ backgroundColor: getStatusColor(task.status), color: 'white' }}>
+                                  {task.status}
+                                </span>
+                                <span className="badge" style={{ backgroundColor: getPriorityColor(task.priority), color: 'white' }}>
+                                  {task.priority}
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                          {task.description && (
-                            <p className="text-sm text-gray-600 mb-2">{task.description}</p>
-                          )}
-                          <div className="flex gap-4 text-xs text-gray-500">
-                            <span>👤 Assigned: {task.assignedTo || 'Unassigned'}</span>
-                            {task.dueDate && (
-                              <span>📅 Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                            {task.description && (
+                              <p className="text-muted mb-2 small">{task.description}</p>
                             )}
+                            <div className="d-flex gap-4 small text-muted">
+                              <span>👤 Assigned: {task.assignedTo || 'Unassigned'}</span>
+                              {task.dueDate && (
+                                <span>📅 Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -554,77 +600,74 @@ function SupervisorDashboardComponent() {
               </div>
 
               {/* Users by Queue Section */}
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-                <div className="bg-[#1e3a8a] px-6 py-4">
-                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                    <span>👥</span> Users by Work Queue
-                  </h3>
-                  <p className="text-gray-200 text-sm mt-1">View which users are in which queues and their active tasks</p>
+              <div className="card">
+                <div className="card-header" style={{ backgroundColor: 'var(--color-p2, #046b99)', color: 'white' }}>
+                  <h3 className="card-title mb-0" style={{ color: 'white' }}>👥 Users by Work Queue</h3>
+                  <p className="text-muted mb-0" style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.875rem' }}>View which users are in which queues and their active tasks</p>
                 </div>
-                <div className="p-6">
+                <div className="card-body">
                   {userQueueData.length === 0 ? (
-                    <p className="text-gray-500 text-center py-8">No users assigned to work queues yet</p>
+                    <p className="text-center text-muted py-4">No users assigned to work queues yet</p>
                   ) : (
-                    <div className="space-y-6">
+                    <div>
                       {userQueueData.map((userQueue, idx) => (
                         <div
                           key={`${userQueue.username}_${userQueue.queueName}_${idx}`}
-                          className="border border-gray-300 rounded-lg p-5 hover:border-gray-400 transition-all bg-white"
+                          className="card mb-3"
                         >
-                          <div className="flex justify-between items-start mb-4">
-                            <div>
-                              <h4 className="text-lg font-bold text-gray-900">
-                                👤 {userQueue.username}
-                              </h4>
-                              <p className="text-sm text-gray-700 font-medium mt-1">
-                                📋 Queue: {userQueue.queueDisplayName}
-                              </p>
+                          <div className="card-body">
+                            <div className="d-flex justify-content-between align-items-start mb-3">
+                              <div>
+                                <h5 className="fw-bold mb-1">
+                                  👤 {userQueue.username}
+                                </h5>
+                                <p className="text-muted mb-0 small">
+                                  📋 Queue: {userQueue.queueDisplayName}
+                                </p>
+                              </div>
+                              <span className="badge bg-primary" style={{ fontSize: '1rem', padding: '0.5rem 1rem' }}>
+                                {userQueue.taskCount} Task{userQueue.taskCount !== 1 ? 's' : ''}
+                              </span>
                             </div>
-                            <div className="bg-[#1e3a8a] text-white px-4 py-2 rounded-lg font-bold">
-                              {userQueue.taskCount} Task{userQueue.taskCount !== 1 ? 's' : ''}
-                            </div>
-                          </div>
-                          
-                          {userQueue.tasks.length === 0 ? (
-                            <p className="text-gray-500 text-sm">No active tasks</p>
-                          ) : (
-                            <div className="space-y-2 mt-4">
-                              {userQueue.tasks.map((task) => (
-                                <div
-                                  key={task.id}
-                                  className="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow"
-                                >
-                                  <div className="flex justify-between items-start">
-                                    <div className="flex-1">
-                                      <h5 className="font-semibold text-gray-900 text-sm">{task.title}</h5>
-                                      {task.description && (
-                                        <p className="text-xs text-gray-600 mt-1">{task.description}</p>
-                                      )}
-                                    </div>
-                                    <div className="flex gap-2 ml-4">
-                                      <span
-                                        className="px-2 py-1 rounded-full text-xs font-semibold text-white"
-                                        style={{ backgroundColor: getStatusColor(task.status) }}
-                                      >
-                                        {task.status}
-                                      </span>
-                                      <span
-                                        className="px-2 py-1 rounded-full text-xs font-semibold text-white"
-                                        style={{ backgroundColor: getPriorityColor(task.priority) }}
-                                      >
-                                        {task.priority}
-                                      </span>
+                            
+                            {userQueue.tasks.length === 0 ? (
+                              <p className="text-muted small mb-0">No active tasks</p>
+                            ) : (
+                              <div className="mt-3">
+                                {userQueue.tasks.map((task) => (
+                                  <div
+                                    key={task.id}
+                                    className="card mb-2"
+                                    style={{ borderLeft: '3px solid ' + getStatusColor(task.status) }}
+                                  >
+                                    <div className="card-body py-2">
+                                      <div className="d-flex justify-content-between align-items-start">
+                                        <div className="flex-grow-1">
+                                          <h6 className="fw-semibold mb-1 small">{task.title}</h6>
+                                          {task.description && (
+                                            <p className="text-muted small mb-1">{task.description}</p>
+                                          )}
+                                          {task.dueDate && (
+                                            <p className="text-muted small mb-0">
+                                              📅 Due: {new Date(task.dueDate).toLocaleDateString()}
+                                            </p>
+                                          )}
+                                        </div>
+                                        <div className="d-flex gap-2 ms-3">
+                                          <span className="badge" style={{ backgroundColor: getStatusColor(task.status), color: 'white' }}>
+                                            {task.status}
+                                          </span>
+                                          <span className="badge" style={{ backgroundColor: getPriorityColor(task.priority), color: 'white' }}>
+                                            {task.priority}
+                                          </span>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
-                                  {task.dueDate && (
-                                    <p className="text-xs text-gray-500 mt-2">
-                                      📅 Due: {new Date(task.dueDate).toLocaleDateString()}
-                                    </p>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          )}
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -638,184 +681,190 @@ function SupervisorDashboardComponent() {
             <>
               {queueView === 'workQueues' && (
                 <div>
-                  <div className="flex justify-between items-center mb-6">
+                  <div className="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                      <h2 className="text-3xl font-bold text-gray-900">Work Queues</h2>
-                      <p className="text-gray-600 mt-1">Manage work queues and subscriptions</p>
+                      <h2 className="card-title mb-1">Work Queues</h2>
+                      <p className="text-muted">Manage work queues and subscriptions</p>
                     </div>
                     <button
                       onClick={loadDashboardData}
-                      className="px-5 py-2.5 bg-[#1e3a8a] text-white rounded-lg hover:bg-[#1e40af] transition-colors font-medium shadow-md flex items-center gap-2"
+                      className="btn btn-primary"
                     >
-                      <span>🔄</span> Refresh
+                      <span className="ca-gov-icon-refresh" aria-hidden="true"></span>
+                      Refresh
                     </button>
                   </div>
 
                   {error && (
-                    <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-md shadow-sm mb-6">
+                    <div className="alert alert-danger mb-4">
                       {error}
                     </div>
                   )}
 
                   {/* Work Queues Table */}
-                  <div className="bg-white border border-gray-300 overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase border-b border-gray-300">Action</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase border-b border-gray-300">Name</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase border-b border-gray-300">Administrator</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase border-b border-gray-300">User Subscription</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {queues.map((queue) => (
-                          <tr key={queue.name} className="hover:bg-gray-50">
-                            <td className="px-4 py-3 whitespace-nowrap">
-                              <button
-                                onClick={() => handleViewQueue(queue)}
-                                className="text-[#1e3a8a] hover:text-[#1e40af] text-sm font-medium hover:underline"
-                              >
-                                View
-                              </button>
-                            </td>
-                            <td className="px-4 py-3 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">{queue.displayName}</div>
-                            </td>
-                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                              ADMIN
-                            </td>
-                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                              Yes
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  <div className="card">
+                    <div className="card-header" style={{ backgroundColor: 'var(--color-p2, #046b99)', color: 'white' }}>
+                      <h3 className="card-title mb-0" style={{ color: 'white' }}>Work Queues List</h3>
+                    </div>
+                    <div className="card-body">
+                      {queues.length === 0 ? (
+                        <p className="text-center text-muted py-4">No work queues found</p>
+                      ) : (
+                        <div className="table-responsive">
+                          <table className="table table-striped">
+                            <thead>
+                              <tr>
+                                <th>Action</th>
+                                <th>Name</th>
+                                <th>Administrator</th>
+                                <th>User Subscription</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {queues.map((queue) => (
+                                <tr key={queue.name}>
+                                  <td>
+                                    <button
+                                      onClick={() => handleViewQueue(queue)}
+                                      className="btn btn-primary btn-sm"
+                                    >
+                                      View
+                                    </button>
+                                  </td>
+                                  <td>{queue.displayName}</td>
+                                  <td>
+                                    <span className="badge bg-primary">ADMIN</span>
+                                  </td>
+                                  <td>
+                                    <span className="badge bg-success">Yes</span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
 
               {queueView === 'queueTasks' && selectedQueue && (
                 <div>
-                  <div className="flex justify-between items-center mb-6">
+                  <div className="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                      <h2 className="text-3xl font-bold text-gray-900">
+                      <h2 className="card-title mb-1">
                         Work Queue Tasks: {selectedQueue.displayName}
                       </h2>
-                      <p className="text-gray-600 mt-1">{selectedQueue.description}</p>
+                      <p className="text-muted">{selectedQueue.description}</p>
                     </div>
                     <button
                       onClick={() => setQueueView('workQueues' as ViewType)}
-                      className="px-5 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium shadow-md"
+                      className="btn btn-secondary"
                     >
-                      ← Back to Queues
+                      <span className="ca-gov-icon-arrow-prev" aria-hidden="true"></span>
+                      Back to Queues
                     </button>
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
-                    <div className="flex gap-3 flex-wrap">
-                      <button
-                        onClick={() => handleReserveTasks(5)}
-                        className="px-5 py-2.5 bg-[#1e3a8a] text-white rounded-lg hover:bg-[#1e40af] transition-colors font-medium shadow-md"
-                      >
-                        Reserve Next 5 Tasks...
-                      </button>
-                      <button
-                        onClick={() => handleReserveTasks(20)}
-                        className="px-5 py-2.5 bg-[#1e3a8a] text-white rounded-lg hover:bg-[#1e40af] transition-colors font-medium shadow-md"
-                      >
-                        Reserve Next 20 Tasks...
-                      </button>
-                      <button
-                        onClick={() => handleReserveTasks()}
-                        className="px-5 py-2.5 bg-[#1e3a8a] text-white rounded-lg hover:bg-[#1e40af] transition-colors font-medium shadow-md disabled:bg-gray-400 disabled:cursor-not-allowed"
-                        disabled={selectedTasks.size === 0}
-                      >
-                        Reserve Selected Tasks...
-                      </button>
-                      <button
-                        onClick={handleForwardTasks}
-                        className="px-5 py-2.5 bg-[#1e3a8a] text-white rounded-lg hover:bg-[#1e40af] transition-colors font-medium shadow-md disabled:bg-gray-400 disabled:cursor-not-allowed"
-                        disabled={selectedTasks.size === 0}
-                      >
-                        Forward Selected Tasks...
-                      </button>
+                  <div className="card mb-4">
+                    <div className="card-body">
+                      <h3 className="card-title mb-4">Task Actions</h3>
+                      <div className="d-flex gap-2 flex-wrap">
+                        <button
+                          onClick={() => handleReserveTasks(5)}
+                          className="btn btn-primary"
+                        >
+                          Reserve Next 5 Tasks
+                        </button>
+                        <button
+                          onClick={() => handleReserveTasks(20)}
+                          className="btn btn-primary"
+                        >
+                          Reserve Next 20 Tasks
+                        </button>
+                        <button
+                          onClick={() => handleReserveTasks()}
+                          className="btn btn-primary"
+                          disabled={selectedTasks.size === 0}
+                        >
+                          Reserve Selected ({selectedTasks.size})
+                        </button>
+                        <button
+                          onClick={handleForwardTasks}
+                          className="btn btn-primary"
+                          disabled={selectedTasks.size === 0}
+                        >
+                          Forward Selected ({selectedTasks.size})
+                        </button>
+                      </div>
                     </div>
                   </div>
 
                   {/* Tasks Table */}
-                  <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-                    <div className="px-6 py-4 bg-[#1e3a8a]">
-                      <h3 className="text-lg font-bold text-white">Total Tasks: {queueTasks.length}</h3>
+                  <div className="card">
+                    <div className="card-header" style={{ backgroundColor: 'var(--color-p2, #046b99)', color: 'white' }}>
+                      <h3 className="card-title mb-0" style={{ color: 'white' }}>Total Tasks: {queueTasks.length}</h3>
                     </div>
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Action</th>
-                          <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Task ID</th>
-                          <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Subject</th>
-                          <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Priority</th>
-                          <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
-                          <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Deadline</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {queueTasks.length === 0 ? (
-                          <tr>
-                            <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                              No tasks found in this queue
-                            </td>
-                          </tr>
-                        ) : (
-                          queueTasks.map((task) => (
-                            <tr key={task.id} className="hover:bg-gray-50 transition-colors">
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <input
-                                  type="checkbox"
-                                  checked={selectedTasks.has(task.id)}
-                                  onChange={() => toggleTaskSelection(task.id)}
-                                  className="mr-2 w-4 h-4 text-[#1e3a8a]"
-                                />
-                                <button className="text-[#1e3a8a] hover:text-[#1e40af] font-semibold hover:underline">
-                                  Reserve...
-                                </button>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <button className="text-[#1e3a8a] hover:text-[#1e40af] font-semibold hover:underline">
-                                  {task.id}
-                                </button>
-                              </td>
-                              <td className="px-6 py-4 text-sm font-medium text-gray-900">{task.title}</td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span
-                                  className="px-3 py-1 rounded-full text-xs font-semibold text-white"
-                                  style={{ backgroundColor: getPriorityColor(task.priority) }}
-                                >
-                                  {task.priority}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span
-                                  className="px-3 py-1 rounded-full text-xs font-semibold text-white"
-                                  style={{ backgroundColor: getStatusColor(task.status) }}
-                                >
-                                  {task.status}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700">
-                                {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '-'}
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
+                    <div className="card-body">
+                      {queueTasks.length === 0 ? (
+                        <p className="text-center text-muted py-4">No tasks found in this queue</p>
+                      ) : (
+                        <div className="table-responsive">
+                          <table className="table table-striped">
+                            <thead>
+                              <tr>
+                                <th>Action</th>
+                                <th>Task ID</th>
+                                <th>Subject</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Deadline</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {queueTasks.map((task) => (
+                                <tr key={task.id}>
+                                  <td>
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedTasks.has(task.id)}
+                                      onChange={() => toggleTaskSelection(task.id)}
+                                      className="me-2"
+                                    />
+                                    <button className="btn btn-link btn-sm p-0" style={{ textDecoration: 'none' }}>
+                                      Reserve...
+                                    </button>
+                                  </td>
+                                  <td>
+                                    <button className="btn btn-link btn-sm p-0" style={{ textDecoration: 'none' }}>
+                                      {task.id}
+                                    </button>
+                                  </td>
+                                  <td>{task.title}</td>
+                                  <td>
+                                    <span className="badge" style={{ backgroundColor: getPriorityColor(task.priority), color: 'white' }}>
+                                      {task.priority}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span className="badge" style={{ backgroundColor: getStatusColor(task.status), color: 'white' }}>
+                                      {task.status}
+                                    </span>
+                                  </td>
+                                  <td>{task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '-'}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* View Tabs */}
-                  <div className="mt-4 border-b border-gray-300">
+                  <div className="mt-4 border-b border-gray-300 mb-6">
                     <nav className="flex">
                       <button
                         onClick={() => setQueueView('queueTasks' as ViewType)}
@@ -844,167 +893,286 @@ function SupervisorDashboardComponent() {
 
               {queueView === 'queueSubscriptions' && selectedQueue && (
                 <div>
-                  <div className="mb-4">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                      Work Queue Subscriptions: {selectedQueue.displayName}
-                    </h2>
-                  </div>
-
-                  {/* View Tabs */}
-                  <div className="mb-4 border-b border-gray-300">
-                    <nav className="flex">
-                      <button
-                        onClick={() => setQueueView('queueTasks' as ViewType)}
-                        className={`px-4 py-2 text-sm font-medium border-t border-l border-r rounded-t ${
-                          (queueView as string) === 'queueTasks'
-                            ? 'bg-white border-gray-300 text-gray-900'
-                            : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-50'
-                        }`}
-                      >
-                        View Work Queue
-                      </button>
-                      <button
-                        onClick={() => setQueueView('queueSubscriptions' as ViewType)}
-                        className={`px-4 py-2 text-sm font-medium border-t border-l border-r rounded-t ${
-                          (queueView as string) === 'queueSubscriptions'
-                            ? 'bg-white border-gray-300 text-gray-900'
-                            : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-gray-50'
-                        }`}
-                      >
-                        Work Queues Subscriptions
-                      </button>
-                    </nav>
-                  </div>
-
-                  <div className="mb-4">
+                  <div className="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                      <h2 className="card-title mb-1">
+                        Work Queue Subscriptions: {selectedQueue.displayName}
+                      </h2>
+                      <p className="text-muted">Manage user subscriptions for this work queue</p>
+                    </div>
                     <button
-                      onClick={() => setShowAddSubscriptionModal(true)}
-                      className="px-4 py-2 bg-[#1e3a8a] text-white text-sm font-medium hover:bg-[#1e40af]"
+                      onClick={() => setQueueView('workQueues' as ViewType)}
+                      className="btn btn-secondary"
                     >
-                      New...
+                      <span className="ca-gov-icon-arrow-prev" aria-hidden="true"></span>
+                      Back to Queues
                     </button>
                   </div>
 
+                  {/* View Tabs */}
+                  <div className="mb-4">
+                    <ul className="nav nav-tabs" role="tablist">
+                      <li className="nav-item" role="presentation">
+                        <button
+                          className={`nav-link ${(queueView as string) === 'queueTasks' ? 'active' : ''}`}
+                          onClick={() => setQueueView('queueTasks' as ViewType)}
+                          type="button"
+                        >
+                          View Work Queue
+                        </button>
+                      </li>
+                      <li className="nav-item" role="presentation">
+                        <button
+                          className={`nav-link ${(queueView as string) === 'queueSubscriptions' ? 'active' : ''}`}
+                          onClick={() => setQueueView('queueSubscriptions' as ViewType)}
+                          type="button"
+                        >
+                          Work Queues Subscriptions
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+
                   {/* Subscriptions Table */}
-                  <div className="bg-white border border-gray-300 overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase border-b border-gray-300">Action</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase border-b border-gray-300">Name</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase border-b border-gray-300">
-                            Subscription Date
-                            <span className="ml-1 text-gray-400">▼</span>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {queueSubscriptions.length === 0 ? (
-                          <tr>
-                            <td colSpan={3} className="px-4 py-8 text-center text-gray-500">
-                              No users subscribed to this queue
-                            </td>
-                          </tr>
-                        ) : (
-                          queueSubscriptions.map((sub) => (
-                            <tr key={sub.id} className="hover:bg-gray-50">
-                              <td className="px-4 py-3 whitespace-nowrap">
-                                <button
-                                  onClick={() => handleRemoveSubscription(sub.username)}
-                                  className="text-[#1e3a8a] hover:text-[#1e40af] text-sm font-medium hover:underline"
-                                >
-                                  Remove...
-                                </button>
-                              </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                                {sub.username}
-                              </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                                {new Date(sub.createdAt).toLocaleDateString('en-US', { 
-                                  year: 'numeric', 
-                                  month: '2-digit', 
-                                  day: '2-digit',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
+                  <div className="card">
+                    <div className="card-header" style={{ backgroundColor: 'var(--color-p2, #046b99)', color: 'white' }}>
+                      <h3 className="card-title mb-0" style={{ color: 'white' }}>Subscribed Users</h3>
+                    </div>
+                    <div className="card-body">
+                      <div className="mb-4">
+                        <button
+                          onClick={() => setShowAddSubscriptionModal(true)}
+                          className="btn btn-primary"
+                        >
+                          Add User Subscription
+                        </button>
+                      </div>
+
+                      {queueSubscriptions.length === 0 ? (
+                        <p className="text-center text-muted py-4">No users subscribed to this queue</p>
+                      ) : (
+                        <div className="table-responsive">
+                          <table className="table table-striped table-hover">
+                            <thead>
+                              <tr>
+                                <th>Action</th>
+                                <th>Name</th>
+                                <th>Subscription Date</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {queueSubscriptions.map((sub) => (
+                                <tr key={sub.id}>
+                                  <td>
+                                    <button
+                                      onClick={() => handleRemoveSubscription(sub.username)}
+                                      className="btn btn-link btn-sm p-0"
+                                    >
+                                      Remove...
+                                    </button>
+                                  </td>
+                                  <td>{sub.username}</td>
+                                  <td>
+                                    {new Date(sub.createdAt).toLocaleDateString('en-US', { 
+                                      year: 'numeric', 
+                                      month: '2-digit', 
+                                      day: '2-digit',
+                                      hour: '2-digit',
+                                      minute: '2-digit'
+                                    })}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
             </>
           )}
-          </div>
-        </main>
-      </div>
 
-      {/* Add Subscription Modal */}
-      {showAddSubscriptionModal && selectedQueue && (
+          {activeTab === 'timesheets' && (
+            <div>
+              {/* Header */}
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                  <h2 className="card-title mb-1">Timesheet Review</h2>
+                  <p className="text-muted">Review and approve submitted timesheets</p>
+                </div>
+                <div className="d-flex align-items-center gap-3">
+                  {timesheetAllowedActions.length > 0 && (
+                    <small className="text-muted">
+                      Actions: {timesheetAllowedActions.join(', ')}
+                    </small>
+                  )}
+                  <button
+                    onClick={loadTimesheetsData}
+                    className="btn btn-primary"
+                  >
+                    🔄 Refresh
+                  </button>
+                </div>
+              </div>
+
+              {/* Pending Timesheets */}
+              <div className="card">
+                <div className="card-header" style={{ backgroundColor: 'var(--color-p2, #046b99)', color: 'white' }}>
+                  <h3 className="card-title mb-0" style={{ color: 'white' }}>📋 Pending Timesheets for Review</h3>
+                </div>
+                <div className="card-body">
+                  {pendingTimesheets.length === 0 ? (
+                    <p className="text-center text-muted py-4">No timesheets pending review</p>
+                  ) : (
+                    <div className="table-responsive">
+                      <table className="table table-striped table-hover">
+                        <thead>
+                          <tr>
+                            {pendingTimesheets[0] && isFieldVisible(pendingTimesheets[0], 'employeeId') && (
+                              <th>Employee ID</th>
+                            )}
+                            {pendingTimesheets[0] && isFieldVisible(pendingTimesheets[0], 'employeeName') && (
+                              <th>Employee</th>
+                            )}
+                            {pendingTimesheets[0] && isFieldVisible(pendingTimesheets[0], 'department') && (
+                              <th>Department</th>
+                            )}
+                            <th>Pay Period</th>
+                            <th>Hours</th>
+                            <th>Status</th>
+                            {pendingTimesheets[0] && isFieldVisible(pendingTimesheets[0], 'submittedAt') && (
+                              <th>Submitted</th>
+                            )}
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {pendingTimesheets.map((timesheet) => (
+                            <tr key={timesheet.id}>
+                              {isFieldVisible(pendingTimesheets[0], 'employeeId') && (
+                                <td>
+                                  <FieldAuthorizedValue data={timesheet} field="employeeId" />
+                                </td>
+                              )}
+                              {isFieldVisible(pendingTimesheets[0], 'employeeName') && (
+                                <td>
+                                  <FieldAuthorizedValue data={timesheet} field="employeeName" />
+                                </td>
+                              )}
+                              {isFieldVisible(pendingTimesheets[0], 'department') && (
+                                <td>
+                                  <FieldAuthorizedValue data={timesheet} field="department" />
+                                </td>
+                              )}
+                              <td>
+                                <FieldAuthorizedValue data={timesheet} field="payPeriodStart" type="date" />
+                                {' - '}
+                                <FieldAuthorizedValue data={timesheet} field="payPeriodEnd" type="date" />
+                              </td>
+                              <td className="fw-bold">
+                                <FieldAuthorizedValue data={timesheet} field="totalHours" type="number" />
+                              </td>
+                              <td>
+                                <FieldAuthorizedValue data={timesheet} field="status" type="badge" />
+                              </td>
+                              {isFieldVisible(pendingTimesheets[0], 'submittedAt') && (
+                                <td>
+                                  <FieldAuthorizedValue data={timesheet} field="submittedAt" type="date" />
+                                </td>
+                              )}
+                              <td>
+                                <ActionButtons
+                                  allowedActions={timesheetAllowedActions}
+                                  onView={() => alert(`View timesheet ${timesheet.id}`)}
+                                  onApprove={() => handleApproveTimesheet(timesheet.id)}
+                                  onReject={() => handleRejectTimesheet(timesheet.id)}
+                                  size="sm"
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'analytics' && <AnalyticsTab />}
+
+          {activeTab === 'batchJobs' && <BatchJobsTab />}
+        </div>
+
+        {/* Add Subscription Modal */}
+        {showAddSubscriptionModal && selectedQueue && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 1050 }}
           onClick={() => setShowAddSubscriptionModal(false)}
         >
-          <div
-            className="bg-white rounded-xl w-full max-w-lg shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200 bg-[#1e3a8a] rounded-t-xl">
-              <h3 className="text-lg font-bold text-white">
-                Add Work Queue Subscription: {selectedQueue.displayName}
-              </h3>
-              <button
-                onClick={() => setShowAddSubscriptionModal(false)}
-                className="text-white hover:text-gray-200 text-2xl font-bold leading-none w-8 h-8 flex items-center justify-center rounded hover:bg-[#1e40af] transition-colors"
-                aria-label="Close"
-              >
-                ×
-              </button>
-            </div>
+            <div
+              className="card"
+              style={{ maxWidth: '500px', width: '90%' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="card-header" style={{ backgroundColor: 'var(--color-p2, #046b99)', color: 'white' }}>
+                <div className="d-flex justify-content-between align-items-center">
+                  <h3 className="card-title mb-0" style={{ color: 'white' }}>
+                    Add Work Queue Subscription: {selectedQueue.displayName}
+                  </h3>
+                  <button
+                    onClick={() => setShowAddSubscriptionModal(false)}
+                    className="btn-close btn-close-white"
+                    aria-label="Close"
+                  ></button>
+                </div>
+              </div>
             
             {/* Modal Body */}
-            <div className="px-6 py-6 space-y-6">
-              <div>
-                <label className="block text-sm font-bold text-gray-900 mb-2">
-                  User: <span className="text-red-500">*</span>
+            <div className="card-body">
+              <div className="mb-3">
+                <label htmlFor="user-select" className="form-label fw-bold">
+                  User: <span className="text-danger">*</span>
                 </label>
                 <select
+                  id="user-select"
                   value={selectedUserToAdd}
                   onChange={(e) => setSelectedUserToAdd(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e3a8a] focus:border-[#1e3a8a] text-gray-900 bg-white text-sm font-medium"
+                  className="form-select"
                 >
-                  <option value="" className="text-gray-500">-- Select User --</option>
+                  <option value="">-- Select User --</option>
                   {allUsers.map((u) => (
-                    <option key={u.id} value={u.username} className="text-gray-900">
+                    <option key={u.id} value={u.username}>
                       {u.username} {u.firstName && u.lastName && `(${u.firstName} ${u.lastName})`}
                     </option>
                   ))}
                 </select>
-                <p className="mt-2 text-xs text-gray-500">
-                  <span className="text-red-500">*</span> required field
+                <p className="text-muted small mt-2">
+                  <span className="text-danger">*</span> required field
                 </p>
               </div>
             </div>
             
             {/* Modal Footer */}
-            <div className="flex gap-3 justify-end px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+            <div className="card-footer d-flex justify-content-end gap-2">
               <button
                 onClick={() => {
                   setShowAddSubscriptionModal(false);
                   setSelectedUserToAdd('');
                 }}
-                className="px-6 py-2.5 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 font-medium text-sm transition-colors"
+                className="btn btn-secondary"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddSubscription}
                 disabled={!selectedUserToAdd}
-                className="px-6 py-2.5 bg-[#1e3a8a] text-white rounded-lg hover:bg-[#1e40af] disabled:bg-gray-400 disabled:cursor-not-allowed font-medium text-sm transition-colors shadow-md"
+                className="btn btn-primary"
               >
                 Save
               </button>
@@ -1012,8 +1180,7 @@ function SupervisorDashboardComponent() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
-
-export default dynamic(() => Promise.resolve(SupervisorDashboardComponent), { ssr: false });

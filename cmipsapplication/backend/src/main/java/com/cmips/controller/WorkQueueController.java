@@ -5,8 +5,8 @@ import com.cmips.service.WorkQueueCatalogService;
 import com.cmips.service.TaskService;
 import com.cmips.service.WorkQueueSubscriptionService;
 import com.cmips.service.KeycloakAdminService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,14 +17,24 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/work-queues")
 @CrossOrigin(origins = "*")
-@RequiredArgsConstructor
-@Slf4j
 public class WorkQueueController {
-    
+
+    private static final Logger log = LoggerFactory.getLogger(WorkQueueController.class);
+
     private final WorkQueueCatalogService catalogService;
     private final TaskService taskService;
     private final WorkQueueSubscriptionService subscriptionService;
     private final KeycloakAdminService keycloakAdminService;
+
+    public WorkQueueController(WorkQueueCatalogService catalogService,
+                               TaskService taskService,
+                               WorkQueueSubscriptionService subscriptionService,
+                               KeycloakAdminService keycloakAdminService) {
+        this.catalogService = catalogService;
+        this.taskService = taskService;
+        this.subscriptionService = subscriptionService;
+        this.keycloakAdminService = keycloakAdminService;
+    }
     
     /**
      * Get all predefined work queues

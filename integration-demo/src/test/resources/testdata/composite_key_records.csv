@@ -1,0 +1,7 @@
+regionCode,accountNumber,transactionDate,amount,description,category
+US-EAST,1001,2024-01-15,500.00,Monthly payment,PAYMENT
+US-EAST,1001,2024-02-15,500.00,Monthly payment,PAYMENT
+US-WEST,1002,2024-01-20,1200.50,Quarterly fee,FEE
+EU-NORTH,2001,2024-01-10,350.25,Service charge,SERVICE
+EU-NORTH,2001,2024-02-10,350.25,Service charge,SERVICE
+ASIA-PAC,3001,2024-01-05,2100.00,Annual subscription,SUBSCRIPTION

@@ -1,0 +1,421 @@
+<svg width="1800" height="1600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="frontendGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2563EB;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="securityGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#EF4444;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#DC2626;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="controllerGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="serviceGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="keycloakGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F59E0B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D97706;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="dbGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#EC4899;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#DB2777;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#333" />
+    </marker>
+    <marker id="arrowheadBlue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#3B82F6" />
+    </marker>
+    <marker id="arrowheadGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#10B981" />
+    </marker>
+    <marker id="arrowheadRed" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#EF4444" />
+    </marker>
+    <marker id="arrowheadPurple" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#8B5CF6" />
+    </marker>
+    <marker id="arrowheadOrange" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#F59E0B" />
+    </marker>
+    <marker id="arrowheadPink" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#EC4899" />
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="900" y="30" font-family="Arial, sans-serif" font-size="28" font-weight="bold" text-anchor="middle" fill="#1E3A8A">
+    CMIPS API Routing Architecture
+  </text>
+  <text x="900" y="55" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" fill="#6B7280">
+    Complete Request Flow: Frontend → Security → Controllers → Services → Data
+  </text>
+  
+  <!-- Phase 1: Frontend API Client -->
+  <rect x="50" y="80" width="1700" height="200" rx="10" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="900" y="105" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#1E40AF">
+    Phase 1: Frontend API Client (lib/api.ts)
+  </text>
+  
+  <!-- React Component -->
+  <rect x="100" y="130" width="250" height="130" rx="8" fill="url(#frontendGrad)" stroke="#2563EB" stroke-width="2"/>
+  <text x="225" y="155" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">React Component</text>
+  <text x="225" y="175" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#DBEAFE">Dashboard/Form/etc</text>
+  <rect x="120" y="185" width="210" height="65" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="225" y="205" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">apiClient.get('/timesheets')</text>
+  <text x="225" y="225" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">apiClient.post('/auth/login')</text>
+  <text x="225" y="245" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">apiClient.get('/analytics/...')</text>
+  
+  <!-- Arrow 1 -->
+  <path d="M 350 195 L 390 195" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrowheadBlue)"/>
+  
+  <!-- API Client Interceptor -->
+  <rect x="410" y="130" width="350" height="130" rx="8" fill="url(#frontendGrad)" stroke="#2563EB" stroke-width="2"/>
+  <text x="585" y="155" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">API Client (Axios)</text>
+  <text x="585" y="175" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#DBEAFE">api.ts - Request Interceptor</text>
+  <rect x="430" y="185" width="310" height="65" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="585" y="205" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">Base URL: http://localhost:8081/api</text>
+  <text x="585" y="225" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">Request Interceptor:</text>
+  <text x="585" y="240" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• Reads token from localStorage</text>
+  <text x="585" y="255" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• Adds: Authorization: Bearer {token}</text>
+  
+  <!-- Arrow 2 -->
+  <path d="M 760 195 L 800 195" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrowheadBlue)"/>
+  
+  <!-- HTTP Request -->
+  <rect x="820" y="130" width="300" height="130" rx="8" fill="#E0F2FE" stroke="#0EA5E9" stroke-width="2"/>
+  <text x="970" y="155" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#0C4A6E">HTTP Request</text>
+  <text x="970" y="175" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#075985">To Backend Server</text>
+  <rect x="840" y="185" width="260" height="65" rx="5" fill="rgba(14,165,233,0.1)" stroke="#0EA5E9" stroke-width="1"/>
+  <text x="970" y="205" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#075985">GET /api/timesheets</text>
+  <text x="970" y="225" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#075985">Headers:</text>
+  <text x="970" y="240" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#075985">Authorization: Bearer {JWT}</text>
+  <text x="970" y="255" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#075985">Content-Type: application/json</text>
+  
+  <!-- Arrow 3 -->
+  <path d="M 1120 195 L 1160 195" stroke="#3B82F6" stroke-width="2" marker-end="url(#arrowheadBlue)"/>
+  
+  <!-- Spring Boot Server -->
+  <rect x="1180" y="130" width="280" height="130" rx="8" fill="#D1FAE5" stroke="#10B981" stroke-width="2"/>
+  <text x="1320" y="155" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#059669">Spring Boot Server</text>
+  <text x="1320" y="175" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#047857">Port: 8081</text>
+  <rect x="1200" y="185" width="240" height="65" rx="5" fill="rgba(16,185,129,0.1)" stroke="#10B981" stroke-width="1"/>
+  <text x="1320" y="205" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#047857">Receives HTTP Request</text>
+  <text x="1320" y="225" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#047857">Dispatches to Security Filter</text>
+  <text x="1320" y="240" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#047857">Chain</text>
+  
+  <!-- Phase 2: Security Layer -->
+  <rect x="50" y="320" width="1700" height="280" rx="10" fill="#FEE2E2" stroke="#EF4444" stroke-width="2" filter="url(#shadow)"/>
+  <text x="900" y="345" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#DC2626">
+    Phase 2: Security Filter Chain (SecurityConfig.java)
+  </text>
+  
+  <!-- Security Filter Chain -->
+  <rect x="100" y="370" width="350" height="200" rx="8" fill="url(#securityGrad)" stroke="#DC2626" stroke-width="2"/>
+  <text x="275" y="395" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Security Filter Chain</text>
+  <text x="275" y="415" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#FEE2E2">SecurityConfig.java</text>
+  <rect x="120" y="425" width="310" height="135" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="275" y="445" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">1. CORS Configuration</text>
+  <text x="275" y="465" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">2. CSRF Disabled (JWT)</text>
+  <text x="275" y="485" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">3. Session Management:</text>
+  <text x="275" y="505" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">STATELESS</text>
+  <text x="275" y="525" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">4. Authorization Rules:</text>
+  <text x="275" y="545" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• /api/auth/** → permitAll()</text>
+  <text x="275" y="560" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• /api/admin/** → hasRole('ADMIN')</text>
+  
+  <!-- Arrow 4 -->
+  <path d="M 450 470 L 490 470" stroke="#EF4444" stroke-width="2" marker-end="url(#arrowheadRed)"/>
+  
+  <!-- JWT Validation -->
+  <rect x="510" y="370" width="350" height="200" rx="8" fill="url(#securityGrad)" stroke="#DC2626" stroke-width="2"/>
+  <text x="685" y="395" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">JWT Validation</text>
+  <text x="685" y="415" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#FEE2E2">OAuth2ResourceServer</text>
+  <rect x="530" y="425" width="310" height="135" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="685" y="445" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">1. Extracts JWT from header</text>
+  <text x="685" y="465" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">2. Validates signature with</text>
+  <text x="685" y="485" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">Keycloak JWK Set</text>
+  <text x="685" y="505" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">3. Checks expiration</text>
+  <text x="685" y="525" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">4. Extracts roles from token:</text>
+  <text x="685" y="545" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">realm_access.roles</text>
+  <text x="685" y="560" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">5. Creates SecurityContext</text>
+  
+  <!-- Arrow 5 -->
+  <path d="M 860 470 L 900 470" stroke="#EF4444" stroke-width="2" marker-end="url(#arrowheadRed)"/>
+  
+  <!-- Keycloak JWK Validation -->
+  <rect x="920" y="370" width="300" height="200" rx="8" fill="url(#keycloakGrad)" stroke="#D97706" stroke-width="2"/>
+  <text x="1070" y="395" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Keycloak</text>
+  <text x="1070" y="415" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#FEF3C7">JWK Set Endpoint</text>
+  <rect x="940" y="425" width="260" height="135" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1070" y="445" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">GET /realms/cmips/</text>
+  <text x="1070" y="465" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">protocol/openid-connect/certs</text>
+  <text x="1070" y="485" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">Returns public keys</text>
+  <text x="1070" y="505" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">for JWT signature</text>
+  <text x="1070" y="525" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">validation</text>
+  
+  <!-- Arrow 6 (Response) -->
+  <path d="M 900 530 L 860 530" stroke="#F59E0B" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowheadOrange)"/>
+  
+  <!-- Role-Based Authorization -->
+  <rect x="1280" y="370" width="350" height="200" rx="8" fill="url(#securityGrad)" stroke="#DC2626" stroke-width="2"/>
+  <text x="1455" y="395" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Role-Based Authorization</text>
+  <text x="1455" y="415" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#FEE2E2">Authorization Checks</text>
+  <rect x="1300" y="425" width="310" height="135" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1455" y="445" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">Checks SecurityContext:</text>
+  <text x="1455" y="465" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• User has required role?</text>
+  <text x="1455" y="485" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• /api/admin/** → ADMIN</text>
+  <text x="1455" y="505" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• /api/timesheets → Any auth</text>
+  <text x="1455" y="525" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• /api/auth/** → No auth</text>
+  <text x="1455" y="545" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">If authorized → Route to Controller</text>
+  <text x="1455" y="560" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">If not → 403 Forbidden</text>
+  
+  <!-- Phase 3: Controller Routing -->
+  <rect x="50" y="640" width="1700" height="400" rx="10" fill="#D1FAE5" stroke="#10B981" stroke-width="2" filter="url(#shadow)"/>
+  <text x="900" y="665" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#059669">
+    Phase 3: Controller Routing (@RequestMapping)
+  </text>
+  
+  <!-- Request Mapping -->
+  <rect x="100" y="690" width="280" height="320" rx="8" fill="url(#controllerGrad)" stroke="#059669" stroke-width="2"/>
+  <text x="240" y="715" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Spring MVC Router</text>
+  <text x="240" y="735" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#D1FAE5">DispatcherServlet</text>
+  <rect x="120" y="745" width="240" height="255" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="240" y="765" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">Matches URL pattern:</text>
+  <text x="240" y="785" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">/api/auth/** → AuthController</text>
+  <text x="240" y="805" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">/api/timesheets → TimesheetController</text>
+  <text x="240" y="825" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">/api/admin/keycloak →</text>
+  <text x="240" y="840" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">KeycloakAdminController</text>
+  <text x="240" y="860" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">/api/analytics → AnalyticsController</text>
+  <text x="240" y="880" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">/api/work-queues → WorkQueueController</text>
+  <text x="240" y="900" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">/api/tasks → TaskController</text>
+  <text x="240" y="920" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">/api/bi → BusinessIntelligenceController</text>
+  <text x="240" y="940" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">/api/field-masking → FieldMaskingController</text>
+  <text x="240" y="960" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">/api/notifications → NotificationController</text>
+  <text x="240" y="980" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">/api/provider-recipient → ProviderRecipientController</text>
+  
+  <!-- Controllers Grid -->
+  <rect x="420" y="690" width="1260" height="320" rx="8" fill="#ECFDF5" stroke="#10B981" stroke-width="1"/>
+  
+  <!-- Row 1: Auth & Admin -->
+  <rect x="440" y="710" width="280" height="90" rx="5" fill="url(#controllerGrad)" stroke="#059669" stroke-width="2"/>
+  <text x="580" y="735" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">AuthController</text>
+  <text x="580" y="755" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#D1FAE5">@RequestMapping("/api/auth")</text>
+  <text x="580" y="775" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">POST /login</text>
+  <text x="580" y="790" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">POST /refresh</text>
+  
+  <rect x="750" y="710" width="280" height="90" rx="5" fill="url(#controllerGrad)" stroke="#059669" stroke-width="2"/>
+  <text x="890" y="735" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">KeycloakAdminController</text>
+  <text x="890" y="755" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#D1FAE5">@RequestMapping("/api/admin/keycloak")</text>
+  <text x="890" y="775" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">POST/GET/DELETE /users</text>
+  <text x="890" y="790" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">POST/GET /roles, /policies, /groups</text>
+  
+  <rect x="1060" y="710" width="280" height="90" rx="5" fill="url(#controllerGrad)" stroke="#059669" stroke-width="2"/>
+  <text x="1200" y="735" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">TimesheetController</text>
+  <text x="1200" y="755" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#D1FAE5">@RequestMapping("/api/timesheets")</text>
+  <text x="1200" y="775" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">GET, POST, PUT, DELETE</text>
+  <text x="1200" y="790" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">POST /{id}/submit, /approve, /reject</text>
+  
+  <rect x="1370" y="710" width="280" height="90" rx="5" fill="url(#controllerGrad)" stroke="#059669" stroke-width="2"/>
+  <text x="1510" y="735" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">AnalyticsController</text>
+  <text x="1510" y="755" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#D1FAE5">@RequestMapping("/api/analytics")</text>
+  <text x="1510" y="775" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">GET /realtime-metrics</text>
+  <text x="1510" y="790" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">GET /demographics/*, /health</text>
+  
+  <!-- Row 2: Work Queues & Tasks -->
+  <rect x="440" y="820" width="280" height="90" rx="5" fill="url(#controllerGrad)" stroke="#059669" stroke-width="2"/>
+  <text x="580" y="845" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">WorkQueueController</text>
+  <text x="580" y="865" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#D1FAE5">@RequestMapping("/api/work-queues")</text>
+  <text x="580" y="885" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">GET /catalog, /{queueName}/tasks</text>
+  <text x="580" y="900" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">POST /subscribe, DELETE /unsubscribe</text>
+  
+  <rect x="750" y="820" width="280" height="90" rx="5" fill="url(#controllerGrad)" stroke="#059669" stroke-width="2"/>
+  <text x="890" y="845" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">TaskController</text>
+  <text x="890" y="865" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#D1FAE5">@RequestMapping("/api/tasks")</text>
+  <text x="890" y="885" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">GET, POST, PUT, DELETE</text>
+  <text x="890" y="900" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">GET /status/{username}/{status}</text>
+  
+  <rect x="1060" y="820" width="280" height="90" rx="5" fill="url(#controllerGrad)" stroke="#059669" stroke-width="2"/>
+  <text x="1200" y="845" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">BusinessIntelligenceController</text>
+  <text x="1200" y="865" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#D1FAE5">@RequestMapping("/api/bi")</text>
+  <text x="1200" y="885" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">POST /reports/generate</text>
+  <text x="1200" y="900" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">GET /jobs/{jobId}/status, /result</text>
+  
+  <rect x="1370" y="820" width="280" height="90" rx="5" fill="url(#controllerGrad)" stroke="#059669" stroke-width="2"/>
+  <text x="1510" y="845" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">FieldMaskingController</text>
+  <text x="1510" y="865" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#D1FAE5">@RequestMapping("/api/field-masking")</text>
+  <text x="1510" y="885" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">GET /interface/{userRole}</text>
+  <text x="1510" y="900" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">POST /update-rules</text>
+  
+  <!-- Row 3: Other Controllers -->
+  <rect x="440" y="930" width="400" height="60" rx="5" fill="url(#controllerGrad)" stroke="#059669" stroke-width="2"/>
+  <text x="640" y="955" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">NotificationController</text>
+  <text x="640" y="975" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#D1FAE5">@RequestMapping("/api/notifications")</text>
+  <text x="640" y="990" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">GET /user/{userId}, PUT /{id}/read, POST, DELETE</text>
+  
+  <rect x="880" y="930" width="400" height="60" rx="5" fill="url(#controllerGrad)" stroke="#059669" stroke-width="2"/>
+  <text x="1080" y="955" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">ProviderRecipientController</text>
+  <text x="1080" y="975" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#D1FAE5">@RequestMapping("/api/provider-recipient")</text>
+  <text x="1080" y="990" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">GET /my-recipients, /my-providers, /all</text>
+  
+  <rect x="1320" y="930" width="400" height="60" rx="5" fill="url(#controllerGrad)" stroke="#059669" stroke-width="2"/>
+  <text x="1520" y="955" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">GenericResourceController</text>
+  <text x="1520" y="975" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#D1FAE5">@RequestMapping("/api/resources")</text>
+  <text x="1520" y="990" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">Generic CRUD: POST/GET/PUT/DELETE /{resourceType}</text>
+  
+  <!-- Phase 4: Service Layer -->
+  <rect x="50" y="1080" width="1700" height="240" rx="10" fill="#F3E8FF" stroke="#8B5CF6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="900" y="1105" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#7C3AED">
+    Phase 4: Service Layer (Business Logic)
+  </text>
+  
+  <!-- Service Examples -->
+  <rect x="100" y="1140" width="300" height="160" rx="8" fill="url(#serviceGrad)" stroke="#7C3AED" stroke-width="2"/>
+  <text x="250" y="1165" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Service Layer</text>
+  <text x="250" y="1185" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#E9D5FF">Business Logic</text>
+  <rect x="120" y="1195" width="260" height="95" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="250" y="1215" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">Examples:</text>
+  <text x="250" y="1235" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• TimesheetService</text>
+  <text x="250" y="1250" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• AnalyticsService</text>
+  <text x="250" y="1265" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• KeycloakAdminService</text>
+  <text x="250" y="1280" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• TaskService</text>
+  <text x="250" y="1295" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• WorkQueueService</text>
+  
+  <!-- Arrow 7 -->
+  <path d="M 400 1220 L 440 1220" stroke="#8B5CF6" stroke-width="2" marker-end="url(#arrowheadPurple)"/>
+  
+  <!-- Data Access Layer -->
+  <rect x="460" y="1140" width="300" height="160" rx="8" fill="url(#serviceGrad)" stroke="#7C3AED" stroke-width="2"/>
+  <text x="610" y="1165" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Data Access Layer</text>
+  <text x="610" y="1185" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#E9D5FF">JPA Repositories</text>
+  <rect x="480" y="1195" width="260" height="95" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="610" y="1215" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">Examples:</text>
+  <text x="610" y="1235" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• TimesheetRepository</text>
+  <text x="610" y="1250" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• TaskRepository</text>
+  <text x="610" y="1265" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• NotificationRepository</text>
+  <text x="610" y="1280" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• WorkQueueRepository</text>
+  
+  <!-- Arrow 8 -->
+  <path d="M 760 1220 L 800 1220" stroke="#EC4899" stroke-width="2" marker-end="url(#arrowheadPink)"/>
+  
+  <!-- PostgreSQL Database -->
+  <ellipse cx="850" cy="1220" rx="20" ry="10" fill="url(#dbGrad)" opacity="0.6"/>
+  <rect x="830" y="1140" width="300" height="160" rx="8" fill="url(#dbGrad)" stroke="#DB2777" stroke-width="2"/>
+  <text x="980" y="1165" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">PostgreSQL</text>
+  <text x="980" y="1185" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#FCE7F3">Database</text>
+  <rect x="850" y="1195" width="260" height="95" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="980" y="1215" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">Application Schema:</text>
+  <text x="980" y="1235" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• timesheets</text>
+  <text x="980" y="1250" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• tasks</text>
+  <text x="980" y="1265" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• work_queues</text>
+  <text x="980" y="1280" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• notifications</text>
+  
+  <!-- Arrow 9 (Keycloak Admin) -->
+  <path d="M 1130 1220 L 1170 1220" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrowheadOrange)"/>
+  
+  <!-- Keycloak Admin API -->
+  <rect x="1190" y="1140" width="300" height="160" rx="8" fill="url(#keycloakGrad)" stroke="#D97706" stroke-width="2"/>
+  <text x="1340" y="1165" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Keycloak Admin API</text>
+  <text x="1340" y="1185" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#FEF3C7">For Admin Operations</text>
+  <rect x="1210" y="1195" width="260" height="95" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1340" y="1215" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">Endpoints:</text>
+  <text x="1340" y="1235" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• /admin/realms/cmips/users</text>
+  <text x="1340" y="1250" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• /admin/realms/cmips/roles</text>
+  <text x="1340" y="1265" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• /admin/realms/cmips/groups</text>
+  <text x="1340" y="1280" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• /admin/realms/cmips/policies</text>
+  
+  <!-- Arrow 10 (Keycloak DB) -->
+  <path d="M 1490 1220 L 1530 1220" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrowheadOrange)"/>
+  
+  <!-- Keycloak Database -->
+  <ellipse cx="1580" cy="1220" rx="20" ry="10" fill="url(#dbGrad)" opacity="0.6"/>
+  <rect x="1560" y="1140" width="160" height="160" rx="8" fill="url(#dbGrad)" stroke="#DB2777" stroke-width="2"/>
+  <text x="1640" y="1165" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">PostgreSQL</text>
+  <text x="1640" y="1185" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" fill="#FCE7F3">Keycloak Schema</text>
+  <rect x="1580" y="1195" width="120" height="95" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1640" y="1215" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">Tables:</text>
+  <text x="1640" y="1235" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• user_entity</text>
+  <text x="1640" y="1250" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• keycloak_role</text>
+  <text x="1640" y="1265" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• keycloak_group</text>
+  <text x="1640" y="1280" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">• policy</text>
+  
+  <!-- Phase 5: Response Flow -->
+  <rect x="50" y="1360" width="1700" height="200" rx="10" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2" filter="url(#shadow)"/>
+  <text x="900" y="1385" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#92400E">
+    Phase 5: Response Flow Back to Frontend
+  </text>
+  
+  <!-- Response Path -->
+  <rect x="100" y="1410" width="200" height="130" rx="8" fill="url(#dbGrad)" stroke="#DB2777" stroke-width="2"/>
+  <text x="200" y="1435" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Database</text>
+  <text x="200" y="1455" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#FCE7F3">Returns Data</text>
+  <text x="200" y="1475" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">(JSON/Entities)</text>
+  <text x="200" y="1490" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">→ Repository</text>
+  <text x="200" y="1505" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">→ Service</text>
+  <text x="200" y="1520" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">→ Controller</text>
+  
+  <!-- Arrow 11 -->
+  <path d="M 300 1475 L 340 1475" stroke="#EC4899" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowheadPink)"/>
+  
+  <!-- Controller Response -->
+  <rect x="360" y="1410" width="250" height="130" rx="8" fill="url(#controllerGrad)" stroke="#059669" stroke-width="2"/>
+  <text x="485" y="1435" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Controller</text>
+  <text x="485" y="1455" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#D1FAE5">Returns ResponseEntity</text>
+  <text x="485" y="1475" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">ResponseEntity.ok(data)</text>
+  <text x="485" y="1490" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">ResponseEntity.status(404)</text>
+  <text x="485" y="1505" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">ResponseEntity.badRequest()</text>
+  <text x="485" y="1520" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">HTTP Status + Body</text>
+  
+  <!-- Arrow 12 -->
+  <path d="M 610 1475 L 650 1475" stroke="#10B981" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowheadGreen)"/>
+  
+  <!-- HTTP Response -->
+  <rect x="670" y="1410" width="250" height="130" rx="8" fill="#E0F2FE" stroke="#0EA5E9" stroke-width="2"/>
+  <text x="795" y="1435" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#0C4A6E">HTTP Response</text>
+  <text x="795" y="1455" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#075985">To Frontend</text>
+  <text x="795" y="1475" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#075985">Status: 200 OK</text>
+  <text x="795" y="1490" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#075985">Body: JSON data</text>
+  <text x="795" y="1505" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#075985">Headers: Content-Type</text>
+  <text x="795" y="1520" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#075985">application/json</text>
+  
+  <!-- Arrow 13 -->
+  <path d="M 920 1475 L 960 1475" stroke="#3B82F6" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowheadBlue)"/>
+  
+  <!-- API Client Response Interceptor -->
+  <rect x="980" y="1410" width="300" height="130" rx="8" fill="url(#frontendGrad)" stroke="#2563EB" stroke-width="2"/>
+  <text x="1130" y="1435" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">API Client</text>
+  <text x="1130" y="1455" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#DBEAFE">Response Interceptor</text>
+  <text x="1130" y="1475" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">Handles 401 → Logout</text>
+  <text x="1130" y="1490" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">Returns response.data</text>
+  <text x="1130" y="1505" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">to React component</text>
+  
+  <!-- Arrow 14 -->
+  <path d="M 1280 1475 L 1320 1475" stroke="#3B82F6" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowheadBlue)"/>
+  
+  <!-- React Component Update -->
+  <rect x="1340" y="1410" width="300" height="130" rx="8" fill="url(#frontendGrad)" stroke="#2563EB" stroke-width="2"/>
+  <text x="1490" y="1435" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">React Component</text>
+  <text x="1490" y="1455" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#DBEAFE">State Update</text>
+  <text x="1490" y="1475" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">setState(response.data)</text>
+  <text x="1490" y="1490" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">Component re-renders</text>
+  <text x="1490" y="1505" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="white">UI updates with data</text>
+  
+  <!-- Summary Box -->
+  <rect x="50" y="1600" width="1700" height="200" rx="10" fill="#F9FAFB" stroke="#6B7280" stroke-width="2"/>
+  <text x="900" y="1625" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#374151">API Routing Summary</text>
+  
+  <text x="100" y="1655" font-family="Arial, sans-serif" font-size="11" fill="#374151">1. Frontend: React component calls apiClient.get/post/put/delete('/endpoint') → API Client adds JWT token to Authorization header</text>
+  <text x="100" y="1675" font-family="Arial, sans-serif" font-size="11" fill="#374151">2. Security: Spring Security Filter Chain validates JWT, checks authorization rules, extracts roles → Routes to controller if authorized</text>
+  <text x="100" y="1695" font-family="Arial, sans-serif" font-size="11" fill="#374151">3. Routing: DispatcherServlet matches URL pattern (@RequestMapping) → Routes to appropriate Controller method (@GetMapping/@PostMapping/etc)</text>
+  <text x="100" y="1715" font-family="Arial, sans-serif" font-size="11" fill="#374151">4. Controller: Receives request, validates input, calls Service layer → Service executes business logic, calls Repository or Keycloak Admin API</text>
+  <text x="100" y="1735" font-family="Arial, sans-serif" font-size="11" fill="#374151">5. Data Access: Repository queries PostgreSQL (Application Schema) OR Keycloak Admin API queries PostgreSQL (Keycloak Schema) → Returns data</text>
+  <text x="100" y="1755" font-family="Arial, sans-serif" font-size="11" fill="#374151">6. Response: Service → Controller → ResponseEntity → HTTP Response → API Client Response Interceptor → React Component state update → UI re-render</text>
+  
+</svg>
+

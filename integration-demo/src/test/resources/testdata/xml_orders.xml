@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<orders>
+  <order orderId="1001">
+    <customerName>John Smith</customerName>
+    <totalAmount>1250.50</totalAmount>
+    <items>
+      <item sku="SKU-001">
+        <name>Laptop</name>
+        <quantity>1</quantity>
+        <price>999.99</price>
+      </item>
+      <item sku="SKU-002">
+        <name>Mouse</name>
+        <quantity>2</quantity>
+        <price>25.00</price>
+      </item>
+    </items>
+    <shippingAddress>
+      <street>123 Main St</street>
+      <city>Springfield</city>
+      <state>IL</state>
+      <zipCode>62701</zipCode>
+    </shippingAddress>
+  </order>
+  <order orderId="1002">
+    <customerName>Jane Doe</customerName>
+    <totalAmount>599.99</totalAmount>
+    <items>
+      <item sku="SKU-003">
+        <name>Tablet</name>
+        <quantity>1</quantity>
+        <price>599.99</price>
+      </item>
+    </items>
+    <shippingAddress>
+      <street>456 Oak Ave</street>
+      <city>Chicago</city>
+      <state>IL</state>
+      <zipCode>60601</zipCode>
+    </shippingAddress>
+  </order>
+</orders>

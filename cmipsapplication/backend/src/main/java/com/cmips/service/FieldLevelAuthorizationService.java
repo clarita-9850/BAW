@@ -226,10 +226,10 @@ public class FieldLevelAuthorizationService {
                     
                     // Find the first business role (not system roles)
                     for (String role : rolesList) {
-                        if (!role.startsWith("default-roles") && 
-                            !role.equals("uma_authorization") && 
+                        if (!role.startsWith("default-roles") &&
+                            !role.equals("uma_authorization") &&
                             !role.equals("offline_access") &&
-                            (role.equals("PROVIDER") || role.equals("RECIPIENT") || role.equals("CASE_WORKER"))) {
+                            (role.equals("PROVIDER") || role.equals("RECIPIENT") || role.equals("CASE_WORKER") || role.equals("SUPERVISOR"))) {
                             return role;
                         }
                     }
@@ -241,43 +241,158 @@ public class FieldLevelAuthorizationService {
         return "UNKNOWN";
     }
     
+    // Cache for resource attributes to avoid repeated Keycloak calls
+    private final Map<String, ResourceRepresentation> resourceCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private volatile long cacheExpiry = 0;
+    private static final long CACHE_TTL_MS = 300000; // 5 minutes
+
     /**
-     * Queries Keycloak for resource attributes
-     * 
+     * Queries Keycloak for resource attributes using Admin REST API
+     *
      * @param resourceName The name of the resource to query
      * @return ResourceRepresentation with attributes, or null if not found
      */
     private ResourceRepresentation queryKeycloakForResourceAttributes(String resourceName) {
         try {
-            // Create AuthzClient for querying Keycloak
-            Configuration configuration = new Configuration(
-                keycloakServerUrl,
-                realm,
-                clientId,
-                Map.of("secret", clientSecret),
-                null
-            );
-            
-            AuthzClient authzClient = AuthzClient.create(configuration);
-            
-            // Get all resources and find the one matching our resourceName
-            List<ResourceRepresentation> resources = authzClient.protection().resource().find(null, null, null, null, null, null, true, true, true, null, null);
-            logger.debug("Found {} resources in Keycloak", resources.size());
-            
-            for (ResourceRepresentation resource : resources) {
-                logger.debug("Checking resource: {} (ID: {})", resource.getName(), resource.getId());
-                if (resourceName.equals(resource.getName())) {
-                    logger.info("Found matching resource: {} with attributes: {}", resourceName, resource.getAttributes());
-                    return resource;
-                }
+            // Check cache first
+            long now = System.currentTimeMillis();
+            if (now < cacheExpiry && resourceCache.containsKey(resourceName)) {
+                logger.debug("Returning cached resource: {}", resourceName);
+                return resourceCache.get(resourceName);
             }
-            
-            logger.warn("Resource '{}' not found in Keycloak. Available resources: {}", 
-                resourceName, resources.stream().map(ResourceRepresentation::getName).collect(Collectors.toList()));
-            return null;
+
+            // Get admin token using client credentials
+            String adminToken = getClientCredentialsToken();
+            if (adminToken == null) {
+                logger.error("Failed to get admin token");
+                return null;
+            }
+
+            // Get client UUID
+            String clientUuid = getClientUuid(adminToken);
+            if (clientUuid == null) {
+                logger.error("Failed to get client UUID for {}", clientId);
+                return null;
+            }
+
+            // Query resources from Keycloak Admin API
+            String resourcesUrl = keycloakServerUrl + "admin/realms/" + realm + "/clients/" + clientUuid + "/authz/resource-server/resource";
+            logger.debug("Querying resources from: {}", resourcesUrl);
+
+            java.net.http.HttpClient httpClient = java.net.http.HttpClient.newHttpClient();
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                .uri(java.net.URI.create(resourcesUrl))
+                .header("Authorization", "Bearer " + adminToken)
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+
+            java.net.http.HttpResponse<String> response = httpClient.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                logger.error("Failed to get resources from Keycloak: {} - {}", response.statusCode(), response.body());
+                return null;
+            }
+
+            // Parse JSON response
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            List<Map<String, Object>> resources = mapper.readValue(response.body(),
+                mapper.getTypeFactory().constructCollectionType(List.class, Map.class));
+
+            // Update cache
+            resourceCache.clear();
+            cacheExpiry = now + CACHE_TTL_MS;
+
+            for (Map<String, Object> resourceMap : resources) {
+                ResourceRepresentation resource = new ResourceRepresentation();
+                resource.setName((String) resourceMap.get("name"));
+                resource.setId((String) resourceMap.get("_id"));
+                resource.setType((String) resourceMap.get("type"));
+
+                @SuppressWarnings("unchecked")
+                Map<String, List<String>> attributes = (Map<String, List<String>>) resourceMap.get("attributes");
+                if (attributes != null) {
+                    resource.setAttributes(attributes);
+                }
+
+                resourceCache.put(resource.getName(), resource);
+                logger.debug("Cached resource: {} with {} attributes", resource.getName(),
+                    attributes != null ? attributes.size() : 0);
+            }
+
+            ResourceRepresentation result = resourceCache.get(resourceName);
+            if (result != null) {
+                logger.info("Found resource: {} with attributes: {}", resourceName, result.getAttributes());
+            } else {
+                logger.warn("Resource '{}' not found. Available: {}", resourceName, resourceCache.keySet());
+            }
+            return result;
 
         } catch (Exception e) {
             logger.error("Error querying Keycloak for resource attributes: {}", e.getMessage(), e);
+            return null;
+        }
+    }
+
+    /**
+     * Gets a client credentials token for admin API access
+     */
+    private String getClientCredentialsToken() {
+        try {
+            String tokenUrl = keycloakServerUrl + "realms/" + realm + "/protocol/openid-connect/token";
+
+            String body = "grant_type=client_credentials&client_id=" + clientId + "&client_secret=" + clientSecret;
+
+            java.net.http.HttpClient httpClient = java.net.http.HttpClient.newHttpClient();
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                .uri(java.net.URI.create(tokenUrl))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .POST(java.net.http.HttpRequest.BodyPublishers.ofString(body))
+                .build();
+
+            java.net.http.HttpResponse<String> response = httpClient.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                Map<String, Object> tokenResponse = mapper.readValue(response.body(), Map.class);
+                return (String) tokenResponse.get("access_token");
+            } else {
+                logger.error("Failed to get client credentials token: {} - {}", response.statusCode(), response.body());
+                return null;
+            }
+        } catch (Exception e) {
+            logger.error("Error getting client credentials token: {}", e.getMessage(), e);
+            return null;
+        }
+    }
+
+    /**
+     * Gets the client UUID from Keycloak
+     */
+    private String getClientUuid(String adminToken) {
+        try {
+            String clientsUrl = keycloakServerUrl + "admin/realms/" + realm + "/clients?clientId=" + clientId;
+
+            java.net.http.HttpClient httpClient = java.net.http.HttpClient.newHttpClient();
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                .uri(java.net.URI.create(clientsUrl))
+                .header("Authorization", "Bearer " + adminToken)
+                .GET()
+                .build();
+
+            java.net.http.HttpResponse<String> response = httpClient.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                List<Map<String, Object>> clients = mapper.readValue(response.body(),
+                    mapper.getTypeFactory().constructCollectionType(List.class, Map.class));
+                if (!clients.isEmpty()) {
+                    return (String) clients.get(0).get("id");
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            logger.error("Error getting client UUID: {}", e.getMessage(), e);
             return null;
         }
     }
@@ -394,19 +509,86 @@ public class FieldLevelAuthorizationService {
     
     /**
      * Gets a human-readable description of field access for a specific scope
-     * 
+     *
      * @param resourceName The resource name
      * @param scope The scope (read, write, delete)
      * @return Description of field access
      */
     public String getFieldAccessDescription(String resourceName, String scope) {
         Set<String> allowedFields = getAllowedFields(resourceName, scope);
-        
+
         if (allowedFields.isEmpty()) {
             return String.format("No %s field access for resource: %s", scope, resourceName);
         }
-        
-        return String.format("Allowed %s fields for %s: %s", 
+
+        return String.format("Allowed %s fields for %s: %s",
             scope, resourceName, String.join(", ", allowedFields));
+    }
+
+    /**
+     * Filters fields for an entity based on user role and resource permissions.
+     * Converts the entity to a map and filters based on allowed fields.
+     *
+     * @param entity The entity object to filter
+     * @param userRoles The user's roles (comma-separated string or single role)
+     * @param resourceName The resource name to check permissions for
+     * @return Map containing only allowed fields
+     */
+    public Map<String, Object> filterFieldsForRole(Object entity, String userRoles, String resourceName) {
+        if (entity == null) {
+            return new HashMap<>();
+        }
+
+        try {
+            // Convert entity to map using reflection
+            Map<String, Object> entityMap = convertEntityToMap(entity);
+
+            // Use the existing filterFields method with the entity map
+            return filterFields(entityMap, resourceName, "read");
+        } catch (Exception e) {
+            logger.error("Error filtering fields for entity of type {} with resource {}: {}",
+                entity.getClass().getSimpleName(), resourceName, e.getMessage(), e);
+            return new HashMap<>();
+        }
+    }
+
+    /**
+     * Converts an entity object to a Map using reflection
+     *
+     * @param entity The entity to convert
+     * @return Map representation of the entity
+     */
+    private Map<String, Object> convertEntityToMap(Object entity) {
+        Map<String, Object> map = new HashMap<>();
+
+        try {
+            Class<?> clazz = entity.getClass();
+
+            // Get all declared fields including superclass fields
+            for (java.lang.reflect.Field field : clazz.getDeclaredFields()) {
+                field.setAccessible(true);
+                String fieldName = field.getName();
+                Object value = field.get(entity);
+                map.put(fieldName, value);
+            }
+
+            // Also include superclass fields
+            Class<?> superclass = clazz.getSuperclass();
+            while (superclass != null && superclass != Object.class) {
+                for (java.lang.reflect.Field field : superclass.getDeclaredFields()) {
+                    field.setAccessible(true);
+                    String fieldName = field.getName();
+                    if (!map.containsKey(fieldName)) {
+                        Object value = field.get(entity);
+                        map.put(fieldName, value);
+                    }
+                }
+                superclass = superclass.getSuperclass();
+            }
+        } catch (Exception e) {
+            logger.error("Error converting entity to map: {}", e.getMessage(), e);
+        }
+
+        return map;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -94,4 +95,96 @@ public interface TimesheetRepository extends JpaRepository<Timesheet, Long> {
     
     // New method to find timesheets by status
     Page<Timesheet> findByStatus(TimesheetStatus status, Pageable pageable);
+    
+    // IHSS Pipeline methods - Pagination support
+    @Query(value = "SELECT * FROM timesheets WHERE user_id = :userId ORDER BY created_at DESC LIMIT :pageSize OFFSET :offset", nativeQuery = true)
+    List<Timesheet> findByUserWithPagination(@Param("userId") String userId, @Param("offset") int offset, @Param("pageSize") int pageSize);
+    
+    @Query(value = "SELECT * FROM timesheets WHERE user_id = :userId AND pay_period_start <= :endDate AND pay_period_end >= :startDate ORDER BY created_at DESC LIMIT :pageSize OFFSET :offset", nativeQuery = true)
+    List<Timesheet> findByUserAndDateRangeWithPagination(@Param("userId") String userId,
+                                                         @Param("startDate") LocalDate startDate, 
+                                                         @Param("endDate") LocalDate endDate,
+                                                         @Param("offset") int offset,
+                                                         @Param("pageSize") int pageSize);
+    
+    @Query(value = "SELECT * FROM timesheets ORDER BY created_at DESC LIMIT :pageSize OFFSET :offset", nativeQuery = true)
+    List<Timesheet> findMostRecentWithPagination(@Param("offset") int offset, @Param("pageSize") int pageSize);
+    
+    @Query(value = "SELECT * FROM timesheets WHERE pay_period_start <= :endDate AND pay_period_end >= :startDate ORDER BY created_at DESC LIMIT :pageSize OFFSET :offset", nativeQuery = true)
+    List<Timesheet> findByDateRangeWithPagination(@Param("startDate") LocalDate startDate, 
+                                                   @Param("endDate") LocalDate endDate,
+                                                   @Param("offset") int offset,
+                                                   @Param("pageSize") int pageSize);
+    
+    @Query(value = "SELECT * FROM timesheets WHERE location = :location ORDER BY created_at DESC LIMIT :pageSize OFFSET :offset", nativeQuery = true)
+    List<Timesheet> findByLocationWithPagination(@Param("location") String location, @Param("offset") int offset, @Param("pageSize") int pageSize);
+    
+    @Query(value = "SELECT * FROM timesheets WHERE location = :location AND pay_period_start <= :endDate AND pay_period_end >= :startDate ORDER BY created_at DESC LIMIT :pageSize OFFSET :offset", nativeQuery = true)
+    List<Timesheet> findByLocationAndDateRangeWithPagination(@Param("location") String location,
+                                                             @Param("startDate") LocalDate startDate, 
+                                                             @Param("endDate") LocalDate endDate,
+                                                             @Param("offset") int offset,
+                                                             @Param("pageSize") int pageSize);
+    
+    @Query(value = "SELECT * FROM timesheets WHERE pay_period_start <= :endDate AND pay_period_end >= :startDate ORDER BY created_at DESC LIMIT :limit", nativeQuery = true)
+    List<Timesheet> findByDateRangeWithLimit(@Param("startDate") LocalDate startDate, 
+                                             @Param("endDate") LocalDate endDate,
+                                             @Param("limit") int limit);
+    
+    @Query(value = "SELECT * FROM timesheets ORDER BY created_at DESC LIMIT :limit", nativeQuery = true)
+    List<Timesheet> findMostRecentWithLimit(@Param("limit") int limit);
+    
+    // Count methods for pagination
+    @Query(value = "SELECT COUNT(*) FROM timesheets WHERE pay_period_start <= :endDate AND pay_period_end >= :startDate", nativeQuery = true)
+    long countByDateRange(@Param("startDate") LocalDate startDate, 
+                         @Param("endDate") LocalDate endDate);
+    
+    @Query(value = "SELECT COUNT(*) FROM timesheets", nativeQuery = true)
+    long countMostRecent();
+    
+    @Query(value = "SELECT COUNT(*) FROM timesheets WHERE user_id = :userId", nativeQuery = true)
+    long countByUser(@Param("userId") String userId);
+    
+    @Query(value = "SELECT COUNT(*) FROM timesheets WHERE user_id = :userId AND pay_period_start <= :endDate AND pay_period_end >= :startDate", nativeQuery = true)
+    long countByUserAndDateRange(@Param("userId") String userId,
+                                 @Param("startDate") LocalDate startDate, 
+                                 @Param("endDate") LocalDate endDate);
+    
+    @Query(value = "SELECT COUNT(*) FROM timesheets WHERE location = :location", nativeQuery = true)
+    long countByLocationNative(@Param("location") String location);
+    
+    @Query(value = "SELECT COUNT(*) FROM timesheets WHERE location = :location AND pay_period_start <= :endDate AND pay_period_end >= :startDate", nativeQuery = true)
+    long countByLocationAndDateRange(@Param("location") String location,
+                                     @Param("startDate") LocalDate startDate, 
+                                     @Param("endDate") LocalDate endDate);
+    
+    // Additional methods for analytics
+    @Query(value = "SELECT COUNT(*) FROM timesheets " +
+            "WHERE (:createdAfter IS NULL OR created_at >= :createdAfter) " +
+            "AND (:createdBefore IS NULL OR created_at <= :createdBefore) " +
+            "AND (:location IS NULL OR location = :location) " +
+            "AND (:department IS NULL OR department = :department) " +
+            "AND (:statusFilter IS NULL OR status = :statusFilter)", nativeQuery = true)
+    long countCreatedAfterWithFilters(@Param("createdAfter") LocalDateTime createdAfter,
+                                      @Param("createdBefore") LocalDateTime createdBefore,
+                                      @Param("location") String location,
+                                      @Param("department") String department,
+                                      @Param("statusFilter") String statusFilter);
+    
+    @Query(value = "SELECT COUNT(*) FROM timesheets " +
+            "WHERE status IN ('SUBMITTED', 'REVISION_REQUESTED') " +
+            "AND (:location IS NULL OR location = :location) " +
+            "AND (:department IS NULL OR department = :department) " +
+            "AND (:statusFilter IS NULL OR status = :statusFilter) " +
+            "AND (:createdAfter IS NULL OR created_at >= :createdAfter) " +
+            "AND (:createdBefore IS NULL OR created_at <= :createdBefore)", nativeQuery = true)
+    long countPendingApprovalsWithFilters(@Param("location") String location,
+                                          @Param("department") String department,
+                                          @Param("statusFilter") String statusFilter,
+                                          @Param("createdAfter") LocalDateTime createdAfter,
+                                          @Param("createdBefore") LocalDateTime createdBefore);
+    
+    // Status as String for compatibility with IHSS pipeline
+    @Query(value = "SELECT * FROM timesheets WHERE status = :status ORDER BY created_at DESC", nativeQuery = true)
+    List<Timesheet> findByStatusOrderByCreatedAtDesc(@Param("status") String status);
 }

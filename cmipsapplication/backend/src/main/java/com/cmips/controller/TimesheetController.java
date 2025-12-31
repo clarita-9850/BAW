@@ -296,9 +296,9 @@ public class TimesheetController {
                 // Recipients should see timesheets submitted to them (or all submitted for now)
                 timesheets = timesheetService.getSubmittedTimesheets(pageable);
                 logger.info("Recipient {} requested submitted timesheets. Found {} timesheets.", userId, timesheets.getTotalElements());
-            } else if (keycloakAuthzService.hasRole(roles, "CASE_WORKER")) {
+            } else if (keycloakAuthzService.hasRole(roles, "CASE_WORKER") || keycloakAuthzService.hasRole(roles, "SUPERVISOR")) {
                 timesheets = timesheetService.getAllTimesheets(pageable);
-                logger.info("Case Worker {} requested all timesheets. Found {} timesheets.", userId, timesheets.getTotalElements());
+                logger.info("Case Worker/Supervisor {} requested all timesheets. Found {} timesheets.", userId, timesheets.getTotalElements());
             } else {
                 logger.warn("Access denied for timesheet read for user {} with roles {}", userId, roles);
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)

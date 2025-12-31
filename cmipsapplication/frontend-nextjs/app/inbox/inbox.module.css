@@ -1,0 +1,87 @@
+.pageContainer {
+  min-height: 60vh;
+  padding: 2rem 0;
+  background-color: #f9f9f9;
+}
+
+.content {
+  margin-top: 2rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.headerTitle h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--theme-primary, #1e3a8a);
+  margin-bottom: 0.5rem;
+}
+
+.headerTitle p {
+  font-size: 1.1rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.infoCard {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.infoCard h2 {
+  color: var(--theme-primary, #1e3a8a);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.infoCard p {
+  color: #64748b;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.placeholder {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 4rem 2rem;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.placeholderIcon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.placeholder h3 {
+  color: var(--theme-primary, #1e3a8a);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.placeholder p {
+  color: #64748b;
+  font-size: 1rem;
+  margin: 0.5rem 0;
+}
+
+.placeholderSubtext {
+  color: #9ca3af !important;
+  font-size: 0.9rem !important;
+  font-style: italic;
+}
+

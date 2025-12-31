@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration Hub Framework - Demo Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background: #f5f5f5;
+            border: none;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            background: #e8e8e8;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95em;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="file"] {
+            padding: 10px;
+            cursor: pointer;
+            background: #f8f9fa;
+        }
+        
+        input[type="file"]:hover {
+            background: #e9ecef;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: monospace;
+        }
+        
+        .file-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        .file-input-group input {
+            flex: 1;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9em;
+        }
+        
+        .options-group {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+        
+        .options-group h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .result pre {
+            background: rgba(0,0,0,0.05);
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .schema-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .schema-info h3 {
+            margin-bottom: 15px;
+        }
+        
+        .schema-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .schema-table th,
+        .schema-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .schema-table th {
+            background: #e9ecef;
+            font-weight: 600;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .download-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .download-section h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .download-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .download-section .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .download-section .btn-primary {
+            font-size: 1.1em;
+            padding: 15px 30px;
+        }
+
+        /* Split by Columns specific styles */
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .split-definition {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .split-def-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .split-def-header h4 {
+            margin: 0;
+            color: #333;
+        }
+
+        .columns-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px;
+            background: #e8f4fd;
+            border-radius: 4px;
+        }
+
+        .column-tag {
+            background: #667eea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 0.85em;
+        }
+
+        small {
+            color: #888;
+            font-size: 0.85em;
+        }
+
+        #addSplitDefBtn {
+            margin-top: 10px;
+        }
+
+        /* File drop zone styles */
+        .file-drop-zone {
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-drop-zone:hover {
+            background: #e8f4fd;
+            border-color: #764ba2;
+        }
+
+        .file-drop-zone.drag-over {
+            background: #e8f4fd;
+            border-color: #764ba2;
+            transform: scale(1.02);
+        }
+
+        .file-drop-zone input[type="file"] {
+            display: none;
+        }
+
+        .file-drop-zone p {
+            color: #666;
+            margin: 10px 0;
+        }
+
+        .file-drop-zone .file-name {
+            color: #667eea;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Integration Hub Framework</h1>
+            <p>Interactive Demo Interface for File Operations</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('merge')">Merge Files</button>
+            <button class="tab" onclick="showTab('splitColumns')">Split by Columns</button>
+            <button class="tab" onclick="showTab('splitField')">Split by Field</button>
+            <button class="tab" onclick="showTab('convert')">Convert Format</button>
+            <button class="tab" onclick="showTab('schema')">View Schema</button>
+        </div>
+        
+        <div class="content">
+            <!-- Merge Tab -->
+            <div id="merge" class="tab-content active">
+                <h2>Merge Multiple Files</h2>
+                <form id="mergeForm">
+                    <div class="form-group">
+                        <label>Input File 1</label>
+                        <input type="file" id="mergeInputFile1" name="file1" accept=".csv,.json,.xml,.txt" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Input File 2</label>
+                        <input type="file" id="mergeInputFile2" name="file2" accept=".csv,.json,.xml,.txt" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Output Format</label>
+                        <select id="mergeFormat" name="format">
+                            <option value="CSV">CSV</option>
+                            <option value="JSON" selected>JSON</option>
+                            <option value="XML">XML</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Output File Path (optional)</label>
+                        <input type="text" id="mergeOutputPath" name="outputPath" placeholder="Auto-generated if empty">
+                    </div>
+                    
+                    <div class="options-group">
+                        <h3>Merge Options</h3>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="mergeDeduplicate" name="deduplicate">
+                            <label for="mergeDeduplicate">Remove duplicates</label>
+                        </div>
+                        
+                        <div class="checkbox-group" id="keepFirstGroup" style="display:none; margin-left: 30px;">
+                            <input type="checkbox" id="mergeKeepFirst" name="keepFirst" checked>
+                            <label for="mergeKeepFirst">Keep first occurrence (uncheck to keep last)</label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Sort By Field (optional)</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="mergeSortField" name="sortField" placeholder="e.g., id, name, department">
+                                <select id="mergeSortOrder" name="sortOrder">
+                                    <option value="ASC">Ascending</option>
+                                    <option value="DESC">Descending</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Filter Expressions (one per line, format: field=value)</label>
+                            <textarea id="mergeFilters" name="filters" placeholder="department=Engineering&#10;salary>80000"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Limit Results (optional)</label>
+                            <input type="number" id="mergeLimit" name="limit" min="1" placeholder="No limit">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Merge Files</button>
+                </form>
+                
+                <div class="loading" id="mergeLoading">
+                    <div class="spinner"></div>
+                    <p>Processing...</p>
+                </div>
+                
+                <div class="result" id="mergeResult"></div>
+            </div>
+            
+            <!-- Split by Columns Tab -->
+            <div id="splitColumns" class="tab-content">
+                <h2>Split File by Columns</h2>
+                <p class="description">Upload a file and define how to split it into multiple files based on columns. Each output file will contain all records but only the specified columns.</p>
+
+                <form id="splitColumnsForm">
+                    <div class="form-group">
+                        <label>Input File Format</label>
+                        <select id="splitColumnsInputFormat" name="inputFormat">
+                            <option value="CSV" selected>CSV</option>
+                            <option value="JSON">JSON</option>
+                            <option value="XML">XML</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Input File</label>
+                        <input type="file" id="splitColumnsInputFile" name="file" accept=".csv,.json,.xml,.txt" required>
+                        <small>Upload a file to detect its columns</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Output Format</label>
+                        <select id="splitColumnsFormat" name="format">
+                            <option value="CSV" selected>CSV</option>
+                            <option value="JSON">JSON</option>
+                            <option value="XML">XML</option>
+                        </select>
+                    </div>
+
+                    <!-- Detected columns will be shown here -->
+                    <div id="detectedColumnsSection" style="display:none;">
+                        <div class="form-group">
+                            <label>Available Columns (detected from file)</label>
+                            <div id="availableColumns" class="columns-list"></div>
+                        </div>
+                    </div>
+
+                    <!-- Split Definitions -->
+                    <div class="options-group">
+                        <h3>Define Output Files</h3>
+                        <p>Configure which columns should go into each output file. File names will be auto-generated based on partition number.</p>
+
+                        <div id="splitDefinitionsContainer">
+                            <!-- Split definition 1 -->
+                            <div class="split-definition" data-index="0">
+                                <div class="split-def-header">
+                                    <h4>Output File 1</h4>
+                                    <button type="button" class="btn btn-small btn-secondary remove-split-def" style="display:none;">Remove</button>
+                                </div>
+                                <div class="form-group">
+                                    <label>Columns to Include (comma-separated)</label>
+                                    <input type="text" class="split-def-columns" placeholder="e.g., id, name" required>
+                                    <small>Enter column names separated by commas</small>
+                                </div>
+                            </div>
+
+                            <!-- Split definition 2 -->
+                            <div class="split-definition" data-index="1">
+                                <div class="split-def-header">
+                                    <h4>Output File 2</h4>
+                                    <button type="button" class="btn btn-small btn-secondary remove-split-def">Remove</button>
+                                </div>
+                                <div class="form-group">
+                                    <label>Columns to Include (comma-separated)</label>
+                                    <input type="text" class="split-def-columns" placeholder="e.g., id, department, salary">
+                                    <small>Enter column names separated by commas</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" id="addSplitDefBtn" class="btn btn-secondary">+ Add Another Output File</button>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Split File by Columns</button>
+                </form>
+
+                <div class="loading" id="splitColumnsLoading">
+                    <div class="spinner"></div>
+                    <p>Processing...</p>
+                </div>
+
+                <div class="result" id="splitColumnsResult"></div>
+            </div>
+            
+            <!-- Convert Tab -->
+            <div id="convert" class="tab-content">
+                <h2>Convert File Format</h2>
+                <form id="convertForm">
+                    <div class="form-group">
+                        <label>Input File</label>
+                        <input type="file" id="convertInputFile" name="file" accept=".csv,.json,.xml,.txt" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Source Format</label>
+                        <select id="convertSourceFormat" name="sourceFormat">
+                            <option value="CSV">CSV</option>
+                            <option value="JSON" selected>JSON</option>
+                            <option value="XML">XML</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Target Format</label>
+                        <select id="convertTargetFormat" name="targetFormat">
+                            <option value="CSV">CSV</option>
+                            <option value="JSON" selected>JSON</option>
+                            <option value="XML">XML</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Output File Path (optional)</label>
+                        <input type="text" id="convertOutputPath" name="outputPath" placeholder="Auto-generated if empty">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Convert File</button>
+                </form>
+                
+                <div class="loading" id="convertLoading">
+                    <div class="spinner"></div>
+                    <p>Processing...</p>
+                </div>
+                
+                <div class="result" id="convertResult"></div>
+            </div>
+            
+            <!-- Split by Field Tab -->
+            <div id="splitField" class="tab-content">
+                <h2>Split File by Field Value</h2>
+                <p class="description">Upload a file and split it into multiple files based on the value of a specific field. For example, split employees by department.</p>
+
+                <form id="splitFieldForm">
+                    <div class="form-group">
+                        <label>Input File Format</label>
+                        <select id="splitFieldInputFormat" name="inputFormat">
+                            <option value="CSV" selected>CSV</option>
+                            <option value="JSON">JSON</option>
+                            <option value="XML">XML</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Input File</label>
+                        <input type="file" id="splitFieldInputFile" name="file" accept=".csv,.json,.xml,.txt" required>
+                        <small>Upload a file to split by field value</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Split Field</label>
+                        <input type="text" id="splitFieldField" name="splitField" placeholder="e.g., department" required>
+                        <small>Enter the field name to split by (e.g., department, status)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Output Format</label>
+                        <select id="splitFieldFormat" name="format">
+                            <option value="CSV" selected>CSV</option>
+                            <option value="JSON">JSON</option>
+                            <option value="XML">XML</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Output File Path (optional)</label>
+                        <input type="text" id="splitFieldOutputPath" name="outputFilePath" placeholder="Auto-generated if empty">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Split File by Field</button>
+                </form>
+
+                <div class="loading" id="splitFieldLoading">
+                    <div class="spinner"></div>
+                    <p>Processing...</p>
+                </div>
+
+                <div class="result" id="splitFieldResult"></div>
+            </div>
+
+            <!-- Schema Tab -->
+            <div id="schema" class="tab-content">
+                <h2>View Schema Information</h2>
+                <p class="description">View schema information either by selecting a record type or by uploading a file to detect its schema.</p>
+
+                <form id="schemaForm">
+                    <!-- File Upload Method -->
+                    <div id="schemaFileMethod" class="form-group">
+                        <label>Upload File</label>
+                        <div class="file-drop-zone" id="schemaFileDropZone">
+                            <input type="file" id="schemaFileInput" accept=".csv,.json,.xml,.txt">
+                            <p>Click to select or drag and drop a file here</p>
+                            <p style="font-size: 0.9em; color: #888;">Supported formats: CSV, JSON, XML</p>
+                            <p class="file-name" id="schemaFileName" style="display:none;"></p>
+                        </div>
+                        <small style="margin-top: 10px; display: block;">Schema will be detected from the file structure (defaults to Employee record type)</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">View Schema</button>
+                </form>
+                
+                <div class="loading" id="schemaLoading">
+                    <div class="spinner"></div>
+                    <p>Loading...</p>
+                </div>
+                
+                <div class="schema-info" id="schemaResult" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8081/api/files';
+        
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            // Show selected tab
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+        
+        // Wait for DOM to be fully loaded before adding event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+        
+        // Merge form
+        document.getElementById('mergeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const loading = document.getElementById('mergeLoading');
+            const result = document.getElementById('mergeResult');
+            
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            
+            try {
+                const fileInput1 = document.getElementById('mergeInputFile1');
+                const fileInput2 = document.getElementById('mergeInputFile2');
+                const file1 = fileInput1.files[0];
+                const file2 = fileInput2.files[0];
+                
+                if (!file1) {
+                    throw new Error('Please select Input File 1');
+                }
+                if (!file2) {
+                    throw new Error('Please select Input File 2');
+                }
+                
+                console.log(`Uploading 2 files: ${file1.name}, ${file2.name}`);
+                
+                const formData = new FormData();
+                // Append both files with the same parameter name 'files'
+                formData.append('files', file1);
+                formData.append('files', file2);
+                formData.append('recordType', 'Employee'); // Default to Employee
+                // Input format will be auto-detected from file extension, output format is what user selects
+                formData.append('format', document.getElementById('mergeFormat').value);
+                
+                const outputPath = document.getElementById('mergeOutputPath').value;
+                if (outputPath) {
+                    formData.append('outputFilePath', outputPath);
+                }
+                
+                // Convert boolean to string explicitly
+                formData.append('deduplicate', String(document.getElementById('mergeDeduplicate').checked));
+                formData.append('keepFirst', String(document.getElementById('mergeKeepFirst').checked));
+                
+                const sortField = document.getElementById('mergeSortField').value;
+                if (sortField) {
+                    formData.append('sortField', sortField);
+                }
+                formData.append('sortOrder', document.getElementById('mergeSortOrder').value);
+                
+                const filterExpressions = document.getElementById('mergeFilters').value
+                    .split('\n')
+                    .map(f => f.trim())
+                    .filter(f => f)
+                    .join('\n');
+                if (filterExpressions) {
+                    formData.append('filterExpressions', filterExpressions);
+                }
+                
+                const limit = document.getElementById('mergeLimit').value;
+                if (limit) {
+                    formData.append('limit', limit);
+                }
+                
+                const response = await fetch(`${API_BASE}/merge`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Server error: ${response.status} ${response.statusText}. ${errorText}`);
+                }
+                
+                const data = await response.json();
+                displayResult(result, data);
+            } catch (error) {
+                console.error('Merge error:', error);
+                displayError(result, error.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+        
+        // Show/hide keepFirst option
+        document.getElementById('mergeDeduplicate').addEventListener('change', (e) => {
+            document.getElementById('keepFirstGroup').style.display = e.target.checked ? 'flex' : 'none';
+        });
+        
+        // Split by Columns form - detect columns when file is selected
+        document.getElementById('splitColumnsInputFile').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const inputFormat = document.getElementById('splitColumnsInputFormat').value;
+
+            try {
+                const text = await file.text();
+                let headers = [];
+
+                if (inputFormat === 'CSV') {
+                    // Parse CSV headers
+                    const lines = text.split('\n');
+                    if (lines.length > 0) {
+                        headers = lines[0].split(',').map(h => h.trim().replace(/^["']|["']$/g, ''));
+                    }
+                } else if (inputFormat === 'JSON') {
+                    // Parse JSON and get keys from first object
+                    const jsonData = JSON.parse(text);
+                    if (Array.isArray(jsonData) && jsonData.length > 0) {
+                        headers = Object.keys(jsonData[0]);
+                    } else if (typeof jsonData === 'object') {
+                        // Could be wrapped in a root element
+                        const keys = Object.keys(jsonData);
+                        if (keys.length > 0 && Array.isArray(jsonData[keys[0]]) && jsonData[keys[0]].length > 0) {
+                            headers = Object.keys(jsonData[keys[0]][0]);
+                        } else {
+                            headers = keys;
+                        }
+                    }
+                } else if (inputFormat === 'XML') {
+                    // Parse XML and get element names
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(text, 'text/xml');
+                    // Find the first repeated element (records)
+                    const root = xmlDoc.documentElement;
+                    const children = root.children;
+                    if (children.length > 0) {
+                        const firstRecord = children[0];
+                        headers = Array.from(firstRecord.children).map(el => el.tagName);
+                    }
+                }
+
+                if (headers.length > 0) {
+                    const columnsSection = document.getElementById('detectedColumnsSection');
+                    const columnsDiv = document.getElementById('availableColumns');
+
+                    columnsDiv.innerHTML = headers.map(h => `<span class="column-tag">${h}</span>`).join('');
+                    columnsSection.style.display = 'block';
+
+                    console.log('Detected columns:', headers);
+                }
+            } catch (error) {
+                console.error('Error reading file:', error);
+                alert('Error parsing file. Please ensure the file format matches the selected input format.');
+            }
+        });
+
+        // Re-detect columns when input format changes
+        document.getElementById('splitColumnsInputFormat').addEventListener('change', () => {
+            const fileInput = document.getElementById('splitColumnsInputFile');
+            if (fileInput.files.length > 0) {
+                // Trigger the change event to re-parse with new format
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+
+        // Add more split definitions
+        let splitDefCount = 2;
+        document.getElementById('addSplitDefBtn').addEventListener('click', () => {
+            splitDefCount++;
+            const container = document.getElementById('splitDefinitionsContainer');
+            const newDef = document.createElement('div');
+            newDef.className = 'split-definition';
+            newDef.dataset.index = splitDefCount - 1;
+            newDef.innerHTML = `
+                <div class="split-def-header">
+                    <h4>Output File ${splitDefCount}</h4>
+                    <button type="button" class="btn btn-small btn-secondary remove-split-def">Remove</button>
+                </div>
+                <div class="form-group">
+                    <label>Columns to Include (comma-separated)</label>
+                    <input type="text" class="split-def-columns" placeholder="e.g., column1, column2">
+                    <small>Enter column names separated by commas</small>
+                </div>
+            `;
+            container.appendChild(newDef);
+        });
+
+        // Remove split definition
+        document.getElementById('splitDefinitionsContainer').addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-split-def')) {
+                const splitDef = e.target.closest('.split-definition');
+                if (splitDef) {
+                    splitDef.remove();
+                    // Renumber remaining definitions
+                    const defs = document.querySelectorAll('.split-definition');
+                    defs.forEach((def, idx) => {
+                        def.querySelector('h4').textContent = `Output File ${idx + 1}`;
+                    });
+                    splitDefCount = defs.length;
+                }
+            }
+        });
+
+        // Split by Columns form submission
+        document.getElementById('splitColumnsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const loading = document.getElementById('splitColumnsLoading');
+            const result = document.getElementById('splitColumnsResult');
+
+            loading.style.display = 'block';
+            result.style.display = 'none';
+
+            try {
+                const fileInput = document.getElementById('splitColumnsInputFile');
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    throw new Error('Please select a file');
+                }
+
+                // Gather split definitions
+                const splitDefinitions = [];
+                const defElements = document.querySelectorAll('.split-definition');
+
+                defElements.forEach((defEl, index) => {
+                    const columnsStr = defEl.querySelector('.split-def-columns').value.trim();
+
+                    if (columnsStr) {
+                        const columns = columnsStr.split(',').map(c => c.trim()).filter(c => c);
+                        if (columns.length > 0) {
+                            splitDefinitions.push({
+                                name: `part_${index + 1}`,  // Auto-generate name
+                                columns: columns
+                            });
+                        }
+                    }
+                });
+
+                if (splitDefinitions.length === 0) {
+                    throw new Error('Please define at least one output file with columns');
+                }
+
+                console.log('Split definitions:', splitDefinitions);
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('inputFormat', document.getElementById('splitColumnsInputFormat').value);
+                formData.append('format', document.getElementById('splitColumnsFormat').value);
+                formData.append('splitDefinitions', JSON.stringify(splitDefinitions));
+
+                const response = await fetch(`${API_BASE}/split-columns`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                displayResult(result, data, true); // Pass isSplit=true for partition downloads
+            } catch (error) {
+                console.error('Column split error:', error);
+                displayError(result, error.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+
+        // Convert form
+        document.getElementById('convertForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const loading = document.getElementById('convertLoading');
+            const result = document.getElementById('convertResult');
+            
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            
+            try {
+                const fileInput = document.getElementById('convertInputFile');
+                const file = fileInput.files[0];
+                
+                if (!file) {
+                    throw new Error('Please select a file');
+                }
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('recordType', 'Employee'); // Default to Employee
+                formData.append('sourceFormat', document.getElementById('convertSourceFormat').value);
+                formData.append('targetFormat', document.getElementById('convertTargetFormat').value);
+                
+                const outputPath = document.getElementById('convertOutputPath').value;
+                if (outputPath) {
+                    formData.append('outputFilePath', outputPath);
+                }
+                
+                const response = await fetch(`${API_BASE}/convert`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                displayResult(result, data);
+            } catch (error) {
+                displayError(result, error.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+        
+
+        // File drop zone for schema
+        const schemaFileDropZone = document.getElementById('schemaFileDropZone');
+        const schemaFileInput = document.getElementById('schemaFileInput');
+        const schemaFileName = document.getElementById('schemaFileName');
+
+        schemaFileDropZone.addEventListener('click', () => {
+            schemaFileInput.click();
+        });
+
+        schemaFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                schemaFileName.textContent = file.name;
+                schemaFileName.style.display = 'block';
+            }
+        });
+
+        schemaFileDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            schemaFileDropZone.classList.add('drag-over');
+        });
+
+        schemaFileDropZone.addEventListener('dragleave', () => {
+            schemaFileDropZone.classList.remove('drag-over');
+        });
+
+        schemaFileDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            schemaFileDropZone.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                schemaFileInput.files = files;
+                schemaFileName.textContent = files[0].name;
+                schemaFileName.style.display = 'block';
+            }
+        });
+
+        // Schema form
+        document.getElementById('schemaForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const loading = document.getElementById('schemaLoading');
+            const result = document.getElementById('schemaResult');
+            
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            
+            try {
+                // Default to Employee record type
+                const recordType = 'Employee';
+
+                const response = await fetch(`${API_BASE}/schema/${recordType}`);
+                const data = await response.json();
+                
+                let html = `<h3>Schema: ${data.typeName}</h3>`;
+                html += `<p><strong>Version:</strong> ${data.version}</p>`;
+                html += `<p><strong>Description:</strong> ${data.description || 'N/A'}</p>`;
+                
+                if (data.identityFields && data.identityFields.length > 0) {
+                    html += `<p><strong>Identity Fields:</strong> ${data.identityFields.join(', ')}</p>`;
+                }
+                
+                html += `<table class="schema-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Order</th>
+                            <th>Nullable</th>
+                            <th>Format</th>
+                            <th>Length</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+                
+                data.columns.forEach(col => {
+                    html += `<tr>
+                        <td>${col.name}</td>
+                        <td>${col.javaType}</td>
+                        <td>${col.order}</td>
+                        <td>${col.nullable ? 'Yes' : 'No'}</td>
+                        <td>${col.format || 'N/A'}</td>
+                        <td>${col.length || 'N/A'}</td>
+                    </tr>`;
+                });
+                
+                html += `</tbody></table>`;
+                result.innerHTML = html;
+                result.style.display = 'block';
+            } catch (error) {
+                result.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+                result.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+
+        // Split by Field form
+        document.getElementById('splitFieldForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const loading = document.getElementById('splitFieldLoading');
+            const result = document.getElementById('splitFieldResult');
+
+            loading.style.display = 'block';
+            result.style.display = 'none';
+
+            try {
+                const fileInput = document.getElementById('splitFieldInputFile');
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    throw new Error('Please select a file');
+                }
+
+                const splitField = document.getElementById('splitFieldField').value.trim();
+                if (!splitField) {
+                    throw new Error('Please enter a field name to split by');
+                }
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('recordType', 'Employee'); // Default to Employee
+                formData.append('inputFormat', document.getElementById('splitFieldInputFormat').value);
+                formData.append('format', document.getElementById('splitFieldFormat').value);
+                formData.append('splitType', 'FIELD');
+                formData.append('splitField', splitField);
+
+                const outputPath = document.getElementById('splitFieldOutputPath').value;
+                if (outputPath) {
+                    formData.append('outputFilePath', outputPath);
+                }
+
+                const response = await fetch(`${API_BASE}/split`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                displayResult(result, data, true); // Pass isSplit=true for partition downloads
+            } catch (error) {
+                console.error('Split by field error:', error);
+                displayError(result, error.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+        
+        }); // End of DOMContentLoaded
+        
+        // Helper functions (defined outside DOMContentLoaded so they're accessible)
+        function displayResult(element, data, isSplit = false) {
+            element.className = 'result ' + (data.success ? 'success' : 'error');
+
+            let html = `<h3>${data.success ? '✓ Success' : '✗ Error'}</h3>`;
+            html += `<p><strong>${data.message}</strong></p>`;
+
+            if (data.outputFilePath) {
+                html += `<p><strong>Output:</strong> ${data.outputFilePath}</p>`;
+
+                // Add download button for successful operations
+                if (data.success) {
+                    if (isSplit && data.stats && data.stats.partitionFilePaths) {
+                        // For split operations, show download buttons for each partition
+                        html += `<div class="download-section">
+                            <h4>Download Partitions:</h4>
+                            <div class="download-buttons">`;
+                        for (const [partitionKey, filePath] of Object.entries(data.stats.partitionFilePaths)) {
+                            const count = data.stats.partitionCounts[partitionKey] || 0;
+                            html += `<button class="btn btn-secondary btn-small" onclick="downloadFile('${filePath}')">
+                                Download ${partitionKey} (${count} records)
+                            </button>`;
+                        }
+                        html += `</div></div>`;
+                    } else {
+                        // For merge and convert, single download button
+                        html += `<div class="download-section">
+                            <button class="btn btn-primary" onclick="downloadFile('${data.outputFilePath}')">
+                                Download Output File
+                            </button>
+                        </div>`;
+                    }
+                }
+            }
+
+            if (data.stats) {
+                html += `<div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value">${data.stats.inputRecordCount || 0}</div>
+                        <div class="stat-label">Input Records</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${data.stats.outputRecordCount || 0}</div>
+                        <div class="stat-label">Output Records</div>
+                    </div>`;
+
+                if (data.stats.duplicatesRemoved) {
+                    html += `<div class="stat-item">
+                        <div class="stat-value">${data.stats.duplicatesRemoved}</div>
+                        <div class="stat-label">Duplicates Removed</div>
+                    </div>`;
+                }
+
+                if (data.stats.partitionsCreated) {
+                    html += `<div class="stat-item">
+                        <div class="stat-value">${data.stats.partitionsCreated}</div>
+                        <div class="stat-label">Partitions Created</div>
+                    </div>`;
+                }
+
+                html += `</div>`;
+            }
+
+            if (data.errors && data.errors.length > 0) {
+                html += `<pre>${data.errors.join('\n')}</pre>`;
+            }
+
+            element.innerHTML = html;
+            element.style.display = 'block';
+        }
+
+        // Download file function
+        function downloadFile(filePath) {
+            const url = `${API_BASE}/download?path=${encodeURIComponent(filePath)}`;
+            window.location.href = url;
+        }
+        
+        function displayError(element, message) {
+            element.className = 'result error';
+            element.innerHTML = `<h3>✗ Error</h3><p>${message}</p>`;
+            element.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+

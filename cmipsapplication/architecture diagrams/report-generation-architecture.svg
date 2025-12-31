@@ -1,0 +1,282 @@
+<svg width="1200" height="1600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font-family: Arial, sans-serif; font-size: 22px; font-weight: bold; fill: #1a1a1a; }
+      .section-title { font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; fill: #2c3e50; }
+      .box { fill: #ecf0f1; stroke: #34495e; stroke-width: 2; rx: 5; }
+      .pipeline-box { fill: #fff9c4; stroke: #f57f17; stroke-width: 2; rx: 5; }
+      .service-box { fill: #e8f5e9; stroke: #2e7d32; stroke-width: 2; rx: 5; }
+      .database-box { fill: #f3e5f5; stroke: #6a1b9a; stroke-width: 2; rx: 5; }
+      .delivery-box { fill: #fce4ec; stroke: #c2185b; stroke-width: 2; rx: 5; }
+      .text { font-family: Arial, sans-serif; font-size: 12px; fill: #2c3e50; }
+      .text-small { font-family: Arial, sans-serif; font-size: 10px; fill: #555; }
+      .text-bold { font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; fill: #2c3e50; }
+      .arrow { stroke: #34495e; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .arrow-dashed { stroke: #7f8c8d; stroke-width: 1.5; fill: none; stroke-dasharray: 5,5; marker-end: url(#arrowhead); }
+      .label { font-family: Arial, sans-serif; font-size: 10px; fill: #555; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#34495e" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="600" y="30" text-anchor="middle" class="title">Report Generation Architecture</text>
+  <text x="600" y="50" text-anchor="middle" class="text-small">IHSS Pipeline - 5-Stage Report Generation Pipeline</text>
+
+  <!-- 5-STAGE PIPELINE -->
+  <rect x="50" y="70" width="1100" height="200" class="pipeline-box" opacity="0.2"/>
+  <text x="600" y="95" text-anchor="middle" class="section-title">5-Stage Report Generation Pipeline</text>
+  
+  <rect x="100" y="110" width="190" height="70" class="pipeline-box"/>
+  <text x="195" y="130" text-anchor="middle" class="text-bold">Stage 1: Parameter Extraction</text>
+  <text x="195" y="145" text-anchor="middle" class="text-small">Extract userRole, countyId</text>
+  <text x="195" y="157" text-anchor="middle" class="text-small">from JWT token</text>
+  <text x="195" y="169" text-anchor="middle" class="text-small">Validate permissions</text>
+  <text x="195" y="181" text-anchor="middle" class="text-small">Extract date range, filters</text>
+
+  <rect x="330" y="110" width="190" height="70" class="pipeline-box"/>
+  <text x="425" y="130" text-anchor="middle" class="text-bold">Stage 2: Query Building</text>
+  <text x="425" y="145" text-anchor="middle" class="text-small">QueryBuilderService.buildQuery()</text>
+  <text x="425" y="157" text-anchor="middle" class="text-small">Add county WHERE clause</text>
+  <text x="425" y="169" text-anchor="middle" class="text-small">Date range filtering</text>
+  <text x="425" y="181" text-anchor="middle" class="text-small">Role-based SQL generation</text>
+
+  <rect x="560" y="110" width="190" height="70" class="pipeline-box"/>
+  <text x="655" y="130" text-anchor="middle" class="text-bold">Stage 3: Data Fetching</text>
+  <text x="655" y="145" text-anchor="middle" class="text-small">DataFetchingService.fetchData()</text>
+  <text x="655" y="157" text-anchor="middle" class="text-small">Pagination (chunk size: 1000)</text>
+  <text x="655" y="169" text-anchor="middle" class="text-small">Return TimesheetEntity list</text>
+  <text x="655" y="181" text-anchor="middle" class="text-small">Total count calculation</text>
+
+  <rect x="790" y="110" width="190" height="70" class="pipeline-box"/>
+  <text x="885" y="130" text-anchor="middle" class="text-bold">Stage 4: Field Masking</text>
+  <text x="885" y="145" text-anchor="middle" class="text-small">FieldMaskingService.applyFieldMasking()</text>
+  <text x="885" y="157" text-anchor="middle" class="text-small">Keycloak JWT-based rules</text>
+  <text x="885" y="169" text-anchor="middle" class="text-small">Role-based field visibility</text>
+  <text x="885" y="181" text-anchor="middle" class="text-small">Return MaskedTimesheetData</text>
+
+  <rect x="1020" y="110" width="100" height="70" class="pipeline-box"/>
+  <text x="1070" y="130" text-anchor="middle" class="text-bold">Stage 5:</text>
+  <text x="1070" y="145" text-anchor="middle" class="text-bold">Report Format</text>
+  <text x="1070" y="157" text-anchor="middle" class="text-small">Convert to format</text>
+  <text x="1070" y="169" text-anchor="middle" class="text-small">JSON/CSV/PDF/XML</text>
+  <text x="1070" y="181" text-anchor="middle" class="text-small">Stream to file</text>
+
+  <!-- SERVICE LAYER -->
+  <rect x="50" y="290" width="1100" height="200" class="service-box" opacity="0.2"/>
+  <text x="600" y="315" text-anchor="middle" class="section-title">Service Layer Components</text>
+  
+  <rect x="100" y="335" width="200" height="70" class="service-box"/>
+  <text x="200" y="355" text-anchor="middle" class="text-bold">Report Generation Service</text>
+  <text x="200" y="370" text-anchor="middle" class="text-small">generateReport(request, jwtToken)</text>
+  <text x="200" y="382" text-anchor="middle" class="text-small">Orchestrates 5-stage pipeline</text>
+  <text x="200" y="394" text-anchor="middle" class="text-small">Returns ReportGenerationResponse</text>
+
+  <rect x="340" y="335" width="200" height="70" class="service-box"/>
+  <text x="440" y="355" text-anchor="middle" class="text-bold">Query Builder Service</text>
+  <text x="440" y="370" text-anchor="middle" class="text-small">buildQuery(role, county, dates)</text>
+  <text x="440" y="382" text-anchor="middle" class="text-small">Builds SQL with filters</text>
+  <text x="440" y="394" text-anchor="middle" class="text-small">Returns QueryParameters</text>
+
+  <rect x="580" y="335" width="200" height="70" class="service-box"/>
+  <text x="680" y="355" text-anchor="middle" class="text-bold">Data Fetching Service</text>
+  <text x="680" y="370" text-anchor="middle" class="text-small">fetchData(queryParams, page, size)</text>
+  <text x="680" y="382" text-anchor="middle" class="text-small">Pagination support</text>
+  <text x="680" y="394" text-anchor="middle" class="text-small">Returns DataFetchResult</text>
+
+  <rect x="820" y="335" width="200" height="70" class="service-box"/>
+  <text x="920" y="355" text-anchor="middle" class="text-bold">Field Masking Service</text>
+  <text x="920" y="370" text-anchor="middle" class="text-small">applyFieldMasking(data, role, jwt)</text>
+  <text x="920" y="382" text-anchor="middle" class="text-small">Keycloak-based masking</text>
+  <text x="920" y="394" text-anchor="middle" class="text-small">Returns MaskedTimesheetData</text>
+
+  <rect x="100" y="425" width="200" height="55" class="service-box"/>
+  <text x="200" y="445" text-anchor="middle" class="text-bold">Field Visibility Service</text>
+  <text x="200" y="460" text-anchor="middle" class="text-small">getVisibleFields(userRole)</text>
+  <text x="200" y="472" text-anchor="middle" class="text-small">Role-based field configuration</text>
+
+  <rect x="340" y="425" width="200" height="55" class="service-box"/>
+  <text x="440" y="445" text-anchor="middle" class="text-bold">Rules Engine Service</text>
+  <text x="440" y="460" text-anchor="middle" class="text-small">Business rules validation</text>
+  <text x="440" y="472" text-anchor="middle" class="text-small">Data quality checks</text>
+
+  <rect x="580" y="425" width="200" height="55" class="service-box"/>
+  <text x="680" y="445" text-anchor="middle" class="text-bold">Report Template Service</text>
+  <text x="680" y="460" text-anchor="middle" class="text-small">FreeMarker template management</text>
+  <text x="680" y="472" text-anchor="middle" class="text-small">Template rendering</text>
+
+  <rect x="820" y="425" width="200" height="55" class="service-box"/>
+  <text x="920" y="445" text-anchor="middle" class="text-bold">Event Service</text>
+  <text x="920" y="460" text-anchor="middle" class="text-small">Audit logging</text>
+  <text x="920" y="472" text-anchor="middle" class="text-small">Event publishing</text>
+
+  <!-- REPORT GENERATORS -->
+  <rect x="50" y="510" width="1100" height="120" class="service-box" opacity="0.2"/>
+  <text x="600" y="535" text-anchor="middle" class="section-title">Report Format Generators</text>
+  
+  <rect x="100" y="555" width="200" height="65" class="service-box"/>
+  <text x="200" y="575" text-anchor="middle" class="text-bold">PDF Report Generator</text>
+  <text x="200" y="590" text-anchor="middle" class="text-small">PDFReportGeneratorService</text>
+  <text x="200" y="602" text-anchor="middle" class="text-small">FreeMarker templates</text>
+  <text x="200" y="614" text-anchor="middle" class="text-small">OpenPDF library</text>
+
+  <rect x="340" y="555" width="200" height="65" class="service-box"/>
+  <text x="440" y="575" text-anchor="middle" class="text-bold">CSV Report Generator</text>
+  <text x="440" y="590" text-anchor="middle" class="text-small">CSVReportGeneratorService</text>
+  <text x="440" y="602" text-anchor="middle" class="text-small">Streaming CSV output</text>
+  <text x="440" y="614" text-anchor="middle" class="text-small">Comma-separated values</text>
+
+  <rect x="580" y="555" width="200" height="65" class="service-box"/>
+  <text x="680" y="575" text-anchor="middle" class="text-bold">JSON Report Generator</text>
+  <text x="680" y="590" text-anchor="middle" class="text-small">Native JSON format</text>
+  <text x="680" y="602" text-anchor="middle" class="text-small">Jackson ObjectMapper</text>
+  <text x="680" y="614" text-anchor="middle" class="text-small">Structured data format</text>
+
+  <rect x="820" y="555" width="200" height="65" class="service-box"/>
+  <text x="920" y="575" text-anchor="middle" class="text-bold">XML Report Generator</text>
+  <text x="920" y="590" text-anchor="middle" class="text-small">XML format support</text>
+  <text x="920" y="602" text-anchor="middle" class="text-small">Structured markup</text>
+  <text x="920" y="614" text-anchor="middle" class="text-small">Legacy system compatibility</text>
+
+  <!-- DELIVERY LAYER -->
+  <rect x="50" y="650" width="1100" height="120" class="delivery-box" opacity="0.2"/>
+  <text x="600" y="675" text-anchor="middle" class="section-title">Delivery &amp; Distribution</text>
+  
+  <rect x="100" y="695" width="200" height="65" class="delivery-box"/>
+  <text x="200" y="715" text-anchor="middle" class="text-bold">Email Report Service</text>
+  <text x="200" y="730" text-anchor="middle" class="text-small">sendScheduledReportEmail()</text>
+  <text x="200" y="742" text-anchor="middle" class="text-small">PDF attachments</text>
+  <text x="200" y="754" text-anchor="middle" class="text-small">SMTP delivery</text>
+
+  <rect x="340" y="695" width="200" height="65" class="delivery-box"/>
+  <text x="440" y="715" text-anchor="middle" class="text-bold">SFTP Delivery Service</text>
+  <text x="440" y="730" text-anchor="middle" class="text-small">deliverFile(filePath, role, type)</text>
+  <text x="440" y="742" text-anchor="middle" class="text-small">Encrypted file transfer</text>
+  <text x="440" y="754" text-anchor="middle" class="text-small">Secure FTP protocol</text>
+
+  <rect x="580" y="695" width="200" height="65" class="delivery-box"/>
+  <text x="680" y="715" text-anchor="middle" class="text-bold">Encryption Service</text>
+  <text x="680" y="730" text-anchor="middle" class="text-small">encryptFile(filePath)</text>
+  <text x="680" y="742" text-anchor="middle" class="text-small">AES-256 encryption</text>
+  <text x="680" y="754" text-anchor="middle" class="text-small">File security</text>
+
+  <rect x="820" y="695" width="200" height="65" class="delivery-box"/>
+  <text x="920" y="715" text-anchor="middle" class="text-bold">File Storage</text>
+  <text x="920" y="730" text-anchor="middle" class="text-small">./reports/ directory</text>
+  <text x="920" y="742" text-anchor="middle" class="text-small">Organized by date/county</text>
+  <text x="920" y="754" text-anchor="middle" class="text-small">Result path tracking</text>
+
+  <!-- DATABASE -->
+  <rect x="50" y="790" width="1100" height="100" class="database-box" opacity="0.2"/>
+  <text x="600" y="815" text-anchor="middle" class="section-title">Database Layer</text>
+  
+  <rect x="100" y="835" width="300" height="45" class="database-box"/>
+  <text x="250" y="855" text-anchor="middle" class="text-bold">PostgreSQL Database</text>
+  <text x="250" y="870" text-anchor="middle" class="text-small">timesheets, cases, persons tables</text>
+
+  <rect x="450" y="835" width="250" height="45" class="database-box"/>
+  <text x="575" y="855" text-anchor="middle" class="text-bold">Timesheet Repository</text>
+  <text x="575" y="870" text-anchor="middle" class="text-small">Custom JPA queries with pagination</text>
+
+  <rect x="750" y="835" width="250" height="45" class="database-box"/>
+  <text x="875" y="855" text-anchor="middle" class="text-bold">Query Optimization</text>
+  <text x="875" y="870" text-anchor="middle" class="text-small">Indexed columns, efficient joins</text>
+
+  <!-- PROCESSING FLOW -->
+  <rect x="50" y="910" width="1100" height="200" class="box" opacity="0.1"/>
+  <text x="600" y="935" text-anchor="middle" class="section-title">Report Generation Flow</text>
+  
+  <rect x="100" y="955" width="180" height="70" class="box"/>
+  <text x="190" y="975" text-anchor="middle" class="text-bold">1. Request Received</text>
+  <text x="190" y="990" text-anchor="middle" class="text-small">ReportGenerationRequest</text>
+  <text x="190" y="1002" text-anchor="middle" class="text-small">JWT token provided</text>
+  <text x="190" y="1014" text-anchor="middle" class="text-small">Report type, date range</text>
+
+  <rect x="320" y="955" width="180" height="70" class="box"/>
+  <text x="410" y="975" text-anchor="middle" class="text-bold">2. Pipeline Execution</text>
+  <text x="410" y="990" text-anchor="middle" class="text-small">5 stages executed sequentially</text>
+  <text x="410" y="1002" text-anchor="middle" class="text-small">Chunked processing</text>
+  <text x="410" y="1014" text-anchor="middle" class="text-small">Progress tracking</text>
+
+  <rect x="540" y="955" width="180" height="70" class="box"/>
+  <text x="630" y="975" text-anchor="middle" class="text-bold">3. Format Generation</text>
+  <text x="630" y="990" text-anchor="middle" class="text-small">Select format generator</text>
+  <text x="630" y="1002" text-anchor="middle" class="text-small">PDF/CSV/JSON/XML</text>
+  <text x="630" y="1014" text-anchor="middle" class="text-small">Stream to file</text>
+
+  <rect x="760" y="955" width="180" height="70" class="box"/>
+  <text x="850" y="975" text-anchor="middle" class="text-bold">4. File Storage</text>
+  <text x="850" y="990" text-anchor="middle" class="text-small">Save to ./reports/</text>
+  <text x="850" y="1002" text-anchor="middle" class="text-small">Organized structure</text>
+  <text x="850" y="1014" text-anchor="middle" class="text-small">Result path returned</text>
+
+  <rect x="980" y="955" width="120" height="70" class="box"/>
+  <text x="1040" y="975" text-anchor="middle" class="text-bold">5. Delivery</text>
+  <text x="1040" y="990" text-anchor="middle" class="text-small">Email or SFTP</text>
+  <text x="1040" y="1002" text-anchor="middle" class="text-small">Notification sent</text>
+  <text x="1040" y="1014" text-anchor="middle" class="text-small">Job completed</text>
+
+  <!-- ARROWS -->
+  <line x1="195" y1="180" x2="425" y2="180" class="arrow"/>
+  <line x1="425" y1="180" x2="655" y2="180" class="arrow"/>
+  <line x1="655" y1="180" x2="885" y2="180" class="arrow"/>
+  <line x1="885" y1="180" x2="1070" y2="180" class="arrow"/>
+  
+  <line x1="200" y1="405" x2="195" y2="180" class="arrow-dashed"/>
+  <line x1="440" y1="405" x2="425" y2="180" class="arrow-dashed"/>
+  <line x1="680" y1="405" x2="655" y2="180" class="arrow-dashed"/>
+  <line x1="920" y1="405" x2="885" y2="180" class="arrow-dashed"/>
+  
+  <line x1="1070" y1="180" x2="200" y2="695" class="arrow"/>
+  <line x1="1070" y1="180" x2="440" y2="695" class="arrow"/>
+  <line x1="1070" y1="180" x2="680" y2="695" class="arrow"/>
+  
+  <line x1="680" y1="405" x2="250" y2="835" class="arrow"/>
+  <line x1="440" y1="405" x2="575" y2="835" class="arrow"/>
+  
+  <line x1="190" y1="1025" x2="410" y2="1025" class="arrow"/>
+  <line x1="410" y1="1025" x2="630" y2="1025" class="arrow"/>
+  <line x1="630" y1="1025" x2="850" y2="1025" class="arrow"/>
+  <line x1="850" y1="1025" x2="1040" y2="1025" class="arrow"/>
+
+  <!-- FEATURES -->
+  <rect x="50" y="1130" width="1100" height="120" class="box" opacity="0.1"/>
+  <text x="600" y="1155" text-anchor="middle" class="section-title">Key Features</text>
+  
+  <text x="100" y="1175" class="text-small">• 5-Stage Pipeline: Structured data processing with clear separation of concerns</text>
+  <text x="100" y="1190" class="text-small">• Chunked Processing: Large datasets processed in chunks (1000 records) to avoid memory issues</text>
+  <text x="100" y="1205" class="text-small">• Streaming Output: Files written incrementally, not loaded entirely into memory</text>
+  <text x="100" y="1220" class="text-small">• Multiple Formats: Support for PDF, CSV, JSON, and XML output formats</text>
+  
+  <text x="600" y="1175" class="text-small">• JWT-Based Security: All reports require valid JWT tokens for authentication</text>
+  <text x="600" y="1190" class="text-small">• Field Masking: Role-based field visibility enforced at Stage 4</text>
+  <text x="600" y="1205" class="text-small">• County Filtering: Automatic county-based data filtering from JWT token</text>
+  <text x="600" y="1220" class="text-small">• Progress Tracking: Real-time progress updates (0-100%) during processing</text>
+
+  <!-- CONFIGURATION -->
+  <rect x="50" y="1270" width="1100" height="100" class="box" opacity="0.1"/>
+  <text x="600" y="1295" text-anchor="middle" class="section-title">Configuration</text>
+  
+  <rect x="100" y="1310" width="200" height="50" class="box"/>
+  <text x="200" y="1330" text-anchor="middle" class="text-bold">Chunk Size</text>
+  <text x="200" y="1345" text-anchor="middle" class="text-small">Default: 1000 records</text>
+  <text x="200" y="1357" text-anchor="middle" class="text-small">Configurable per job</text>
+
+  <rect x="350" y="1310" width="200" height="50" class="box"/>
+  <text x="450" y="1330" text-anchor="middle" class="text-bold">PDF Configuration</text>
+  <text x="450" y="1345" text-anchor="middle" class="text-small">Page size: A4</text>
+  <text x="450" y="1357" text-anchor="middle" class="text-small">Font size: 10pt</text>
+
+  <rect x="600" y="1310" width="200" height="50" class="box"/>
+  <text x="700" y="1330" text-anchor="middle" class="text-bold">Storage Path</text>
+  <text x="700" y="1345" text-anchor="middle" class="text-small">./reports/ directory</text>
+  <text x="700" y="1357" text-anchor="middle" class="text-small">Organized by date/county</text>
+
+  <rect x="850" y="1310" width="200" height="50" class="box"/>
+  <text x="950" y="1330" text-anchor="middle" class="text-bold">Encryption</text>
+  <text x="950" y="1345" text-anchor="middle" class="text-small">Algorithm: AES-256</text>
+  <text x="950" y="1357" text-anchor="middle" class="text-small">Key size: 256 bits</text>
+
+</svg>
+

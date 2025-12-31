@@ -1,0 +1,26 @@
+services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8090:8080"
+    environment:
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://cmips-keycloak:8080/realms/cmips
+    # Dependencies are in other compose files - gateway connects via networks
+    # Start order: 1) cmipsapplication services, 2) trial services, 3) api-gateway
+    networks:
+      - cmips-shared-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+networks:
+  cmips-shared-network:
+    external: true
+    name: cmips-shared-network
+

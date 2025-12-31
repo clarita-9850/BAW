@@ -1,0 +1,3 @@
+id,name,email,age,salary,status,code,percentage
+0,A,invalid-email,200,-5000.00,UNKNOWN,ab,150.0
+-1,,test@example.com,25,3000.00,ACTIVE,TOOLONGCODE,50.0

@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMIPS Sprint Guide: Field-Level Authorization Architecture</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 30px 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #ecf0f1;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 8px;
+        }
+
+        .sidebar a {
+            color: #ecf0f1;
+            text-decoration: none;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+
+        .sidebar a:hover {
+            background-color: #34495e;
+            color: #3498db;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 40px 60px;
+            overflow-y: auto;
+        }
+
+        /* Header */
+        h1 {
+            font-size: 32px;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            font-size: 26px;
+            color: #2c3e50;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+
+        h3 {
+            font-size: 22px;
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            font-size: 18px;
+            color: #555;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        /* Document Info Box */
+        .doc-info {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #3498db;
+        }
+
+        .doc-info ul {
+            list-style: none;
+        }
+
+        .doc-info li {
+            padding: 5px 0;
+        }
+
+        .doc-info strong {
+            color: #2c3e50;
+            display: inline-block;
+            width: 140px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Code Blocks */
+        pre {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        code {
+            background-color: #ecf0f1;
+            color: #e74c3c;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* Paragraphs */
+        p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        /* Horizontal Rule */
+        hr {
+            border: none;
+            border-top: 2px solid #ecf0f1;
+            margin: 40px 0;
+        }
+
+        /* Benefits/Features Box */
+        .benefit-box {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background-color: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        /* ASCII Diagrams */
+        .ascii-diagram {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                padding: 30px 20px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .sidebar {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#executive-summary">1. Executive Summary</a></li>
+                <li><a href="#architecture-overview">2. Architecture Overview</a></li>
+                <li><a href="#keycloak-configuration">3. Keycloak Configuration</a></li>
+                <li><a href="#backend-implementation">4. Backend Implementation</a></li>
+                <li><a href="#frontend-implementation">5. Frontend Implementation</a></li>
+                <li><a href="#adding-new-endpoints">6. Adding New Endpoints</a></li>
+                <li><a href="#adding-new-resources">7. Adding New Resources</a></li>
+                <li><a href="#best-practices">8. Best Practices</a></li>
+                <li><a href="#troubleshooting">9. Troubleshooting</a></li>
+                <li><a href="#appendix">10. Appendix</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h1>CMIPS Sprint Guide: Field-Level Authorization Architecture</h1>
+
+            <div class="doc-info">
+                <ul>
+                    <li><strong>Version:</strong> 1.0</li>
+                    <li><strong>Created:</strong> December 2024</li>
+                    <li><strong>Last Updated:</strong> December 2024</li>
+                    <li><strong>Status:</strong> Active</li>
+                </ul>
+            </div>
+
+            <hr>
+
+            <h2 id="executive-summary">1. Executive Summary</h2>
+
+            <h3>Purpose</h3>
+            <p>This document provides a standardized approach for implementing <strong>configurable, Keycloak-driven authorization</strong> in the CMIPS application. The goal is to enable:</p>
+
+            <ul>
+                <li><strong>Zero-code configuration changes</strong> - Add/modify permissions via Keycloak Admin UI</li>
+                <li><strong>Role-based field visibility</strong> - Different roles see different fields</li>
+                <li><strong>Action-based authorization</strong> - Control who can read/create/update/delete/approve/reject</li>
+                <li><strong>Centralized policy management</strong> - All authorization rules in Keycloak</li>
+            </ul>
+
+            <h3>Key Benefits</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Benefit</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>No Hardcoding</strong></td>
+                        <td>Authorization rules configured in Keycloak, not code</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Runtime Updates</strong></td>
+                        <td>Change permissions without redeployment</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Audit Trail</strong></td>
+                        <td>Keycloak logs all permission changes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Consistency</strong></td>
+                        <td>Same pattern across all endpoints</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Scalability</strong></td>
+                        <td>Easy to add new resources and roles</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Architecture Pattern</h3>
+            <div class="ascii-diagram">
+<pre>
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   Frontend      │────▶│    Backend      │────▶│    Keycloak     │
+│   (Next.js)     │     │  (Spring Boot)  │     │  (Authorization)│
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+        │                       │                       │
+        │                       │                       │
+   ┌────▼────┐            ┌─────▼─────┐          ┌──────▼──────┐
+   │ Display │            │ Filter    │          │ Resources   │
+   │ Fields  │            │ Response  │          │ + Policies  │
+   │ Based on│            │ Based on  │          │ + Scopes    │
+   │ Response│            │ Keycloak  │          │ + Attributes│
+   └─────────┘            └───────────┘          └─────────────┘
+</pre>
+            </div>
+
+            <hr>
+
+            <h2 id="architecture-overview">2. Architecture Overview</h2>
+
+            <h3>Components</h3>
+
+            <h4>2.1 Keycloak Resources</h4>
+            <p>Resources represent protected entities in your application.</p>
+
+            <div class="ascii-diagram">
+<pre>
+Resource: "timesheet"
+├── Scopes: read, create, update, delete, submit, approve, reject
+├── Attributes:
+│   ├── PROVIDER_read_fields: "id,payPeriodStart,payPeriodEnd,totalHours,status"
+│   ├── PROVIDER_read_actions: "read,submit,create,update"
+│   ├── SUPERVISOR_read_fields: "id,userId,employeeId,employeeName,department,..."
+│   ├── SUPERVISOR_read_actions: "read,approve,reject,delete"
+│   └── ... (other roles)
+└── Policies: role-based-policy, time-based-policy, etc.
+</pre>
+            </div>
+
+            <h4>2.2 Naming Convention</h4>
+            <div class="ascii-diagram">
+<pre>
+Attribute Pattern: {ROLE}_{SCOPE}_fields
+                   {ROLE}_{SCOPE}_actions
+
+Examples:
+- PROVIDER_read_fields     → Fields visible to PROVIDER role
+- SUPERVISOR_read_actions  → Actions available to SUPERVISOR role
+- CASEWORKER_update_fields → Fields CASEWORKER can update
+</pre>
+            </div>
+
+            <h4>2.3 Data Flow</h4>
+            <div class="ascii-diagram">
+<pre>
+1. User Request → Backend API
+2. Backend extracts JWT → Gets user roles
+3. Backend queries Keycloak → Gets resource attributes
+4. Backend filters response → Only allowed fields/actions
+5. Frontend receives response → Displays based on data present
+</pre>
+            </div>
+
+            <hr>
+
+            <h2 id="keycloak-configuration">3. Keycloak Configuration</h2>
+
+            <h3>3.1 Prerequisites</h3>
+            <ul>
+                <li>Keycloak realm: <code>cmips</code></li>
+                <li>Client: <code>cmips-backend</code> (with service account enabled)</li>
+                <li>Authorization enabled on client</li>
+            </ul>
+
+            <h3>3.2 Creating a New Resource</h3>
+
+            <h4>Step 1: Navigate to Resources</h4>
+            <pre><code>Keycloak Admin → Clients → cmips-backend → Authorization → Resources</code></pre>
+
+            <h4>Step 2: Create Resource</h4>
+            <pre><code>{
+  "name": "timesheet",
+  "displayName": "Timesheet Resource",
+  "type": "urn:cmips:resources:timesheet",
+  "uris": ["/api/timesheets/*"],
+  "scopes": ["read", "create", "update", "delete", "submit", "approve", "reject"]
+}</code></pre>
+
+            <h4>Step 3: Add Attributes</h4>
+            <p>Click "Attributes" tab and add:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>PROVIDER_read_fields</code></td>
+                        <td><code>id,payPeriodStart,payPeriodEnd,regularHours,overtimeHours,totalHours,status,submittedAt,comments</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>PROVIDER_read_actions</code></td>
+                        <td><code>read,submit,create,update</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>RECIPIENT_read_fields</code></td>
+                        <td><code>id,payPeriodStart,payPeriodEnd,totalHours,status,employeeName</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>RECIPIENT_read_actions</code></td>
+                        <td><code>read,approve,reject</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>CASEWORKER_read_fields</code></td>
+                        <td><code>id,userId,employeeId,employeeName,department,location,payPeriodStart,payPeriodEnd,regularHours,overtimeHours,totalHours,status,comments,supervisorComments,approvedBy,submittedAt,createdAt,updatedAt</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>CASEWORKER_read_actions</code></td>
+                        <td><code>read,approve,reject,delete</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>SUPERVISOR_read_fields</code></td>
+                        <td><code>id,userId,employeeId,employeeName,department,location,payPeriodStart,payPeriodEnd,regularHours,overtimeHours,totalHours,status,comments,supervisorComments,approvedBy,submittedAt,createdAt,updatedAt</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>SUPERVISOR_read_actions</code></td>
+                        <td><code>read,approve,reject,delete</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>3.3 Creating Policies</h3>
+
+            <h4>Role-Based Policy</h4>
+            <pre><code>Keycloak Admin → Clients → cmips-backend → Authorization → Policies → Create Policy → Role</code></pre>
+
+            <pre><code>{
+  "name": "provider-policy",
+  "description": "Policy for providers",
+  "roles": [{"id": "PROVIDER", "required": true}],
+  "logic": "POSITIVE"
+}</code></pre>
+
+            <h4>Create policies for each role:</h4>
+            <ul>
+                <li><code>provider-policy</code> → PROVIDER role</li>
+                <li><code>recipient-policy</code> → RECIPIENT role</li>
+                <li><code>caseworker-policy</code> → CASEWORKER role</li>
+                <li><code>supervisor-policy</code> → SUPERVISOR role</li>
+            </ul>
+
+            <h3>3.4 Creating Permissions</h3>
+
+            <pre><code>Keycloak Admin → Clients → cmips-backend → Authorization → Permissions → Create Permission → Resource-Based</code></pre>
+
+            <pre><code>{
+  "name": "timesheet-provider-permission",
+  "description": "Provider access to timesheets",
+  "resources": ["timesheet"],
+  "policies": ["provider-policy"],
+  "scopes": ["read", "create", "update", "submit"],
+  "decisionStrategy": "UNANIMOUS"
+}</code></pre>
+
+            <h3>3.5 Complete Resource Configuration Script</h3>
+
+            <p>Save this script to quickly configure new resources:</p>
+
+            <pre><code>#!/bin/bash
+# File: /tmp/configure_keycloak_resource.sh
+
+KEYCLOAK_URL="http://localhost:8080"
+REALM="cmips"
+CLIENT_ID="cmips-backend"
+
+# Get admin token
+ADMIN_TOKEN=$(curl -s -X POST "$KEYCLOAK_URL/realms/master/protocol/openid-connect/token" \
+  -d "client_id=admin-cli" \
+  -d "username=admin" \
+  -d "password=admin" \
+  -d "grant_type=password" | jq -r '.access_token')
+
+# Get client UUID
+CLIENT_UUID=$(curl -s -X GET "$KEYCLOAK_URL/admin/realms/$REALM/clients" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" | jq -r '.[] | select(.clientId=="'$CLIENT_ID'") | .id')
+
+# Function to create/update resource
+create_resource() {
+  local RESOURCE_NAME=$1
+  local DISPLAY_NAME=$2
+  local SCOPES=$3
+
+  # Create resource
+  RESOURCE_PAYLOAD=$(cat &lt;&lt;EOF
+{
+  "name": "$RESOURCE_NAME",
+  "displayName": "$DISPLAY_NAME",
+  "type": "urn:cmips:resources:$RESOURCE_NAME",
+  "scopes": $SCOPES
+}
+EOF
+)
+
+  curl -s -X POST "$KEYCLOAK_URL/admin/realms/$REALM/clients/$CLIENT_UUID/authz/resource-server/resource" \
+    -H "Authorization: Bearer $ADMIN_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "$RESOURCE_PAYLOAD"
+}
+
+# Function to add attributes to resource
+add_resource_attributes() {
+  local RESOURCE_NAME=$1
+  local ATTRIBUTES=$2
+
+  # Get resource ID
+  RESOURCE_ID=$(curl -s -X GET "$KEYCLOAK_URL/admin/realms/$REALM/clients/$CLIENT_UUID/authz/resource-server/resource?name=$RESOURCE_NAME" \
+    -H "Authorization: Bearer $ADMIN_TOKEN" | jq -r '.[0]._id')
+
+  # Update resource with attributes
+  curl -s -X PUT "$KEYCLOAK_URL/admin/realms/$REALM/clients/$CLIENT_UUID/authz/resource-server/resource/$RESOURCE_ID" \
+    -H "Authorization: Bearer $ADMIN_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "$ATTRIBUTES"
+}
+
+# Usage example:
+# create_resource "new-entity" "New Entity Resource" '["read", "create", "update", "delete"]'</code></pre>
+
+            <hr>
+
+            <h2 id="backend-implementation">4. Backend Implementation</h2>
+
+            <h3>4.1 Service Layer Pattern</h3>
+
+            <p>Create a base service for field-level authorization:</p>
+
+            <pre><code>// File: src/main/java/com/cmips/service/FieldLevelAuthorizationService.java
+
+package com.cmips.service;
+
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.representations.idm.authorization.ResourceRepresentation;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Service
+public class FieldLevelAuthorizationService {
+
+    private final Keycloak keycloak;
+    private final String realm;
+    private final String clientId;
+    private final ObjectMapper objectMapper;
+
+    public FieldLevelAuthorizationService(
+            Keycloak keycloak,
+            @Value("${keycloak.realm}") String realm,
+            @Value("${keycloak.resource}") String clientId,
+            ObjectMapper objectMapper) {
+        this.keycloak = keycloak;
+        this.realm = realm;
+        this.clientId = clientId;
+        this.objectMapper = objectMapper;
+    }
+
+    /**
+     * Get allowed fields for a given resource, role, and scope
+     */
+    public Set&lt;String&gt; getAllowedFields(String resourceName, String role, String scope) {
+        try {
+            ResourceRepresentation resource = getResource(resourceName);
+            if (resource == null || resource.getAttributes() == null) {
+                return Collections.emptySet();
+            }
+
+            String attributeKey = role + "_" + scope + "_fields";
+            List&lt;String&gt; fieldsList = resource.getAttributes().get(attributeKey);
+
+            if (fieldsList == null || fieldsList.isEmpty()) {
+                return Collections.emptySet();
+            }
+
+            // Split comma-separated fields
+            return Arrays.stream(fieldsList.get(0).split(","))
+                    .map(String::trim)
+                    .collect(Collectors.toSet());
+        } catch (Exception e) {
+            throw new RuntimeException("Error getting allowed fields", e);
+        }
+    }
+
+    /**
+     * Get allowed actions for a given resource, role, and scope
+     */
+    public Set&lt;String&gt; getAllowedActions(String resourceName, String role, String scope) {
+        try {
+            ResourceRepresentation resource = getResource(resourceName);
+            if (resource == null || resource.getAttributes() == null) {
+                return Collections.emptySet();
+            }
+
+            String attributeKey = role + "_" + scope + "_actions";
+            List&lt;String&gt; actionsList = resource.getAttributes().get(attributeKey);
+
+            if (actionsList == null || actionsList.isEmpty()) {
+                return Collections.emptySet();
+            }
+
+            // Split comma-separated actions
+            return Arrays.stream(actionsList.get(0).split(","))
+                    .map(String::trim)
+                    .collect(Collectors.toSet());
+        } catch (Exception e) {
+            throw new RuntimeException("Error getting allowed actions", e);
+        }
+    }
+
+    /**
+     * Filter an object to only include allowed fields
+     */
+    public ObjectNode filterFields(Object entity, Set&lt;String&gt; allowedFields) {
+        ObjectNode entityNode = objectMapper.valueToTree(entity);
+        ObjectNode filteredNode = objectMapper.createObjectNode();
+
+        allowedFields.forEach(field -&gt; {
+            if (entityNode.has(field)) {
+                filteredNode.set(field, entityNode.get(field));
+            }
+        });
+
+        return filteredNode;
+    }
+
+    /**
+     * Get resource from Keycloak
+     */
+    private ResourceRepresentation getResource(String resourceName) {
+        String clientUuid = getClientUuid();
+        List&lt;ResourceRepresentation&gt; resources = keycloak
+                .realm(realm)
+                .clients()
+                .get(clientUuid)
+                .authorization()
+                .resources()
+                .find(resourceName, null, null, null, null, null, null);
+
+        return resources.isEmpty() ? null : resources.get(0);
+    }
+
+    /**
+     * Get client UUID
+     */
+    private String getClientUuid() {
+        return keycloak.realm(realm)
+                .clients()
+                .findByClientId(clientId)
+                .get(0)
+                .getId();
+    }
+}</code></pre>
+
+            <h3>4.2 Base Controller</h3>
+
+            <p>Create a base controller that all authorized controllers extend:</p>
+
+            <pre><code>// File: src/main/java/com/cmips/controller/BaseAuthorizedController.java
+
+package com.cmips.controller;
+
+import com.cmips.service.FieldLevelAuthorizationService;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public abstract class BaseAuthorizedController {
+
+    @Autowired
+    protected FieldLevelAuthorizationService authService;
+
+    /**
+     * Get the primary role from JWT token
+     */
+    protected String extractRole(Authentication authentication) {
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return "ANONYMOUS";
+        }
+
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        Map&lt;String, Object&gt; realmAccess = jwt.getClaim("realm_access");
+
+        if (realmAccess != null && realmAccess.containsKey("roles")) {
+            List&lt;String&gt; roles = (List&lt;String&gt;) realmAccess.get("roles");
+            // Return first role (or implement priority logic)
+            return roles.isEmpty() ? "ANONYMOUS" : roles.get(0);
+        }
+
+        return "ANONYMOUS";
+    }
+
+    /**
+     * Filter a page of entities based on allowed fields
+     */
+    protected Map&lt;String, Object&gt; filterPageResponse(
+            Page&lt;?&gt; page,
+            String resourceName,
+            String role,
+            String scope) {
+
+        Set&lt;String&gt; allowedFields = authService.getAllowedFields(resourceName, role, scope);
+        Set&lt;String&gt; allowedActions = authService.getAllowedActions(resourceName, role, scope);
+
+        List&lt;ObjectNode&gt; filteredContent = page.getContent().stream()
+                .map(entity -&gt; authService.filterFields(entity, allowedFields))
+                .collect(Collectors.toList());
+
+        Map&lt;String, Object&gt; response = new LinkedHashMap&lt;&gt;();
+        response.put("content", filteredContent);
+        response.put("totalElements", page.getTotalElements());
+        response.put("totalPages", page.getTotalPages());
+        response.put("size", page.getSize());
+        response.put("number", page.getNumber());
+        response.put("numberOfElements", page.getNumberOfElements());
+        response.put("allowedActions", allowedActions);
+        response.put("first", page.isFirst());
+        response.put("last", page.isLast());
+        response.put("empty", page.isEmpty());
+
+        return response;
+    }
+
+    /**
+     * Filter a single entity based on allowed fields
+     */
+    protected Map&lt;String, Object&gt; filterSingleResponse(
+            Object entity,
+            String resourceName,
+            String role,
+            String scope) {
+
+        Set&lt;String&gt; allowedFields = authService.getAllowedFields(resourceName, role, scope);
+        Set&lt;String&gt; allowedActions = authService.getAllowedActions(resourceName, role, scope);
+
+        ObjectNode filteredEntity = authService.filterFields(entity, allowedFields);
+
+        Map&lt;String, Object&gt; response = new LinkedHashMap&lt;&gt;();
+        response.put("data", filteredEntity);
+        response.put("allowedActions", allowedActions);
+
+        return response;
+    }
+}</code></pre>
+
+            <h3>4.3 Example Entity Controller</h3>
+
+            <pre><code>// File: src/main/java/com/cmips/controller/TimesheetController.java
+
+package com.cmips.controller;
+
+import com.cmips.entity.Timesheet;
+import com.cmips.repository.TimesheetRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+import java.util.Set;
+
+@RestController
+@RequestMapping("/api/timesheets")
+public class TimesheetController extends BaseAuthorizedController {
+
+    private static final String RESOURCE_NAME = "timesheet";
+    private final TimesheetRepository timesheetRepository;
+
+    public TimesheetController(TimesheetRepository timesheetRepository) {
+        this.timesheetRepository = timesheetRepository;
+    }
+
+    @GetMapping
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; getAllTimesheets(
+            Pageable pageable,
+            Authentication authentication) {
+
+        String role = extractRole(authentication);
+        Page&lt;Timesheet&gt; page = timesheetRepository.findAll(pageable);
+
+        Map&lt;String, Object&gt; response = filterPageResponse(page, RESOURCE_NAME, role, "read");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; getTimesheetById(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        String role = extractRole(authentication);
+        Timesheet timesheet = timesheetRepository.findById(id)
+                .orElseThrow(() -&gt; new RuntimeException("Timesheet not found"));
+
+        Map&lt;String, Object&gt; response = filterSingleResponse(timesheet, RESOURCE_NAME, role, "read");
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping
+    public ResponseEntity&lt;?&gt; createTimesheet(
+            @RequestBody Timesheet timesheet,
+            Authentication authentication) {
+
+        String role = extractRole(authentication);
+        Set&lt;String&gt; allowedActions = authService.getAllowedActions(RESOURCE_NAME, role, "create");
+
+        if (!allowedActions.contains("create")) {
+            return ResponseEntity.status(403).body("Not authorized to create timesheets");
+        }
+
+        Timesheet saved = timesheetRepository.save(timesheet);
+        Map&lt;String, Object&gt; response = filterSingleResponse(saved, RESOURCE_NAME, role, "read");
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity&lt;?&gt; updateTimesheet(
+            @PathVariable Long id,
+            @RequestBody Timesheet timesheet,
+            Authentication authentication) {
+
+        String role = extractRole(authentication);
+        Set&lt;String&gt; allowedActions = authService.getAllowedActions(RESOURCE_NAME, role, "update");
+
+        if (!allowedActions.contains("update")) {
+            return ResponseEntity.status(403).body("Not authorized to update timesheets");
+        }
+
+        Timesheet existing = timesheetRepository.findById(id)
+                .orElseThrow(() -&gt; new RuntimeException("Timesheet not found"));
+
+        // Update logic here
+        Timesheet updated = timesheetRepository.save(existing);
+        Map&lt;String, Object&gt; response = filterSingleResponse(updated, RESOURCE_NAME, role, "read");
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity&lt;?&gt; deleteTimesheet(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        String role = extractRole(authentication);
+        Set&lt;String&gt; allowedActions = authService.getAllowedActions(RESOURCE_NAME, role, "delete");
+
+        if (!allowedActions.contains("delete")) {
+            return ResponseEntity.status(403).body("Not authorized to delete timesheets");
+        }
+
+        timesheetRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+}</code></pre>
+
+            <hr>
+
+            <h2 id="frontend-implementation">5. Frontend Implementation</h2>
+
+            <h3>5.1 TypeScript Types</h3>
+
+            <pre><code>// File: types/timesheet.ts
+
+export interface Timesheet {
+  id?: number;
+  userId?: string;
+  employeeId?: string;
+  employeeName?: string;
+  department?: string;
+  location?: string;
+  payPeriodStart?: string;
+  payPeriodEnd?: string;
+  regularHours?: number;
+  overtimeHours?: number;
+  totalHours?: number;
+  status?: string;
+  comments?: string;
+  supervisorComments?: string;
+  approvedBy?: string;
+  submittedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface TimesheetResponse {
+  content: Timesheet[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  numberOfElements: number;
+  allowedActions: string[];
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+}</code></pre>
+
+            <h3>5.2 Custom Hook</h3>
+
+            <pre><code>// File: hooks/useFieldAuthorization.ts
+
+import { useState, useEffect } from 'react';
+
+interface UseFieldAuthorizationReturn&lt;T&gt; {
+  data: T[];
+  allowedActions: string[];
+  visibleFields: string[];
+  loading: boolean;
+  error: string | null;
+}
+
+export function useFieldAuthorization&lt;T&gt;(
+  apiEndpoint: string
+): UseFieldAuthorizationReturn&lt;T&gt; {
+  const [data, setData] = useState&lt;T[]&gt;([]);
+  const [allowedActions, setAllowedActions] = useState&lt;string[]&gt;([]);
+  const [visibleFields, setVisibleFields] = useState&lt;string[]&gt;([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState&lt;string | null&gt;(null);
+
+  useEffect(() =&gt; {
+    const fetchData = async () =&gt; {
+      try {
+        const response = await fetch(apiEndpoint, {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
+        const result = await response.json();
+        setData(result.content || []);
+        setAllowedActions(result.allowedActions || []);
+
+        // Extract visible fields from first record
+        if (result.content && result.content.length &gt; 0) {
+          setVisibleFields(Object.keys(result.content[0]));
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [apiEndpoint]);
+
+  return { data, allowedActions, visibleFields, loading, error };
+}</code></pre>
+
+            <h3>5.3 Field Component</h3>
+
+            <pre><code>// File: components/FieldAuthorizedValue.tsx
+
+import React from 'react';
+
+interface FieldAuthorizedValueProps {
+  value: any;
+  fieldName: string;
+  visibleFields: string[];
+  placeholder?: string;
+}
+
+export const FieldAuthorizedValue: React.FC&lt;FieldAuthorizedValueProps&gt; = ({
+  value,
+  fieldName,
+  visibleFields,
+  placeholder = '—'
+}) =&gt; {
+  // Check if field is in visible fields
+  const isVisible = visibleFields.includes(fieldName);
+
+  if (!isVisible) {
+    return &lt;span className="text-gray-400"&gt;{placeholder}&lt;/span&gt;;
+  }
+
+  // Return actual value if visible
+  return &lt;span&gt;{value ?? placeholder}&lt;/span&gt;;
+};</code></pre>
+
+            <h3>5.4 Page Component Example</h3>
+
+            <pre><code>// File: app/dashboard/timesheets/page.tsx
+
+'use client';
+
+import React from 'react';
+import { useFieldAuthorization } from '@/hooks/useFieldAuthorization';
+import { FieldAuthorizedValue } from '@/components/FieldAuthorizedValue';
+import { Timesheet } from '@/types/timesheet';
+
+export default function TimesheetsPage() {
+  const { data, allowedActions, visibleFields, loading, error } =
+    useFieldAuthorization&lt;Timesheet&gt;('/api/timesheets');
+
+  if (loading) return &lt;div&gt;Loading...&lt;/div&gt;;
+  if (error) return &lt;div&gt;Error: {error}&lt;/div&gt;;
+
+  return (
+    &lt;div className="p-6"&gt;
+      &lt;h1 className="text-2xl font-bold mb-4"&gt;Timesheets&lt;/h1&gt;
+
+      {/* Action Buttons */}
+      &lt;div className="mb-4 flex gap-2"&gt;
+        {allowedActions.includes('create') && (
+          &lt;button className="btn-primary"&gt;Create Timesheet&lt;/button&gt;
+        )}
+        {allowedActions.includes('approve') && (
+          &lt;button className="btn-success"&gt;Approve Selected&lt;/button&gt;
+        )}
+        {allowedActions.includes('reject') && (
+          &lt;button className="btn-danger"&gt;Reject Selected&lt;/button&gt;
+        )}
+      &lt;/div&gt;
+
+      {/* Table */}
+      &lt;table className="min-w-full table-auto border"&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            {visibleFields.includes('id') && &lt;th&gt;ID&lt;/th&gt;}
+            {visibleFields.includes('employeeName') && &lt;th&gt;Employee&lt;/th&gt;}
+            {visibleFields.includes('payPeriodStart') && &lt;th&gt;Period Start&lt;/th&gt;}
+            {visibleFields.includes('payPeriodEnd') && &lt;th&gt;Period End&lt;/th&gt;}
+            {visibleFields.includes('totalHours') && &lt;th&gt;Total Hours&lt;/th&gt;}
+            {visibleFields.includes('status') && &lt;th&gt;Status&lt;/th&gt;}
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          {data.map((timesheet) =&gt; (
+            &lt;tr key={timesheet.id}&gt;
+              &lt;td&gt;
+                &lt;FieldAuthorizedValue
+                  value={timesheet.id}
+                  fieldName="id"
+                  visibleFields={visibleFields}
+                /&gt;
+              &lt;/td&gt;
+              &lt;td&gt;
+                &lt;FieldAuthorizedValue
+                  value={timesheet.employeeName}
+                  fieldName="employeeName"
+                  visibleFields={visibleFields}
+                /&gt;
+              &lt;/td&gt;
+              &lt;td&gt;
+                &lt;FieldAuthorizedValue
+                  value={timesheet.payPeriodStart}
+                  fieldName="payPeriodStart"
+                  visibleFields={visibleFields}
+                /&gt;
+              &lt;/td&gt;
+              &lt;td&gt;
+                &lt;FieldAuthorizedValue
+                  value={timesheet.payPeriodEnd}
+                  fieldName="payPeriodEnd"
+                  visibleFields={visibleFields}
+                /&gt;
+              &lt;/td&gt;
+              &lt;td&gt;
+                &lt;FieldAuthorizedValue
+                  value={timesheet.totalHours}
+                  fieldName="totalHours"
+                  visibleFields={visibleFields}
+                /&gt;
+              &lt;/td&gt;
+              &lt;td&gt;
+                &lt;FieldAuthorizedValue
+                  value={timesheet.status}
+                  fieldName="status"
+                  visibleFields={visibleFields}
+                /&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+          ))}
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+            <hr>
+
+            <h2 id="adding-new-endpoints">6. Adding New Endpoints</h2>
+
+            <h3>Step-by-Step Guide</h3>
+
+            <h4>Step 1: Create Keycloak Resource</h4>
+            <ol>
+                <li>Navigate to Keycloak Admin Console</li>
+                <li>Go to: Clients → cmips-backend → Authorization → Resources</li>
+                <li>Click "Create Resource"</li>
+                <li>Add resource attributes for each role</li>
+            </ol>
+
+            <h4>Step 2: Create Backend Controller</h4>
+            <pre><code>@RestController
+@RequestMapping("/api/new-entity")
+public class NewEntityController extends BaseAuthorizedController {
+
+    private static final String RESOURCE_NAME = "new-entity";
+
+    @GetMapping
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; getAll(
+            Pageable pageable,
+            Authentication authentication) {
+
+        String role = extractRole(authentication);
+        Page&lt;NewEntity&gt; page = repository.findAll(pageable);
+        Map&lt;String, Object&gt; response = filterPageResponse(page, RESOURCE_NAME, role, "read");
+
+        return ResponseEntity.ok(response);
+    }
+}</code></pre>
+
+            <h4>Step 3: Create Frontend Types</h4>
+            <pre><code>export interface NewEntity {
+  id?: number;
+  field1?: string;
+  field2?: string;
+  // ... other fields
+}</code></pre>
+
+            <h4>Step 4: Create Frontend Page</h4>
+            <pre><code>const { data, allowedActions, visibleFields } =
+  useFieldAuthorization&lt;NewEntity&gt;('/api/new-entity');</code></pre>
+
+            <hr>
+
+            <h2 id="adding-new-resources">7. Adding New Resources</h2>
+
+            <h3>Quick Checklist</h3>
+
+            <div class="benefit-box">
+                <strong>✓ Keycloak Setup</strong>
+                <ul>
+                    <li>Create resource in Keycloak</li>
+                    <li>Add attributes for each role ({ROLE}_read_fields, {ROLE}_read_actions)</li>
+                    <li>Create policies for each role</li>
+                    <li>Create permissions linking resources to policies</li>
+                </ul>
+            </div>
+
+            <div class="benefit-box">
+                <strong>✓ Backend Setup</strong>
+                <ul>
+                    <li>Create entity class</li>
+                    <li>Create repository interface</li>
+                    <li>Create controller extending BaseAuthorizedController</li>
+                    <li>Define RESOURCE_NAME constant</li>
+                    <li>Use filterPageResponse() and filterSingleResponse()</li>
+                </ul>
+            </div>
+
+            <div class="benefit-box">
+                <strong>✓ Frontend Setup</strong>
+                <ul>
+                    <li>Create TypeScript type (all fields optional)</li>
+                    <li>Use useFieldAuthorization hook</li>
+                    <li>Use FieldAuthorizedValue component</li>
+                    <li>Check allowedActions before showing action buttons</li>
+                </ul>
+            </div>
+
+            <hr>
+
+            <h2 id="best-practices">8. Best Practices</h2>
+
+            <h3>8.1 Keycloak Configuration</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Practice</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Consistent Naming</strong></td>
+                        <td>Always use {ROLE}_{SCOPE}_fields pattern</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Document Changes</strong></td>
+                        <td>Log all attribute changes in Keycloak</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Test Each Role</strong></td>
+                        <td>Verify field visibility for all roles</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Export Configuration</strong></td>
+                        <td>Export realm settings regularly for backup</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>8.2 Backend Development</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Practice</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Use Base Class</strong></td>
+                        <td>Always extend BaseAuthorizedController</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Constant Resource Names</strong></td>
+                        <td>Define RESOURCE_NAME as constant</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Check Actions</strong></td>
+                        <td>Always verify allowedActions before mutations</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cache Attributes</strong></td>
+                        <td>Consider caching Keycloak attributes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Log Access</strong></td>
+                        <td>Log authorization decisions for audit</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>8.3 Frontend Development</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Practice</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Optional Fields</strong></td>
+                        <td>Make all entity fields optional in TypeScript</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Check First Record</strong></td>
+                        <td>Use first record to determine visible columns</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Consistent Components</strong></td>
+                        <td>Use FieldAuthorizedValue consistently</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Show Actions</strong></td>
+                        <td>Display allowedActions in UI for transparency</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Handle Empty</strong></td>
+                        <td>Gracefully handle empty allowedActions</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>8.4 Testing</h3>
+
+            <pre><code>// Example test cases for each role
+describe('Field Level Authorization', () =&gt; {
+  const roles = ['PROVIDER', 'RECIPIENT', 'CASEWORKER', 'SUPERVISOR'];
+
+  roles.forEach(role =&gt; {
+    it(`${role} sees correct fields`, async () =&gt; {
+      const token = await getTokenForRole(role);
+      const response = await api.get('/timesheets', { headers: { Authorization: `Bearer ${token}` }});
+
+      // Verify expected fields present
+      expect(response.data.content[0]).toHaveProperty('id');
+
+      // Verify restricted fields absent (for certain roles)
+      if (role === 'PROVIDER') {
+        expect(response.data.content[0]).not.toHaveProperty('supervisorComments');
+      }
+
+      // Verify allowedActions
+      expect(response.data.allowedActions).toContain('read');
+    });
+  });
+});</code></pre>
+
+            <hr>
+
+            <h2 id="troubleshooting">9. Troubleshooting</h2>
+
+            <h3>Common Issues</h3>
+
+            <h4>Issue: Fields not being filtered</h4>
+            <div class="warning-box">
+                <strong>Symptom:</strong> All fields visible regardless of role<br>
+                <strong>Cause:</strong> Resource attributes not configured correctly<br><br>
+                <strong>Solution:</strong>
+                <ol>
+                    <li>Verify resource exists in Keycloak</li>
+                    <li>Check attribute naming: {ROLE}_read_fields</li>
+                    <li>Ensure backend is reading from correct client</li>
+                    <li>Check logs for Keycloak connection errors</li>
+                </ol>
+            </div>
+
+            <h4>Issue: Actions not enforced</h4>
+            <div class="warning-box">
+                <strong>Symptom:</strong> Users can perform actions they shouldn't<br>
+                <strong>Cause:</strong> allowedActions not checked in controller<br><br>
+                <strong>Solution:</strong><br>
+                Add action check before mutation:<br>
+                <code>if (!allowedActions.contains("approve")) {
+    return ResponseEntity.status(403).body("Not authorized");
+}</code>
+            </div>
+
+            <h4>Issue: Empty response</h4>
+            <div class="warning-box">
+                <strong>Symptom:</strong> API returns empty content array<br>
+                <strong>Cause:</strong> No matching role attributes found<br><br>
+                <strong>Solution:</strong>
+                <ol>
+                    <li>Check role extraction from JWT</li>
+                    <li>Verify role name matches Keycloak attribute prefix</li>
+                    <li>Add default/fallback fields for unknown roles</li>
+                </ol>
+            </div>
+
+            <h4>Issue: Frontend shows placeholder for all fields</h4>
+            <div class="warning-box">
+                <strong>Symptom:</strong> All fields show "—" placeholder<br>
+                <strong>Cause:</strong> Field names don't match between backend and frontend<br><br>
+                <strong>Solution:</strong>
+                <ol>
+                    <li>Verify field names match exactly (case-sensitive)</li>
+                    <li>Check TypeScript type definition matches entity</li>
+                    <li>Log response to verify field names</li>
+                </ol>
+            </div>
+
+            <h3>Debug Script</h3>
+
+            <pre><code>#!/bin/bash
+# File: /tmp/debug_field_auth.sh
+
+echo "=== Debug Field Level Authorization ==="
+
+# Test each role
+for role in provider1 recipient1 caseworker1 supervisor1; do
+  echo ""
+  echo "Testing as: $role"
+  echo "---"
+
+  TOKEN=$(curl -s -X POST "http://localhost:8080/realms/cmips/protocol/openid-connect/token" \
+    -d "client_id=cmips-frontend" \
+    -d "client_secret=YOUR_SECRET" \
+    -d "username=$role" \
+    -d "password=password123" \
+    -d "grant_type=password" | jq -r '.access_token')
+
+  RESPONSE=$(curl -s "http://localhost:8081/api/timesheets?page=0&size=1" \
+    -H "Authorization: Bearer $TOKEN")
+
+  echo "Fields visible:"
+  echo "$RESPONSE" | jq '.content[0] | keys'
+
+  echo "Allowed actions:"
+  echo "$RESPONSE" | jq '.allowedActions'
+done</code></pre>
+
+            <hr>
+
+            <h2 id="appendix">10. Appendix</h2>
+
+            <h3>A. Complete Keycloak Resource Template</h3>
+
+            <pre><code>{
+  "name": "entity-name",
+  "displayName": "Entity Display Name",
+  "type": "urn:cmips:resources:entity-name",
+  "uris": ["/api/entity-name/*"],
+  "scopes": [
+    {"name": "read"},
+    {"name": "create"},
+    {"name": "update"},
+    {"name": "delete"}
+  ],
+  "attributes": {
+    "PROVIDER_read_fields": ["id,field1,field2"],
+    "PROVIDER_read_actions": ["read"],
+    "RECIPIENT_read_fields": ["id,field1,field2"],
+    "RECIPIENT_read_actions": ["read"],
+    "CASEWORKER_read_fields": ["id,field1,field2,field3,field4"],
+    "CASEWORKER_read_actions": ["read,create,update"],
+    "SUPERVISOR_read_fields": ["id,field1,field2,field3,field4,field5"],
+    "SUPERVISOR_read_actions": ["read,create,update,delete"]
+  }
+}</code></pre>
+
+            <h3>B. File Structure Reference</h3>
+
+            <div class="ascii-diagram">
+<pre>
+cmipsapplication/
+├── backend/
+│   └── src/main/java/com/cmips/
+│       ├── config/
+│       │   └── SecurityConfig.java
+│       ├── controller/
+│       │   ├── BaseAuthorizedController.java
+│       │   └── [Entity]Controller.java
+│       ├── service/
+│       │   └── FieldLevelAuthorizationService.java
+│       └── entity/
+│           └── [Entity].java
+│
+├── frontend-nextjs/
+│   ├── hooks/
+│   │   └── useFieldAuthorization.ts
+│   ├── components/
+│   │   └── FieldAuthorizedValue.tsx
+│   ├── types/
+│   │   └── [entity].ts
+│   └── app/
+│       └── [role]/
+│           └── dashboard/
+│               └── page.tsx
+│
+└── keycloak/
+    └── realm-export.json
+</pre>
+            </div>
+
+            <h3>C. API Response Format</h3>
+
+            <pre><code>{
+  "content": [
+    {
+      "id": 1,
+      "field1": "value1",
+      "field2": "value2"
+    }
+  ],
+  "totalElements": 100,
+  "totalPages": 10,
+  "size": 10,
+  "number": 0,
+  "numberOfElements": 10,
+  "allowedActions": ["read", "create", "update"],
+  "first": true,
+  "last": false,
+  "empty": false
+}</code></pre>
+
+            <h3>D. Role-Field Matrix Template</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>PROVIDER</th>
+                        <th>RECIPIENT</th>
+                        <th>CASEWORKER</th>
+                        <th>SUPERVISOR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td>✓</td>
+                        <td>✓</td>
+                        <td>✓</td>
+                        <td>✓</td>
+                    </tr>
+                    <tr>
+                        <td>field1</td>
+                        <td>✓</td>
+                        <td>✓</td>
+                        <td>✓</td>
+                        <td>✓</td>
+                    </tr>
+                    <tr>
+                        <td>field2</td>
+                        <td>✓</td>
+                        <td></td>
+                        <td>✓</td>
+                        <td>✓</td>
+                    </tr>
+                    <tr>
+                        <td>field3</td>
+                        <td></td>
+                        <td></td>
+                        <td>✓</td>
+                        <td>✓</td>
+                    </tr>
+                    <tr>
+                        <td>sensitiveField</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>✓</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>E. Quick Reference Commands</h3>
+
+            <pre><code># Get Keycloak admin token
+ADMIN_TOKEN=$(curl -s -X POST "http://localhost:8080/realms/master/protocol/openid-connect/token" \
+  -d "client_id=admin-cli" -d "username=admin" -d "password=admin" \
+  -d "grant_type=password" | jq -r '.access_token')
+
+# List all resources
+curl -s "http://localhost:8080/admin/realms/cmips/clients/$CLIENT_UUID/authz/resource-server/resource" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" | jq '.[].name'
+
+# Get resource details
+curl -s "http://localhost:8080/admin/realms/cmips/clients/$CLIENT_UUID/authz/resource-server/resource?name=timesheet" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" | jq '.[0]'
+
+# Test endpoint as specific user
+TOKEN=$(curl -s -X POST "http://localhost:8080/realms/cmips/protocol/openid-connect/token" \
+  -d "client_id=cmips-frontend" -d "client_secret=SECRET" \
+  -d "username=provider1" -d "password=password123" \
+  -d "grant_type=password" | jq -r '.access_token')
+
+curl -s "http://localhost:8081/api/timesheets" -H "Authorization: Bearer $TOKEN" | jq</code></pre>
+
+            <hr>
+
+            <p style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 40px;">
+                This document should be updated whenever new patterns or best practices are established.
+            </p>
+        </main>
+    </div>
+</body>
+</html>

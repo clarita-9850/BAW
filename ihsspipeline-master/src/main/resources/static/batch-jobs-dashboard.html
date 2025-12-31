@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Job Processing Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-card h3 {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .metric-card .value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .metric-card.success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .metric-card.failed { background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%); }
+        .metric-card.processing { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .metric-card.queued { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(235, 51, 73, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .jobs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .jobs-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .jobs-table th,
+        .jobs-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .jobs-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-queued { background: #4facfe; color: white; }
+        .status-processing { background: #f5576c; color: white; }
+        .status-completed { background: #38ef7d; color: white; }
+        .status-failed { background: #f45c43; color: white; }
+        .status-cancelled { background: #6c757d; color: white; }
+
+        .badge-scheduled { background: #ff9800; color: white; }
+        .badge-manual { background: #2196f3; color: white; }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 30px;
+        }
+
+        .progress-fill.processing {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        .login-section {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-section .login-form-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .login-section h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .user-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info span {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .info-banner {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-banner button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Section (Modal) -->
+    <div id="loginSection" class="login-section hidden" onclick="if(event.target === this) hideLoginModal()">
+        <div class="login-form-container" onclick="event.stopPropagation()">
+            <h2>🔐 Login Required</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">Login to create and manage batch jobs</p>
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="loginUsername" required placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter password">
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+                <button type="button" class="btn btn-secondary" onclick="hideLoginModal()" style="margin-top: 10px; width: 100%;">Cancel</button>
+            </form>
+            <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; font-size: 12px;">
+                <strong>Test Accounts:</strong><br>
+                central_worker / password123<br>
+                county_worker / password123<br>
+                district_worker / password123
+            </div>
+            <div id="loginAlert"></div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="mainDashboard" class="container">
+        <div class="header-section">
+            <h1>📊 Batch Job Processing Dashboard</h1>
+            <div class="user-info" id="userInfoSection" style="display: none;">
+                <span>Logged in as: <strong id="currentUser">-</strong></span>
+                <button class="btn btn-secondary btn-small" onclick="logout()">Logout</button>
+            </div>
+            <div id="loginPromptSection">
+                <button class="btn btn-primary btn-small" onclick="showLoginModal()">Login</button>
+            </div>
+        </div>
+
+        <!-- Info Banner (shown when not logged in) -->
+        <div id="infoBanner" class="info-banner hidden">
+            <span>⚠️ Login required to manage jobs (cancel, download). You can still view all jobs without logging in.</span>
+            <button class="btn btn-primary btn-small" onclick="showLoginModal()">Login Now</button>
+        </div>
+
+        <!-- Metrics Section -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <h3>Total Jobs</h3>
+                <div class="value" id="metricTotal">0</div>
+            </div>
+            <div class="metric-card success">
+                <h3>Completed</h3>
+                <div class="value" id="metricCompleted">0</div>
+            </div>
+            <div class="metric-card processing">
+                <h3>Processing</h3>
+                <div class="value" id="metricProcessing">0</div>
+            </div>
+            <div class="metric-card queued">
+                <h3>Queued</h3>
+                <div class="value" id="metricQueued">0</div>
+            </div>
+            <div class="metric-card failed">
+                <h3>Failed</h3>
+                <div class="value" id="metricFailed">0</div>
+            </div>
+        </div>
+
+        <!-- Jobs List Section -->
+        <div class="section">
+            <div class="header-section">
+                <h2 class="section-title">Job List</h2>
+                <div class="filters">
+                    <div class="filter-group">
+                        <label>Status:</label>
+                        <select id="statusFilter" onchange="loadJobs()">
+                            <option value="ALL">All</option>
+                            <option value="QUEUED">Queued</option>
+                            <option value="PROCESSING">Processing</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="FAILED">Failed</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Date:</label>
+                        <input type="date" id="dateFilter" onchange="handleDateFilterChange()">
+                        <button class="btn btn-secondary btn-small" onclick="clearDateFilter()">Clear</button>
+                    </div>
+                    <button class="btn btn-secondary" onclick="loadJobs()">🔄 Refresh</button>
+                </div>
+            </div>
+            <div id="alertContainer"></div>
+            <div id="jobsTableContainer">
+                <div class="loading">Loading jobs...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api/bi';
+        const AUTH_API = 'http://localhost:8080/api/auth';
+        let accessToken = null;
+        let refreshInterval = null;
+        let currentUser = null;
+        let selectedJobDate = null;
+
+        // Check for stored token on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const storedToken = localStorage.getItem('accessToken');
+            const storedUser = localStorage.getItem('currentUser');
+            
+            if (storedToken && storedUser) {
+                accessToken = storedToken;
+                currentUser = JSON.parse(storedUser);
+                showMainDashboard();
+            } else {
+                // Show dashboard anyway - allow viewing jobs without login
+                // But show login prompt for creating jobs
+                showMainDashboard();
+                // Show a banner that login is required for creating jobs
+                showInfoBanner();
+            }
+        });
+
+        // Show login modal
+        function showLoginModal() {
+            document.getElementById('loginSection').classList.remove('hidden');
+            // Reset form
+            document.getElementById('loginForm').reset();
+            document.getElementById('loginAlert').innerHTML = '';
+        }
+
+        // Hide login modal
+        function hideLoginModal() {
+            document.getElementById('loginSection').classList.add('hidden');
+        }
+
+        // Show main dashboard
+        function showMainDashboard() {
+            document.getElementById('mainDashboard').classList.remove('hidden');
+            
+            // Show/hide user info based on login status
+            if (accessToken && currentUser) {
+                document.getElementById('userInfoSection').style.display = 'flex';
+                document.getElementById('loginPromptSection').style.display = 'none';
+                document.getElementById('currentUser').textContent = currentUser.username || 'Unknown';
+                document.getElementById('infoBanner').classList.add('hidden');
+                
+            } else {
+                document.getElementById('userInfoSection').style.display = 'none';
+                document.getElementById('loginPromptSection').style.display = 'block';
+            }
+            
+            loadJobs();
+            // Auto-refresh - more frequent for better progress tracking
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+            refreshInterval = setInterval(loadJobs, 2000); // Refresh every 2 seconds for real-time updates
+        }
+
+        // Show info banner
+        function showInfoBanner() {
+            if (!accessToken) {
+                document.getElementById('infoBanner').classList.remove('hidden');
+            }
+        }
+
+        // Login form submission
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const loginAlert = document.getElementById('loginAlert');
+
+            try {
+                const response = await fetch(`${AUTH_API}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.accessToken) {
+                    accessToken = data.accessToken;
+                    currentUser = data.user || { username: username };
+                    
+                    // Store in localStorage
+                    localStorage.setItem('accessToken', accessToken);
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
+                    showLoginAlert('✅ Login successful!', 'success');
+                    hideLoginModal();
+                    setTimeout(() => {
+                        showMainDashboard();
+                    }, 500);
+                } else {
+                    showLoginAlert(`❌ Login failed: ${data.message || 'Invalid credentials'}`, 'error');
+                }
+            } catch (error) {
+                showLoginAlert(`❌ Error: ${error.message}`, 'error');
+            }
+        });
+
+        // Logout function
+        function logout() {
+            accessToken = null;
+            currentUser = null;
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('currentUser');
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+            showMainDashboard(); // Stay on dashboard, just update UI
+            document.getElementById('loginForm').reset();
+        }
+
+        // Show login alert
+        function showLoginAlert(message, type) {
+            const loginAlert = document.getElementById('loginAlert');
+            loginAlert.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => {
+                loginAlert.innerHTML = '';
+            }, 3000);
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
+
+        // Load jobs
+        async function loadJobs() {
+            const statusFilter = document.getElementById('statusFilter')?.value || 'ALL';
+            const url = statusFilter === 'ALL' 
+                ? `${API_BASE}/jobs/status/ALL`
+                : `${API_BASE}/jobs/status/${statusFilter}`;
+
+            try {
+                // Build headers - include Authorization only if token exists
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                if (accessToken) {
+                    headers['Authorization'] = `Bearer ${accessToken}`;
+                }
+
+                const response = await fetch(url, { headers });
+                const result = await parseJsonResponse(response);
+                
+                if (result.status === 'SUCCESS') {
+                    const jobs = result.jobs || [];
+                    const filteredJobs = filterJobsByDate(jobs);
+                    displayJobs(filteredJobs);
+                    updateMetrics(filteredJobs);
+                    updateDateFilterBanner(jobs.length, filteredJobs.length);
+                } else {
+                    document.getElementById('jobsTableContainer').innerHTML = 
+                        `<div class="alert alert-error">Failed to load jobs: ${result.message}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('jobsTableContainer').innerHTML = 
+                    `<div class="alert alert-error">Error loading jobs: ${error.message}</div>`;
+            }
+        }
+
+        function handleDateFilterChange() {
+            const dateInput = document.getElementById('dateFilter');
+            selectedJobDate = dateInput?.value || null;
+            loadJobs();
+        }
+
+        function clearDateFilter() {
+            const dateInput = document.getElementById('dateFilter');
+            if (dateInput) {
+                dateInput.value = '';
+            }
+            selectedJobDate = null;
+            loadJobs();
+        }
+
+        function filterJobsByDate(jobs) {
+            if (!selectedJobDate) {
+                return jobs;
+            }
+
+            return jobs.filter(job => {
+                if (!job.createdAt) return false;
+                const jobDateOnly = extractDateOnly(job.createdAt);
+                return jobDateOnly === selectedJobDate;
+            });
+        }
+
+        function extractDateOnly(dateString) {
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) {
+                    return null;
+                }
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            } catch (error) {
+                console.error('Error extracting date:', dateString, error);
+                return null;
+            }
+        }
+
+        function updateDateFilterBanner(totalJobs, filteredJobs) {
+            const alertContainer = document.getElementById('alertContainer');
+            if (!selectedJobDate) {
+                alertContainer.innerHTML = '';
+                return;
+            }
+
+            const message = filteredJobs > 0
+                ? `Showing ${filteredJobs} job(s) created on ${selectedJobDate}.`
+                : `No jobs found for ${selectedJobDate}. Showing 0 of ${totalJobs} total jobs.`;
+
+            alertContainer.innerHTML = `
+                <div class="alert ${filteredJobs > 0 ? 'alert-info' : 'alert-error'}">
+                    ${message}
+                </div>
+            `;
+        }
+
+        async function parseJsonResponse(response) {
+            const raw = await response.text();
+
+            if (!response.ok) {
+                const message = raw || response.statusText || 'Unknown error';
+                throw new Error(`HTTP ${response.status}: ${message}`);
+            }
+
+            if (!raw) {
+                throw new Error('Server returned an empty response.');
+            }
+
+            try {
+                return JSON.parse(raw);
+            } catch (err) {
+                console.error('Failed to parse JSON response:', raw);
+                throw new Error(`Invalid JSON received: ${err.message}`);
+            }
+        }
+
+        // Display jobs in table
+        function displayJobs(jobs) {
+            if (jobs.length === 0) {
+                document.getElementById('jobsTableContainer').innerHTML = 
+                    '<div class="empty-state">No jobs found</div>';
+                return;
+            }
+
+            // Sort jobs by creation date (newest first)
+            const sortedJobs = [...jobs].sort((a, b) => {
+                const getTimestamp = (dateStr) => {
+                    if (!dateStr) return 0;
+                    const timestamp = new Date(dateStr).getTime();
+                    return isNaN(timestamp) ? 0 : timestamp;
+                };
+                const dateA = getTimestamp(a.createdAt);
+                const dateB = getTimestamp(b.createdAt);
+                return dateB - dateA; // Newest first
+            });
+
+            const table = `
+                <table class="jobs-table">
+                    <thead>
+                        <tr>
+                            <th>Job ID</th>
+                            <th>Source</th>
+                            <th>User Role</th>
+                            <th>Report Type</th>
+                            <th>Status</th>
+                            <th>Progress</th>
+                            <th>Records</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sortedJobs.map(job => {
+                            const isProcessing = job.status === 'PROCESSING';
+                            const isQueued = job.status === 'QUEUED';
+                            const progress = job.progress || 0;
+                            const processed = job.processedRecords || 0;
+                            const total = job.totalRecords || 0;
+                            const progressText = total > 0 ? `${processed} / ${total}` : 'Calculating...';
+                            
+                            return `
+                            <tr ${isProcessing ? 'style="background: #fff3cd;"' : ''}>
+                                <td><strong>${job.jobId}</strong> ${isProcessing ? '🔄' : ''}</td>
+                                <td>
+                                    <span class="badge ${job.jobSource === 'SCHEDULED' ? 'badge-scheduled' : 'badge-manual'}" 
+                                          style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
+                                        ${job.jobSource === 'SCHEDULED' ? '⏰ SCHEDULED' : (job.jobSource || 'MANUAL')}
+                                    </span>
+                                </td>
+                                <td>${job.userRole || 'N/A'}</td>
+                                <td>${job.reportType || 'N/A'}</td>
+                                <td>
+                                    <span class="status-badge status-${job.status?.toLowerCase()}">
+                                        ${job.status || 'UNKNOWN'}
+                                        ${isProcessing ? ' ⚙️' : ''}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill ${isProcessing ? 'processing' : ''}" style="width: ${Math.max(progress, 2)}%">
+                                            ${progress > 0 ? progress + '%' : (isProcessing ? 'Starting...' : (isQueued ? 'Queued' : '0%'))}
+                                        </div>
+                                    </div>
+                                    <small style="display: block; margin-top: 5px; color: #666;">
+                                        ${progressText}
+                                        ${isProcessing ? ' <span style="color: #f5576c; font-weight: 600;">⏳ Processing...</span>' : ''}
+                                        ${isQueued ? ' <span style="color: #4facfe;">📋 Queued</span>' : ''}
+                                    </small>
+                                </td>
+                                <td>${total > 0 ? total.toLocaleString() : '-'}</td>
+                                <td>${formatDate(job.createdAt)}</td>
+                                <td class="actions-cell">
+                                    ${isQueued || isProcessing 
+                                        ? `<button class="btn btn-danger btn-small" onclick="cancelJob('${job.jobId}')">Cancel</button>`
+                                        : ''
+                                    }
+                                    ${job.status === 'COMPLETED' 
+                                        ? `<button class="btn btn-primary btn-small" onclick="viewJobResult('${job.jobId}')">View</button>
+                                           <button class="btn btn-success btn-small" onclick="downloadJobReport('${job.jobId}')">Download</button>`
+                                        : ''
+                                    }
+                                    <button class="btn btn-secondary btn-small" onclick="viewJobDetails('${job.jobId}')">Details</button>
+                                </td>
+                            </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('jobsTableContainer').innerHTML = table;
+        }
+
+        // Update metrics
+        function updateMetrics(jobs) {
+            const total = jobs.length;
+            const completed = jobs.filter(j => j.status === 'COMPLETED').length;
+            const processing = jobs.filter(j => j.status === 'PROCESSING').length;
+            const queued = jobs.filter(j => j.status === 'QUEUED').length;
+            const failed = jobs.filter(j => j.status === 'FAILED').length;
+
+            document.getElementById('metricTotal').textContent = total;
+            document.getElementById('metricCompleted').textContent = completed;
+            document.getElementById('metricProcessing').textContent = processing;
+            document.getElementById('metricQueued').textContent = queued;
+            document.getElementById('metricFailed').textContent = failed;
+        }
+
+        // Cancel job
+        async function cancelJob(jobId) {
+            if (!confirm(`Are you sure you want to cancel job ${jobId}?`)) {
+                return;
+            }
+
+            if (!accessToken) {
+                showAlert('Please login to cancel jobs', 'error');
+                showLoginModal();
+                return;
+            }
+
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (accessToken) {
+                    headers['Authorization'] = `Bearer ${accessToken}`;
+                }
+                const response = await fetch(`${API_BASE}/jobs/${jobId}/cancel`, {
+                    method: 'POST',
+                    headers: headers
+                });
+
+                const result = await response.json();
+                
+                if (result.status === 'SUCCESS') {
+                    showAlert(`Job ${jobId} cancelled successfully`, 'success');
+                    loadJobs();
+                } else {
+                    showAlert(`Failed to cancel job: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showAlert(`Error cancelling job: ${error.message}`, 'error');
+            }
+        }
+
+        // Download job report file
+        function downloadJobReport(jobId) {
+            // Direct download via GET request
+            window.location.href = `${API_BASE}/jobs/${jobId}/download`;
+        }
+
+        // View job result
+        async function viewJobResult(jobId) {
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (accessToken) {
+                    headers['Authorization'] = `Bearer ${accessToken}`;
+                }
+                const response = await fetch(`${API_BASE}/jobs/${jobId}/result`, {
+                    headers: headers
+                });
+
+                const result = await response.json();
+                
+                if (result.status === 'SUCCESS') {
+                    const resultData = result.result;
+                    const message = `Job Result:
+                    
+Status: ${resultData.status}
+Result Path: ${resultData.resultPath}
+Total Records: ${resultData.totalRecords?.toLocaleString() || 0}
+Processed Records: ${resultData.processedRecords?.toLocaleString() || 0}
+
+Click OK to download the report file.`;
+                    
+                    if (confirm(message)) {
+                        // Download the file
+                        window.location.href = `${API_BASE}/jobs/${jobId}/download`;
+                    }
+                } else {
+                    showAlert(`Failed to get job result: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showAlert(`Error getting job result: ${error.message}`, 'error');
+            }
+        }
+
+        // View job details
+        async function viewJobDetails(jobId) {
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (accessToken) {
+                    headers['Authorization'] = `Bearer ${accessToken}`;
+                }
+                const response = await fetch(`${API_BASE}/jobs/${jobId}/status`, {
+                    headers: headers
+                });
+
+                const result = await response.json();
+                
+                if (result.status === 'SUCCESS') {
+                    const job = result.jobStatus;
+                    const details = `
+Job Details:
+- Job ID: ${job.jobId}
+- Status: ${job.status}
+- Progress: ${job.progress || 0}%
+- Processed: ${job.processedRecords || 0} / ${job.totalRecords || 0}
+- Created: ${formatDate(job.createdAt)}
+- Started: ${formatDate(job.startedAt)}
+- Completed: ${formatDate(job.completedAt)}
+- Error: ${job.errorMessage || 'None'}
+                    `;
+                    alert(details);
+                } else {
+                    showAlert(`Failed to get job details: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showAlert(`Error getting job details: ${error.message}`, 'error');
+            }
+        }
+
+        // Show alert
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertClass = `alert-${type}`;
+            const alert = document.createElement('div');
+            alert.className = `alert ${alertClass}`;
+            alert.textContent = message;
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Format date - handles ISO-8601 format and other date formats
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            
+            try {
+                // Handle ISO-8601 format (yyyy-MM-dd'T'HH:mm:ss)
+                let date;
+                if (typeof dateString === 'string') {
+                    // If it's already a valid ISO string, parse it directly
+                    date = new Date(dateString);
+                } else {
+                    date = new Date(dateString);
+                }
+                
+                // Check if date is valid
+                if (isNaN(date.getTime())) {
+                    return 'Invalid Date';
+                }
+                
+                // Format as: MM/DD/YYYY, HH:MM:SS AM/PM
+                return date.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+            } catch (error) {
+                console.error('Error formatting date:', dateString, error);
+                return 'Invalid Date';
+            }
+        }
+    </script>
+</body>
+</html>
+

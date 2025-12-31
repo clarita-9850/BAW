@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMIPS Timesheet Reporting System - Technical Architecture</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --secondary: #1e293b;
+            --accent: #f59e0b;
+            --accent-light: #fbbf24;
+            --success: #10b981;
+            --info: #3b82f6;
+            --warning: #f97316;
+            --danger: #ef4444;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --card-bg: #1e293b;
+            --border: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, #0c1425 50%, var(--primary) 100%);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 8rem 2rem 4rem;
+            background: radial-gradient(ellipse at top, rgba(245, 158, 11, 0.1) 0%, transparent 70%);
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Section */
+        .section {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 2rem;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .card-description {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Grid */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        @media (max-width: 1024px) {
+            .grid-3, .grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Flow Diagram */
+        .flow-diagram {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .flow-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .flow-box {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            text-align: center;
+            min-width: 180px;
+            position: relative;
+        }
+
+        .flow-box.trigger {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, var(--secondary) 100%);
+        }
+
+        .flow-box.process {
+            border-color: var(--info);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, var(--secondary) 100%);
+        }
+
+        .flow-box.output {
+            border-color: var(--success);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, var(--secondary) 100%);
+        }
+
+        .flow-box.decision {
+            border-color: var(--warning);
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, var(--secondary) 100%);
+            transform: rotate(0deg);
+        }
+
+        .flow-box-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .flow-box-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .flow-arrow {
+            color: var(--accent);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .flow-arrow-down {
+            display: flex;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--accent);
+            margin: 0.5rem 0;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .code-comment {
+            color: #6e7681;
+        }
+
+        .code-keyword {
+            color: #ff7b72;
+        }
+
+        .code-string {
+            color: #a5d6ff;
+        }
+
+        .code-function {
+            color: #d2a8ff;
+        }
+
+        .code-class {
+            color: #ffa657;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .badge-info {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+            border: 1px solid var(--info);
+        }
+
+        .badge-warning {
+            background: rgba(249, 115, 22, 0.2);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--secondary);
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        tr:hover {
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        /* Icon */
+        .icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .icon-trigger {
+            background: rgba(245, 158, 11, 0.2);
+        }
+
+        .icon-process {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .icon-output {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .icon-security {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* Component Architecture */
+        .component-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem;
+        }
+
+        .component-header {
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .component-list {
+            list-style: none;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .component-list li {
+            padding: 0.25rem 0;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .component-list li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        /* Stats */
+        .stat-box {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 3rem;
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+            color: var(--text-muted);
+        }
+
+        /* Animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Highlight */
+        .highlight {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, transparent 100%);
+            border-left: 4px solid var(--accent);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-content">
+            <div class="nav-logo">CMIPS Technical Architecture</div>
+            <div class="nav-links">
+                <a href="#overview">Overview</a>
+                <a href="#batch-jobs">Batch Jobs</a>
+                <a href="#reports">Reports</a>
+                <a href="#analytics">Analytics</a>
+                <a href="#security">Security</a>
+                <a href="#delivery">Delivery</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="header">
+        <h1>CMIPS Timesheet Reporting System</h1>
+        <p class="subtitle">Enterprise-grade reporting platform with role-based access control, automated batch processing, real-time analytics, and secure multi-channel delivery</p>
+    </header>
+
+    <div class="container">
+
+        <!-- System Overview -->
+        <section id="overview" class="section">
+            <h2 class="section-title">System Architecture Overview</h2>
+            
+            <div class="grid-4">
+                <div class="card">
+                    <div class="icon icon-trigger">🚀</div>
+                    <div class="card-title">6 User Roles</div>
+                    <div class="card-description">Admin, Supervisor, Case Worker, Provider, Recipient, System Scheduler</div>
+                </div>
+                <div class="card">
+                    <div class="icon icon-process">⚙️</div>
+                    <div class="card-title">5 Job States</div>
+                    <div class="card-description">Queued → Processing → Completed / Failed / Cancelled</div>
+                </div>
+                <div class="card">
+                    <div class="icon icon-output">📊</div>
+                    <div class="card-title">3 Delivery Channels</div>
+                    <div class="card-description">Email (PDF), SFTP (Encrypted CSV), Direct Download</div>
+                </div>
+                <div class="card">
+                    <div class="icon icon-security">🔐</div>
+                    <div class="card-title">JWT Security</div>
+                    <div class="card-description">Keycloak OAuth2 with role-based field masking</div>
+                </div>
+            </div>
+
+            <!-- High-Level Architecture -->
+            <div class="flow-diagram">
+                <h3 style="text-align: center; margin-bottom: 2rem; color: var(--accent);">High-Level System Architecture</h3>
+                
+                <div class="flow-row">
+                    <div class="flow-box trigger">
+                        <div class="flow-box-title">🌐 Frontend</div>
+                        <div class="flow-box-subtitle">React/Next.js Dashboard</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box process">
+                        <div class="flow-box-title">🚪 API Gateway</div>
+                        <div class="flow-box-subtitle">Spring Cloud Gateway</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box process">
+                        <div class="flow-box-title">🔐 Keycloak</div>
+                        <div class="flow-box-subtitle">OAuth2 / JWT Auth</div>
+                    </div>
+                </div>
+
+                <div class="flow-arrow-down">↓</div>
+
+                <div class="flow-row">
+                    <div class="flow-box process">
+                        <div class="flow-box-title">☕ Spring Boot App</div>
+                        <div class="flow-box-subtitle">Core Business Logic</div>
+                    </div>
+                </div>
+
+                <div class="flow-arrow-down">↓</div>
+
+                <div class="flow-row">
+                    <div class="flow-box output">
+                        <div class="flow-box-title">🗄️ PostgreSQL</div>
+                        <div class="flow-box-subtitle">Timesheets & Jobs</div>
+                    </div>
+                    <div class="flow-box output">
+                        <div class="flow-box-title">📧 MailHog</div>
+                        <div class="flow-box-subtitle">Email Testing</div>
+                    </div>
+                    <div class="flow-box output">
+                        <div class="flow-box-title">📁 SFTP Server</div>
+                        <div class="flow-box-subtitle">File Delivery</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Batch Job Processing -->
+        <section id="batch-jobs" class="section">
+            <h2 class="section-title">Batch Job Processing System</h2>
+
+            <div class="highlight">
+                <strong>Key Feature:</strong> Automated job scheduling with priority-based queue processing, real-time status tracking, and dependency management between jobs.
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title">📋 Job Queue Management</div>
+                    <div class="code-block">
+<span class="code-comment">// JobQueueService.java</span>
+<span class="code-keyword">public</span> <span class="code-class">Optional</span>&lt;<span class="code-class">ReportJobEntity</span>&gt; <span class="code-function">getNextJobForProcessing</span>() {
+    <span class="code-comment">// Fetch jobs ordered by priority (highest first)</span>
+    <span class="code-comment">// Then by created_at (oldest first)</span>
+    <span class="code-keyword">return</span> jobRepository.<span class="code-function">findQueuedJobsByPriority</span>()
+        .stream().findFirst();
+}
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">⏰ Scheduler Configuration</div>
+                    <div class="code-block">
+<span class="code-comment">// BatchJobScheduler.java</span>
+<span class="code-keyword">@Scheduled</span>(fixedDelayString = <span class="code-string">"${batch.scheduler.interval-ms:5000}"</span>)
+<span class="code-keyword">public void</span> <span class="code-function">pollAndDispatchJobs</span>() {
+    <span class="code-class">List</span>&lt;<span class="code-class">ReportJobEntity</span>&gt; queuedJobs = 
+        jobRepository.<span class="code-function">findTopQueuedJobs</span>(maxJobsPerPoll);
+    
+    <span class="code-keyword">for</span> (<span class="code-class">ReportJobEntity</span> job : queuedJobs) {
+        batchJobExecutor.<span class="code-function">execute</span>(() -> 
+            backgroundProcessingService.<span class="code-function">processJob</span>(job.getJobId()));
+    }
+}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Job State Machine -->
+            <div class="flow-diagram">
+                <h3 style="text-align: center; margin-bottom: 2rem; color: var(--accent);">Job State Machine</h3>
+                
+                <div class="flow-row">
+                    <div class="flow-box trigger">
+                        <div class="flow-box-title">📝 QUEUED</div>
+                        <div class="flow-box-subtitle">Job created, waiting</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box process">
+                        <div class="flow-box-title">⚙️ PROCESSING</div>
+                        <div class="flow-box-subtitle">Worker claimed job</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box output">
+                        <div class="flow-box-title">✅ COMPLETED</div>
+                        <div class="flow-box-subtitle">Report generated</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: center; gap: 15rem; margin-top: 1rem;">
+                    <div style="text-align: center;">
+                        <div class="flow-arrow-down">↓</div>
+                        <div class="flow-box" style="border-color: var(--danger); background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, var(--secondary) 100%);">
+                            <div class="flow-box-title">❌ FAILED</div>
+                            <div class="flow-box-subtitle">Error occurred</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="flow-arrow-down">↓</div>
+                        <div class="flow-box" style="border-color: var(--text-muted);">
+                            <div class="flow-box-title">🚫 CANCELLED</div>
+                            <div class="flow-box-subtitle">User cancelled</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Job Entity Structure -->
+            <div class="card">
+                <div class="card-title">🗃️ ReportJobEntity - Database Schema</div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>job_id</code></td><td>String (PK)</td><td>Unique job identifier (JOB_XXXXXXXX)</td></tr>
+                            <tr><td><code>user_role</code></td><td>String</td><td>Role that triggered the job</td></tr>
+                            <tr><td><code>report_type</code></td><td>String</td><td>Type of report (TIMESHEET_REPORT, DAILY_SUMMARY)</td></tr>
+                            <tr><td><code>status</code></td><td>String</td><td>QUEUED / PROCESSING / COMPLETED / FAILED / CANCELLED</td></tr>
+                            <tr><td><code>progress</code></td><td>Integer</td><td>0-100 percentage complete</td></tr>
+                            <tr><td><code>total_records</code></td><td>Long</td><td>Total records to process</td></tr>
+                            <tr><td><code>processed_records</code></td><td>Long</td><td>Records processed so far</td></tr>
+                            <tr><td><code>result_path</code></td><td>String</td><td>Path to generated report file</td></tr>
+                            <tr><td><code>error_message</code></td><td>Text</td><td>Error details if failed</td></tr>
+                            <tr><td><code>request_data</code></td><td>JSON</td><td>Original request parameters</td></tr>
+                            <tr><td><code>target_system</code></td><td>String</td><td>BUSINESS_OBJECTS, CRYSTAL_REPORTS, etc.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Report Generation -->
+        <section id="reports" class="section">
+            <h2 class="section-title">Report Generation Pipeline</h2>
+
+            <div class="highlight">
+                <strong>Key Feature:</strong> Multi-stage data pipeline with role-based field masking, pagination support, and multiple output formats (JSON, PDF, CSV).
+            </div>
+
+            <!-- Report Generation Flow -->
+            <div class="flow-diagram">
+                <h3 style="text-align: center; margin-bottom: 2rem; color: var(--accent);">Report Generation Flow</h3>
+                
+                <div class="flow-row">
+                    <div class="flow-box trigger">
+                        <div class="flow-box-title">1️⃣ Request</div>
+                        <div class="flow-box-subtitle">API / Scheduled / Manual</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box process">
+                        <div class="flow-box-title">2️⃣ Auth Check</div>
+                        <div class="flow-box-subtitle">JWT Validation</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box process">
+                        <div class="flow-box-title">3️⃣ County Filter</div>
+                        <div class="flow-box-subtitle">Role-based access</div>
+                    </div>
+                </div>
+
+                <div class="flow-arrow-down">↓</div>
+
+                <div class="flow-row">
+                    <div class="flow-box process">
+                        <div class="flow-box-title">4️⃣ Query Builder</div>
+                        <div class="flow-box-subtitle">Dynamic SQL generation</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box process">
+                        <div class="flow-box-title">5️⃣ Data Fetch</div>
+                        <div class="flow-box-subtitle">PostgreSQL query</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box decision">
+                        <div class="flow-box-title">6️⃣ Field Masking</div>
+                        <div class="flow-box-subtitle">Apply visibility rules</div>
+                    </div>
+                </div>
+
+                <div class="flow-arrow-down">↓</div>
+
+                <div class="flow-row">
+                    <div class="flow-box output">
+                        <div class="flow-box-title">7️⃣ Format</div>
+                        <div class="flow-box-subtitle">JSON / PDF / CSV</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box output">
+                        <div class="flow-box-title">8️⃣ Deliver</div>
+                        <div class="flow-box-subtitle">API / Email / SFTP</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Types -->
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-title">📊 TIMESHEET_REPORT</div>
+                    <div class="card-description">
+                        Detailed timesheet records with provider/recipient info, hours worked, amounts, and status.
+                        <br><br>
+                        <span class="badge badge-info">All Roles</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📈 DAILY_SUMMARY</div>
+                    <div class="card-description">
+                        Aggregated daily statistics by county, service type, and status breakdown.
+                        <br><br>
+                        <span class="badge badge-warning">SUPERVISOR+</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📋 COUNTY_EXTRACT</div>
+                    <div class="card-description">
+                        County-specific data extraction for compliance and audit purposes.
+                        <br><br>
+                        <span class="badge badge-success">ADMIN Only</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Code Example -->
+            <div class="card">
+                <div class="card-title">🔧 ReportGenerationService - Core Logic</div>
+                <div class="code-block">
+<span class="code-comment">// ReportGenerationService.java - JWT-ONLY Method</span>
+<span class="code-keyword">public</span> <span class="code-class">ReportGenerationResponse</span> <span class="code-function">generateReport</span>(
+        <span class="code-class">ReportGenerationRequest</span> request, 
+        <span class="code-class">String</span> jwtToken) {
+    
+    <span class="code-comment">// Step 1: Validate JWT token (required, no fallback)</span>
+    <span class="code-keyword">if</span> (jwtToken == <span class="code-keyword">null</span>) {
+        <span class="code-keyword">throw new</span> RuntimeException(<span class="code-string">"JWT token required"</span>);
+    }
+    
+    <span class="code-comment">// Step 2: Generate report data with field masking</span>
+    <span class="code-class">ReportData</span> reportData = <span class="code-function">generateSimpleReportDataWithJWT</span>(request, jwtToken);
+    
+    <span class="code-comment">// Step 3: Create response with pagination</span>
+    <span class="code-class">ReportGenerationResponse</span> response = <span class="code-keyword">new</span> <span class="code-class">ReportGenerationResponse</span>();
+    response.<span class="code-function">setReportId</span>(<span class="code-class">UUID</span>.randomUUID().toString());
+    response.<span class="code-function">setData</span>(reportData);
+    response.<span class="code-function">setTotalRecords</span>(reportData.getTotalCount());
+    response.<span class="code-function">setStatus</span>(<span class="code-string">"SUCCESS"</span>);
+    
+    <span class="code-comment">// Step 4: Publish event for audit trail</span>
+    <span class="code-function">publishReportEvent</span>(request, response);
+    
+    <span class="code-keyword">return</span> response;
+}
+                </div>
+            </div>
+        </section>
+
+        <!-- Scheduled Reports -->
+        <section class="section">
+            <h2 class="section-title">Scheduled Report Generation</h2>
+
+            <div class="highlight">
+                <strong>Key Feature:</strong> Automated daily and weekly report generation for all counties with configurable cron schedules and multi-channel delivery.
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title">📅 Daily Reports</div>
+                    <div class="code-block">
+<span class="code-comment">// ScheduledReportService.java</span>
+<span class="code-keyword">@Scheduled</span>(cron = <span class="code-string">"0 30 5 * * ?"</span>, zone = <span class="code-string">"Asia/Kolkata"</span>)
+<span class="code-keyword">public void</span> <span class="code-function">generateDailyReports</span>() {
+    <span class="code-comment">// Runs at 5:30 AM IST daily</span>
+    <span class="code-keyword">for</span> (<span class="code-class">CronJobProfile</span> profile : CRON_PROFILES.values()) {
+        <span class="code-keyword">for</span> (<span class="code-class">String</span> reportType : profile.getReportTypes()) {
+            <span class="code-function">createScheduledJob</span>(profile, reportType, 
+                <span class="code-string">"DAILY"</span>, <span class="code-function">getPreviousDayRange</span>());
+        }
+    }
+}
+                    </div>
+                    <div class="card-description" style="margin-top: 1rem;">
+                        <span class="badge badge-info">Daily at 5:30 AM IST</span>
+                        <span class="badge badge-success">All Counties</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📆 Weekly Reports</div>
+                    <div class="code-block">
+<span class="code-comment">// ScheduledReportService.java</span>
+<span class="code-keyword">@Scheduled</span>(cron = <span class="code-string">"0 30 5 * * MON"</span>, zone = <span class="code-string">"Asia/Kolkata"</span>)
+<span class="code-keyword">public void</span> <span class="code-function">generateWeeklyReports</span>() {
+    <span class="code-comment">// Runs at 5:30 AM IST every Monday</span>
+    <span class="code-class">DateRange</span> weekRange = <span class="code-function">getPreviousWeekRange</span>();
+    <span class="code-keyword">for</span> (<span class="code-class">CronJobProfile</span> profile : CRON_PROFILES.values()) {
+        <span class="code-function">createScheduledJob</span>(profile, <span class="code-string">"WEEKLY_SUMMARY"</span>, 
+            <span class="code-string">"WEEKLY"</span>, weekRange);
+    }
+}
+                    </div>
+                    <div class="card-description" style="margin-top: 1rem;">
+                        <span class="badge badge-warning">Every Monday 5:30 AM IST</span>
+                        <span class="badge badge-success">All Counties</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- County-based Batch Processing -->
+            <div class="card">
+                <div class="card-title">🏛️ SYSTEM_SCHEDULER - County Batch Processing</div>
+                <div class="code-block">
+<span class="code-comment">// ScheduledReportService.java - Every 5 minutes</span>
+<span class="code-keyword">@Scheduled</span>(cron = <span class="code-string">"0 */5 * * * ?"</span>, zone = <span class="code-string">"Asia/Kolkata"</span>)
+<span class="code-keyword">public void</span> <span class="code-function">generateCountyReportsForScheduler</span>() {
+    <span class="code-comment">// Get all configured county codes: CT1, CT2, CT3, CT4, CT5</span>
+    <span class="code-class">List</span>&lt;<span class="code-class">String</span>&gt; countyCodes = countyCodeMappingService.<span class="code-function">getAllCountyCodes</span>();
+    
+    <span class="code-keyword">for</span> (<span class="code-class">String</span> countyCode : countyCodes) {
+        <span class="code-class">String</span> countyName = countyCodeMappingService.<span class="code-function">getCountyName</span>(countyCode);
+        <span class="code-function">generateCountySpecificReports</span>(countyCode, countyName, systemToken);
+    }
+}
+                </div>
+                <div style="margin-top: 1rem;">
+                    <strong>County Codes:</strong>
+                    <span class="badge badge-info">CT1 = Orange</span>
+                    <span class="badge badge-info">CT2 = Sacramento</span>
+                    <span class="badge badge-info">CT3 = Riverside</span>
+                    <span class="badge badge-info">CT4 = Los Angeles</span>
+                    <span class="badge badge-info">CT5 = Alameda</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics -->
+        <section id="analytics" class="section">
+            <h2 class="section-title">Real-Time Analytics Dashboard</h2>
+
+            <div class="highlight">
+                <strong>Key Feature:</strong> Live dashboard metrics with county-based filtering, time-range analysis, and role-enforced data access.
+            </div>
+
+            <div class="grid-3">
+                <div class="card stat-box">
+                    <div class="stat-value">📈</div>
+                    <div class="stat-label">Total Timesheets Today</div>
+                </div>
+                <div class="card stat-box">
+                    <div class="stat-value">⏳</div>
+                    <div class="stat-label">Pending Approvals</div>
+                </div>
+                <div class="card stat-box">
+                    <div class="stat-value">💰</div>
+                    <div class="stat-label">Total Approved Amount</div>
+                </div>
+            </div>
+
+            <!-- Analytics Endpoints -->
+            <div class="card">
+                <div class="card-title">🔌 Analytics API Endpoints</div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Endpoint</th>
+                                <th>Method</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>/api/analytics/realtime-metrics</code></td>
+                                <td><span class="badge badge-success">GET</span></td>
+                                <td>Real-time KPIs (today's count, pending, amounts)</td>
+                            </tr>
+                            <tr>
+                                <td><code>/api/analytics/metrics-by-district</code></td>
+                                <td><span class="badge badge-success">GET</span></td>
+                                <td>Metrics grouped by district/county</td>
+                            </tr>
+                            <tr>
+                                <td><code>/api/analytics/trend-data</code></td>
+                                <td><span class="badge badge-success">GET</span></td>
+                                <td>Historical trend analysis over time</td>
+                            </tr>
+                            <tr>
+                                <td><code>/api/analytics/stats</code></td>
+                                <td><span class="badge badge-success">GET</span></td>
+                                <td>Aggregate statistics (total records, hours, amounts)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Analytics Code -->
+            <div class="card">
+                <div class="card-title">📊 AnalyticsController - County Enforcement</div>
+                <div class="code-block">
+<span class="code-comment">// AnalyticsController.java</span>
+<span class="code-keyword">private</span> <span class="code-class">String</span> <span class="code-function">resolveCountyFilter</span>(<span class="code-class">String</span> requestedCounty, 
+                                       <span class="code-class">String</span> userRole, 
+                                       <span class="code-class">String</span> tokenCounty) {
+    <span class="code-class">String</span> normalizedRole = userRole.toUpperCase();
+    
+    <span class="code-comment">// Roles that MUST use county from JWT token</span>
+    <span class="code-keyword">if</span> (normalizedRole.contains(<span class="code-string">"SUPERVISOR"</span>) || 
+        normalizedRole.contains(<span class="code-string">"CASE_WORKER"</span>) || 
+        normalizedRole.contains(<span class="code-string">"PROVIDER"</span>) || 
+        normalizedRole.contains(<span class="code-string">"RECIPIENT"</span>)) {
+        
+        <span class="code-keyword">if</span> (tokenCounty != <span class="code-keyword">null</span>) {
+            <span class="code-keyword">return</span> tokenCounty; <span class="code-comment">// Enforce JWT county</span>
+        }
+        <span class="code-keyword">return null</span>; <span class="code-comment">// No access without county</span>
+    }
+    
+    <span class="code-comment">// ADMIN/SYSTEM_SCHEDULER can access all</span>
+    <span class="code-keyword">return</span> tokenCounty != <span class="code-keyword">null</span> ? tokenCounty : requestedCounty;
+}
+                </div>
+            </div>
+        </section>
+
+        <!-- Security & Field Masking -->
+        <section id="security" class="section">
+            <h2 class="section-title">Security & Role-Based Field Masking</h2>
+
+            <div class="highlight">
+                <strong>Key Feature:</strong> Fine-grained field-level access control with multiple masking types (NONE, HIDDEN, PARTIAL_MASK, HASH_MASK, ANONYMIZE, AGGREGATE).
+            </div>
+
+            <!-- User Roles -->
+            <div class="card">
+                <div class="card-title">👥 User Roles & Access Levels</div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Role</th>
+                                <th>Internal Staff</th>
+                                <th>Elevated</th>
+                                <th>County Bound</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge badge-success">ADMIN</span></td>
+                                <td>✅</td>
+                                <td>✅</td>
+                                <td>❌</td>
+                                <td>Full system access, all counties</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-info">SUPERVISOR</span></td>
+                                <td>✅</td>
+                                <td>❌</td>
+                                <td>✅</td>
+                                <td>County-level oversight, masked personal data</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">CASE_WORKER</span></td>
+                                <td>❌</td>
+                                <td>❌</td>
+                                <td>✅</td>
+                                <td>Case management, limited financial view</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">PROVIDER</span></td>
+                                <td>❌</td>
+                                <td>❌</td>
+                                <td>✅</td>
+                                <td>Own data only, limited recipient view</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">RECIPIENT</span></td>
+                                <td>❌</td>
+                                <td>❌</td>
+                                <td>✅</td>
+                                <td>Own data only, limited provider view</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-danger">SYSTEM_SCHEDULER</span></td>
+                                <td>✅</td>
+                                <td>✅</td>
+                                <td>❌</td>
+                                <td>Automated batch jobs, full access</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Field Masking Types -->
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-title">🔓 FULL_ACCESS</div>
+                    <div class="card-description">
+                        Field is visible with original value.
+                        <br><br>
+                        Example: <code>totalHours: 40.5</code>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">🔒 MASKED_ACCESS</div>
+                    <div class="card-description">
+                        Field visible but value is masked.
+                        <br><br>
+                        Example: <code>SSN: XXX-XX-1234</code>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">🚫 HIDDEN_ACCESS</div>
+                    <div class="card-description">
+                        Field completely hidden from response.
+                        <br><br>
+                        Example: <code>dateOfBirth: [HIDDEN]</code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Masking Example -->
+            <div class="card">
+                <div class="card-title">🛡️ SUPERVISOR Field Masking Rules</div>
+                <div class="code-block">
+<span class="code-comment">// FieldMaskingService.java - SUPERVISOR rules</span>
+roleBasedRules.put(<span class="code-class">UserRole</span>.SUPERVISOR.name(), Arrays.asList(
+    <span class="code-function">createRule</span>(<span class="code-string">"timesheetid"</span>, <span class="code-string">"NONE"</span>, <span class="code-string">"FULL_ACCESS"</span>),        <span class="code-comment">// ✅ Visible</span>
+    <span class="code-function">createRule</span>(<span class="code-string">"providerid"</span>, <span class="code-string">"HASH_MASK"</span>, <span class="code-string">"MASKED_ACCESS"</span>),  <span class="code-comment">// 🔒 Hashed</span>
+    <span class="code-function">createRule</span>(<span class="code-string">"providername"</span>, <span class="code-string">"ANONYMIZE"</span>, <span class="code-string">"MASKED_ACCESS"</span>), <span class="code-comment">// 🔒 Anonymized</span>
+    <span class="code-function">createRule</span>(<span class="code-string">"provideremail"</span>, <span class="code-string">"HIDDEN"</span>, <span class="code-string">"HIDDEN_ACCESS"</span>),   <span class="code-comment">// 🚫 Hidden</span>
+    <span class="code-function">createRule</span>(<span class="code-string">"providergender"</span>, <span class="code-string">"HIDDEN"</span>, <span class="code-string">"HIDDEN_ACCESS"</span>),  <span class="code-comment">// 🚫 Hidden</span>
+    <span class="code-function">createRule</span>(<span class="code-string">"totalhours"</span>, <span class="code-string">"NONE"</span>, <span class="code-string">"FULL_ACCESS"</span>),        <span class="code-comment">// ✅ Visible</span>
+    <span class="code-function">createRule</span>(<span class="code-string">"totalamount"</span>, <span class="code-string">"NONE"</span>, <span class="code-string">"FULL_ACCESS"</span>),       <span class="code-comment">// ✅ Visible</span>
+    <span class="code-function">createRule</span>(<span class="code-string">"status"</span>, <span class="code-string">"NONE"</span>, <span class="code-string">"FULL_ACCESS"</span>)            <span class="code-comment">// ✅ Visible</span>
+));
+                </div>
+            </div>
+        </section>
+
+        <!-- Delivery Channels -->
+        <section id="delivery" class="section">
+            <h2 class="section-title">Multi-Channel Report Delivery</h2>
+
+            <div class="highlight">
+                <strong>Key Feature:</strong> Flexible delivery options including real-time API response, email with PDF attachment, and encrypted CSV to SFTP server.
+            </div>
+
+            <div class="grid-3">
+                <div class="card">
+                    <div class="icon icon-trigger">📧</div>
+                    <div class="card-title">Email Delivery (PDF)</div>
+                    <div class="card-description">
+                        <strong>Service:</strong> EmailReportService<br>
+                        <strong>Format:</strong> PDF attachment<br>
+                        <strong>Trigger:</strong> Manual or Scheduled<br><br>
+                        <span class="badge badge-info">PDFReportGeneratorService</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="icon icon-process">📁</div>
+                    <div class="card-title">SFTP Delivery (CSV)</div>
+                    <div class="card-description">
+                        <strong>Service:</strong> SFTPDeliveryService<br>
+                        <strong>Format:</strong> Encrypted CSV<br>
+                        <strong>Path:</strong> /reports/daily/{date}/{role}/<br><br>
+                        <span class="badge badge-warning">EncryptionService</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="icon icon-output">🌐</div>
+                    <div class="card-title">API Response (JSON)</div>
+                    <div class="card-description">
+                        <strong>Service:</strong> ReportDeliveryController<br>
+                        <strong>Format:</strong> JSON with pagination<br>
+                        <strong>Response:</strong> Immediate download<br><br>
+                        <span class="badge badge-success">Real-time</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivery Flow -->
+            <div class="flow-diagram">
+                <h3 style="text-align: center; margin-bottom: 2rem; color: var(--accent);">Report Delivery Pipeline</h3>
+                
+                <div class="flow-row">
+                    <div class="flow-box trigger">
+                        <div class="flow-box-title">📊 Report Generated</div>
+                        <div class="flow-box-subtitle">ReportGenerationService</div>
+                    </div>
+                </div>
+
+                <div class="flow-arrow-down">↓</div>
+
+                <div class="flow-row">
+                    <div class="flow-box decision">
+                        <div class="flow-box-title">🔀 Delivery Method?</div>
+                        <div class="flow-box-subtitle">Based on request type</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 1rem;">
+                    <div style="text-align: center;">
+                        <div class="flow-arrow-down">↓</div>
+                        <div class="flow-box output" style="border-color: var(--info);">
+                            <div class="flow-box-title">📧 Email</div>
+                            <div class="flow-box-subtitle">PDF Generation → SMTP</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="flow-arrow-down">↓</div>
+                        <div class="flow-box output" style="border-color: var(--warning);">
+                            <div class="flow-box-title">📁 SFTP</div>
+                            <div class="flow-box-subtitle">CSV → Encrypt → Upload</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="flow-arrow-down">↓</div>
+                        <div class="flow-box output" style="border-color: var(--success);">
+                            <div class="flow-box-title">🌐 API</div>
+                            <div class="flow-box-subtitle">JSON Response</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Email Code -->
+            <div class="card">
+                <div class="card-title">📧 EmailReportService - PDF Email Delivery</div>
+                <div class="code-block">
+<span class="code-comment">// EmailReportService.java</span>
+<span class="code-keyword">public boolean</span> <span class="code-function">sendReportEmail</span>(<span class="code-class">String</span> reportType, 
+                                 <span class="code-class">String</span> userRole,
+                                 <span class="code-class">List</span>&lt;<span class="code-class">Map</span>&gt; reportData,
+                                 <span class="code-class">List</span>&lt;<span class="code-class">String</span>&gt; recipients,
+                                 <span class="code-class">String</span> jwtToken) {
+    
+    <span class="code-comment">// 1. Generate PDF with field masking based on JWT</span>
+    <span class="code-keyword">byte</span>[] pdfBytes = pdfReportGeneratorService
+        .<span class="code-function">generatePDFReport</span>(reportType, userRole, reportData, jwtToken);
+    
+    <span class="code-comment">// 2. Generate email HTML content</span>
+    <span class="code-class">String</span> emailContent = reportTemplateService
+        .<span class="code-function">renderEmailTemplate</span>(reportType, userRole, reportData);
+    
+    <span class="code-comment">// 3. Create MIME message with PDF attachment</span>
+    <span class="code-class">MimeMessage</span> message = mailSender.<span class="code-function">createMimeMessage</span>();
+    helper.<span class="code-function">setTo</span>(recipients.toArray(<span class="code-keyword">new</span> <span class="code-class">String</span>[0]));
+    helper.<span class="code-function">setText</span>(emailContent, <span class="code-keyword">true</span>);
+    
+    <span class="code-comment">// 4. Attach PDF and send</span>
+    helper.<span class="code-function">addAttachment</span>(filename, <span class="code-keyword">new</span> <span class="code-class">ByteArrayResource</span>(pdfBytes));
+    mailSender.<span class="code-function">send</span>(message);
+    
+    <span class="code-keyword">return true</span>;
+}
+                </div>
+            </div>
+
+            <!-- SFTP Code -->
+            <div class="card">
+                <div class="card-title">📁 SFTPDeliveryService - Encrypted File Upload</div>
+                <div class="code-block">
+<span class="code-comment">// SFTPDeliveryService.java</span>
+<span class="code-keyword">public</span> <span class="code-class">String</span> <span class="code-function">deliverFile</span>(<span class="code-class">String</span> localFilePath, 
+                          <span class="code-class">String</span> userRole, 
+                          <span class="code-class">String</span> reportType, 
+                          <span class="code-class">String</span> dateStr) {
+    
+    <span class="code-comment">// 1. Create SFTP directory structure</span>
+    <span class="code-comment">// /reports/daily/{YYYY-MM}/{DD}/{role}/{type}/</span>
+    <span class="code-class">String</span> sftpDirectory = <span class="code-function">createSFTPDirectoryStructure</span>(userRole, reportType, dateStr);
+    
+    <span class="code-comment">// 2. Generate remote filename with timestamp</span>
+    <span class="code-class">String</span> remoteFileName = String.format(<span class="code-string">"%s_%s_%s_%s.encrypted.csv"</span>,
+        userRole.toLowerCase(), reportType.toLowerCase(), dateStr, timestamp);
+    
+    <span class="code-comment">// 3. Upload encrypted file via SFTP</span>
+    <span class="code-function">uploadToSFTP</span>(localFilePath, sftpDirectory + <span class="code-string">"/"</span> + remoteFileName);
+    
+    <span class="code-keyword">return</span> remoteFilePath;
+}
+                </div>
+            </div>
+        </section>
+
+        <!-- Component Architecture -->
+        <section class="section">
+            <h2 class="section-title">Component Architecture</h2>
+
+            <div class="flow-diagram">
+                <div class="grid-3">
+                    <div class="component-box">
+                        <div class="component-header">🎮 Controllers</div>
+                        <ul class="component-list">
+                            <li>AnalyticsController</li>
+                            <li>AuthController</li>
+                            <li>DataPipelineController</li>
+                            <li>ReportDeliveryController</li>
+                            <li>FieldMaskingController</li>
+                            <li>CountyAccessController</li>
+                            <li>BusinessIntelligenceController</li>
+                        </ul>
+                    </div>
+                    <div class="component-box">
+                        <div class="component-header">⚙️ Services</div>
+                        <ul class="component-list">
+                            <li>ReportGenerationService</li>
+                            <li>JobQueueService</li>
+                            <li>BackgroundProcessingService</li>
+                            <li>ScheduledReportService</li>
+                            <li>FieldMaskingService</li>
+                            <li>PDFReportGeneratorService</li>
+                            <li>EmailReportService</li>
+                            <li>SFTPDeliveryService</li>
+                            <li>EncryptionService</li>
+                            <li>NotificationService</li>
+                        </ul>
+                    </div>
+                    <div class="component-box">
+                        <div class="component-header">🗄️ Data Layer</div>
+                        <ul class="component-list">
+                            <li>TimesheetRepository</li>
+                            <li>ReportJobRepository</li>
+                            <li>PersonRepository</li>
+                            <li>CaseRepository</li>
+                            <li>TimesheetEntity</li>
+                            <li>ReportJobEntity</li>
+                            <li>PersonEntity</li>
+                            <li>CaseEntity</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;"></div>
+
+                <div class="grid-3">
+                    <div class="component-box">
+                        <div class="component-header">🔐 Security</div>
+                        <ul class="component-list">
+                            <li>SecurityConfig</li>
+                            <li>KeycloakUserService</li>
+                            <li>KeycloakFieldMaskingService</li>
+                            <li>FieldVisibilityService</li>
+                            <li>UserRole (Enum)</li>
+                        </ul>
+                    </div>
+                    <div class="component-box">
+                        <div class="component-header">⏰ Scheduling</div>
+                        <ul class="component-list">
+                            <li>BatchJobScheduler</li>
+                            <li>BatchSchedulerProperties</li>
+                            <li>BatchProcessingConfig</li>
+                            <li>JobDependencyService</li>
+                            <li>JobProcessingProperties</li>
+                        </ul>
+                    </div>
+                    <div class="component-box">
+                        <div class="component-header">📦 Models</div>
+                        <ul class="component-list">
+                            <li>ReportGenerationRequest</li>
+                            <li>ReportGenerationResponse</li>
+                            <li>JobStatus</li>
+                            <li>FieldMaskingRule</li>
+                            <li>BIReportRequest</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Endpoints Summary -->
+        <section class="section">
+            <h2 class="section-title">API Endpoints Summary</h2>
+
+            <div class="card">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Endpoint</th>
+                                <th>Method</th>
+                                <th>Auth Required</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="2"><strong>Authentication</strong></td>
+                                <td><code>/api/auth/login</code></td>
+                                <td><span class="badge badge-warning">POST</span></td>
+                                <td>❌</td>
+                                <td>User login via Keycloak</td>
+                            </tr>
+                            <tr>
+                                <td><code>/api/auth/logout</code></td>
+                                <td><span class="badge badge-warning">POST</span></td>
+                                <td>✅</td>
+                                <td>Logout and invalidate token</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="4"><strong>Analytics</strong></td>
+                                <td><code>/api/analytics/realtime-metrics</code></td>
+                                <td><span class="badge badge-success">GET</span></td>
+                                <td>✅</td>
+                                <td>Dashboard KPIs</td>
+                            </tr>
+                            <tr>
+                                <td><code>/api/analytics/metrics-by-district</code></td>
+                                <td><span class="badge badge-success">GET</span></td>
+                                <td>✅</td>
+                                <td>District-level metrics</td>
+                            </tr>
+                            <tr>
+                                <td><code>/api/analytics/trend-data</code></td>
+                                <td><span class="badge badge-success">GET</span></td>
+                                <td>✅</td>
+                                <td>Historical trends</td>
+                            </tr>
+                            <tr>
+                                <td><code>/api/analytics/stats</code></td>
+                                <td><span class="badge badge-success">GET</span></td>
+                                <td>✅</td>
+                                <td>Aggregate statistics</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="3"><strong>Reports</strong></td>
+                                <td><code>/api/reports/email</code></td>
+                                <td><span class="badge badge-warning">POST</span></td>
+                                <td>✅</td>
+                                <td>Generate and email report</td>
+                            </tr>
+                            <tr>
+                                <td><code>/api/reports/download</code></td>
+                                <td><span class="badge badge-warning">POST</span></td>
+                                <td>✅</td>
+                                <td>Download PDF report</td>
+                            </tr>
+                            <tr>
+                                <td><code>/api/bi/jobs/{jobId}/status</code></td>
+                                <td><span class="badge badge-success">GET</span></td>
+                                <td>✅</td>
+                                <td>Get job status</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2"><strong>Pipeline</strong></td>
+                                <td><code>/api/pipeline/generate-report</code></td>
+                                <td><span class="badge badge-warning">POST</span></td>
+                                <td>✅</td>
+                                <td>Queue report generation</td>
+                            </tr>
+                            <tr>
+                                <td><code>/api/pipeline/extract</code></td>
+                                <td><span class="badge badge-warning">POST</span></td>
+                                <td>✅</td>
+                                <td>Data extraction</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2"><strong>Field Masking</strong></td>
+                                <td><code>/api/field-masking/rules</code></td>
+                                <td><span class="badge badge-success">GET</span></td>
+                                <td>✅</td>
+                                <td>Get masking rules for role</td>
+                            </tr>
+                            <tr>
+                                <td><code>/api/field-masking/apply</code></td>
+                                <td><span class="badge badge-warning">POST</span></td>
+                                <td>✅</td>
+                                <td>Apply masking to data</td>
+                            </tr>
+                            <tr>
+                                <td><strong>County</strong></td>
+                                <td><code>/api/county/accessible-counties/{role}</code></td>
+                                <td><span class="badge badge-success">GET</span></td>
+                                <td>✅</td>
+                                <td>Counties accessible by role</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technology Stack -->
+        <section class="section">
+            <h2 class="section-title">Technology Stack</h2>
+
+            <div class="grid-4">
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">☕</div>
+                    <div class="card-title">Spring Boot</div>
+                    <div class="card-description">Java 17+ Backend</div>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🐘</div>
+                    <div class="card-title">PostgreSQL</div>
+                    <div class="card-description">Primary Database</div>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔐</div>
+                    <div class="card-title">Keycloak</div>
+                    <div class="card-description">OAuth2 / OIDC</div>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🐳</div>
+                    <div class="card-title">Docker</div>
+                    <div class="card-description">Containerization</div>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚛️</div>
+                    <div class="card-title">React/Next.js</div>
+                    <div class="card-description">Frontend Framework</div>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📧</div>
+                    <div class="card-title">MailHog</div>
+                    <div class="card-description">Email Testing</div>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📁</div>
+                    <div class="card-title">SFTP Server</div>
+                    <div class="card-description">File Delivery</div>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📊</div>
+                    <div class="card-title">iText PDF</div>
+                    <div class="card-description">PDF Generation</div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>CMIPS Timesheet Reporting System - Technical Architecture</p>
+        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Built with Spring Boot, PostgreSQL, Keycloak, and React</p>
+    </footer>
+
+</body>
+</html>

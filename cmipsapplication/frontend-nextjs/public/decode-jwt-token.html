@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT Token Decoder - CMIPS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        button {
+            background: #046b99;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px 10px 0;
+        }
+        button:hover {
+            background: #035376;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            border-left: 4px solid #046b99;
+        }
+        .result h3 {
+            margin-top: 0;
+        }
+        .json {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .warning {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        .info {
+            color: #17a2b8;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 JWT Token Decoder - CMIPS</h1>
+        <p>This tool helps you decode and inspect JWT tokens to verify county groups are included.</p>
+        
+        <div class="section">
+            <h3>Step 1: Get Token from LocalStorage</h3>
+            <button onclick="loadFromLocalStorage()">Load Token from LocalStorage</button>
+            <button onclick="clearAll()">Clear</button>
+        </div>
+
+        <div class="section">
+            <h3>Step 2: Or Paste Token Manually</h3>
+            <textarea id="tokenInput" placeholder="Paste your JWT token here..."></textarea>
+            <button onclick="decodeToken()">Decode Token</button>
+        </div>
+
+        <div id="result" class="result" style="display: none;">
+            <h3>Decoded Token</h3>
+            <div id="decodedContent"></div>
+        </div>
+    </div>
+
+    <script>
+        function loadFromLocalStorage() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                document.getElementById('tokenInput').value = token;
+                decodeToken();
+            } else {
+                alert('No token found in localStorage. Please login first.');
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('tokenInput').value = '';
+            document.getElementById('result').style.display = 'none';
+        }
+
+        function decodeToken() {
+            const token = document.getElementById('tokenInput').value.trim();
+            if (!token) {
+                alert('Please enter a token');
+                return;
+            }
+
+            try {
+                const parts = token.split('.');
+                if (parts.length !== 3) {
+                    throw new Error('Invalid JWT token format');
+                }
+
+                // Decode header
+                const header = JSON.parse(atob(parts[0]));
+                
+                // Decode payload
+                const payload = JSON.parse(atob(parts[1]));
+
+                // Build result HTML
+                let html = '<div class="section">';
+                html += '<h3>📋 Header</h3>';
+                html += '<pre class="json">' + JSON.stringify(header, null, 2) + '</pre>';
+                html += '</div>';
+
+                html += '<div class="section">';
+                html += '<h3>📦 Payload</h3>';
+                html += '<pre class="json">' + JSON.stringify(payload, null, 2) + '</pre>';
+                html += '</div>';
+
+                // Check for groups
+                html += '<div class="section">';
+                html += '<h3>🔍 County Groups Analysis</h3>';
+                
+                let foundCounty = false;
+                let countyValue = null;
+                let countySource = null;
+
+                // Check groups array
+                if (payload.groups && Array.isArray(payload.groups)) {
+                    html += '<p class="info">✅ Found <code>groups</code> array: ' + JSON.stringify(payload.groups) + '</p>';
+                    const countyGroup = payload.groups.find(g => 
+                        g.toUpperCase() === 'CTA' || 
+                        g.toUpperCase() === 'CTB' || 
+                        g.toUpperCase() === 'CTC' ||
+                        g.includes('/CTA') || 
+                        g.includes('/CTB') || 
+                        g.includes('/CTC')
+                    );
+                    if (countyGroup) {
+                        countyValue = countyGroup.toUpperCase().replace(/^.*\/(CTA|CTB|CTC).*$/i, '$1');
+                        if (['CTA', 'CTB', 'CTC'].includes(countyValue)) {
+                            foundCounty = true;
+                            countySource = 'groups array';
+                        }
+                    }
+                } else {
+                    html += '<p class="error">❌ No <code>groups</code> array found in token</p>';
+                }
+
+                // Check realm_access.groups
+                if (!foundCounty && payload.realm_access?.groups && Array.isArray(payload.realm_access.groups)) {
+                    html += '<p class="info">✅ Found <code>realm_access.groups</code> array: ' + JSON.stringify(payload.realm_access.groups) + '</p>';
+                    const countyGroup = payload.realm_access.groups.find(g => 
+                        g.toUpperCase() === 'CTA' || 
+                        g.toUpperCase() === 'CTB' || 
+                        g.toUpperCase() === 'CTC' ||
+                        g.includes('/CTA') || 
+                        g.includes('/CTB') || 
+                        g.includes('/CTC')
+                    );
+                    if (countyGroup) {
+                        countyValue = countyGroup.toUpperCase().replace(/^.*\/(CTA|CTB|CTC).*$/i, '$1');
+                        if (['CTA', 'CTB', 'CTC'].includes(countyValue)) {
+                            foundCounty = true;
+                            countySource = 'realm_access.groups';
+                        }
+                    }
+                } else if (!foundCounty) {
+                    html += '<p class="warning">⚠️ No <code>realm_access.groups</code> array found</p>';
+                }
+
+                // Check other fields
+                if (!foundCounty) {
+                    const otherFields = ['county', 'location', 'userCounty'];
+                    for (const field of otherFields) {
+                        if (payload[field]) {
+                            html += '<p class="info">ℹ️ Found <code>' + field + '</code>: ' + payload[field] + '</p>';
+                            if (['CTA', 'CTB', 'CTC'].includes(payload[field].toUpperCase())) {
+                                countyValue = payload[field].toUpperCase();
+                                foundCounty = true;
+                                countySource = field;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Final result
+                if (foundCounty) {
+                    html += '<p class="success">✅ County found: <strong>' + countyValue + '</strong> (from ' + countySource + ')</p>';
+                    html += '<p class="info">🎨 Expected theme: ';
+                    const themeMap = {
+                        'CTA': 'Sacramento (Dark Blue)',
+                        'CTB': 'Orange County (Orange/Brown)',
+                        'CTC': 'Shasta (Green)'
+                    };
+                    html += themeMap[countyValue] || 'Unknown';
+                    html += '</p>';
+                } else {
+                    html += '<p class="error">❌ No county found in token</p>';
+                    html += '<p class="warning">💡 Make sure:</p>';
+                    html += '<ul>';
+                    html += '<li>User is assigned to CTA, CTB, or CTC group in Keycloak</li>';
+                    html += '<li>Groups mapper is configured in Keycloak Client Scope</li>';
+                    html += '<li>You logged in AFTER assigning the user to a group</li>';
+                    html += '</ul>';
+                }
+
+                html += '</div>';
+
+                // Check token expiration
+                if (payload.exp) {
+                    const expDate = new Date(payload.exp * 1000);
+                    const now = new Date();
+                    if (expDate < now) {
+                        html += '<div class="section">';
+                        html += '<p class="error">⚠️ Token has expired at: ' + expDate.toLocaleString() + '</p>';
+                        html += '<p>Please logout and login again to get a new token.</p>';
+                        html += '</div>';
+                    } else {
+                        html += '<div class="section">';
+                        html += '<p class="success">✅ Token is valid until: ' + expDate.toLocaleString() + '</p>';
+                        html += '</div>';
+                    }
+                }
+
+                document.getElementById('decodedContent').innerHTML = html;
+                document.getElementById('result').style.display = 'block';
+            } catch (error) {
+                document.getElementById('decodedContent').innerHTML = 
+                    '<p class="error">Error decoding token: ' + error.message + '</p>';
+                document.getElementById('result').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,4 @@
+id,name,email,age,salary,status,code,percentage
+1,Alice Johnson,alice@example.com,30,50000.00,ACTIVE,ABC123,75.5
+2,Bob Smith,bob@example.com,45,65000.00,INACTIVE,XYZ789,82.0
+3,Carol Williams,carol@example.com,28,48000.00,PENDING,DEF456,90.5

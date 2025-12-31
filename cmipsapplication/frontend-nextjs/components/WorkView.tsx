@@ -110,7 +110,9 @@ export default function WorkView({ username }: WorkViewProps) {
     return (
       <div className="bg-white border border-gray-300 rounded-lg p-6">
         <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1e3a8a] mx-auto"></div>
+          <div className="spinner-border text-primary mx-auto" role="status" style={{ width: '3rem', height: '3rem' }}>
+            <span className="visually-hidden">Loading...</span>
+          </div>
           <p className="mt-4 text-gray-600">Loading tasks...</p>
         </div>
       </div>
@@ -119,70 +121,57 @@ export default function WorkView({ username }: WorkViewProps) {
 
   return (
     <div className="bg-white border border-gray-300 rounded-lg overflow-hidden">
-      <div className="bg-[#1e3a8a] px-6 py-4 flex justify-between items-center">
-        <h2 className="text-lg font-bold text-white">📋 Work View</h2>
+      <div className="bg-primary px-6 py-4 d-flex justify-content-between align-items-center" style={{ backgroundColor: 'var(--color-p2, #046b99)', color: 'white' }}>
+        <h2 className="h5 mb-0 text-white fw-bold">📋 Work View</h2>
         <button 
           onClick={fetchTasks}
-          className="px-4 py-2 bg-white text-[#1e3a8a] rounded hover:bg-gray-100 text-sm font-medium"
+          className="btn btn-light btn-sm"
+          style={{ color: 'var(--color-p2, #046b99)' }}
         >
           🔄 Refresh
         </button>
       </div>
 
       {/* Task Counts */}
-      <div className="px-6 py-4 bg-gray-50 border-b border-gray-300 grid grid-cols-3 gap-4">
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">{taskCounts.open}</div>
-          <div className="text-xs text-gray-600">Open</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">{taskCounts.inProgress}</div>
-          <div className="text-xs text-gray-600">In Progress</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">{taskCounts.closed}</div>
-          <div className="text-xs text-gray-600">Closed</div>
+      <div className="px-4 py-3 bg-light border-bottom">
+        <div className="row text-center">
+          <div className="col-4">
+            <div className="h3 fw-bold mb-1" style={{ color: 'var(--color-p2, #046b99)' }}>{taskCounts.open}</div>
+            <div className="small text-muted">Open</div>
+          </div>
+          <div className="col-4">
+            <div className="h3 fw-bold mb-1" style={{ color: 'var(--color-p2, #046b99)' }}>{taskCounts.inProgress}</div>
+            <div className="small text-muted">In Progress</div>
+          </div>
+          <div className="col-4">
+            <div className="h3 fw-bold mb-1" style={{ color: 'var(--color-p2, #046b99)' }}>{taskCounts.closed}</div>
+            <div className="small text-muted">Closed</div>
+          </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="px-6 py-3 bg-gray-50 border-b border-gray-300 flex gap-2">
+      <div className="px-6 py-3 bg-gray-50 border-b border-gray-300 d-flex gap-2">
         <button
-          className={`px-4 py-2 text-sm font-medium rounded ${
-            selectedStatus === 'ALL'
-              ? 'bg-[#1e3a8a] text-white'
-              : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
-          }`}
+          className={`btn btn-sm ${selectedStatus === 'ALL' ? 'btn-primary' : 'btn-outline-primary'}`}
           onClick={() => setSelectedStatus('ALL')}
         >
           All Tasks
         </button>
         <button
-          className={`px-4 py-2 text-sm font-medium rounded ${
-            selectedStatus === 'OPEN'
-              ? 'bg-[#1e3a8a] text-white'
-              : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
-          }`}
+          className={`btn btn-sm ${selectedStatus === 'OPEN' ? 'btn-primary' : 'btn-outline-primary'}`}
           onClick={() => setSelectedStatus('OPEN')}
         >
           Open ({taskCounts.open})
         </button>
         <button
-          className={`px-4 py-2 text-sm font-medium rounded ${
-            selectedStatus === 'IN_PROGRESS'
-              ? 'bg-[#1e3a8a] text-white'
-              : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
-          }`}
+          className={`btn btn-sm ${selectedStatus === 'IN_PROGRESS' ? 'btn-primary' : 'btn-outline-primary'}`}
           onClick={() => setSelectedStatus('IN_PROGRESS')}
         >
           In Progress ({taskCounts.inProgress})
         </button>
         <button
-          className={`px-4 py-2 text-sm font-medium rounded ${
-            selectedStatus === 'CLOSED'
-              ? 'bg-[#1e3a8a] text-white'
-              : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
-          }`}
+          className={`btn btn-sm ${selectedStatus === 'CLOSED' ? 'btn-primary' : 'btn-outline-primary'}`}
           onClick={() => setSelectedStatus('CLOSED')}
         >
           Closed ({taskCounts.closed})
@@ -190,45 +179,59 @@ export default function WorkView({ username }: WorkViewProps) {
       </div>
 
       {/* Task List */}
-      <div className="p-6">
+      <div className="p-4">
         {filteredTasks.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <p>No tasks found</p>
+          <div className="text-center py-5 text-muted">
+            <p className="mb-0">No tasks found</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div>
             {filteredTasks.map(task => (
               <div
                 key={task.id}
-                className="border border-gray-300 rounded-lg p-4 hover:border-[#1e3a8a] hover:shadow-md transition-all cursor-pointer"
+                className="card mb-3"
+                style={{ 
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-p2, #046b99)';
+                  e.currentTarget.style.boxShadow = '0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--bs-border-color, #dee2e6)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
                 onClick={() => setSelectedTask(task)}
               >
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-gray-900">{task.title}</h3>
-                  <div className="flex gap-2">
-                    <span
-                      className="px-2 py-1 rounded-full text-xs font-semibold text-white"
-                      style={{ backgroundColor: getStatusColor(task.status) }}
-                    >
-                      {task.status}
-                    </span>
-                    <span
-                      className="px-2 py-1 rounded-full text-xs font-semibold text-white"
-                      style={{ backgroundColor: getPriorityColor(task.priority) }}
-                    >
-                      {task.priority}
-                    </span>
+                <div className="card-body">
+                  <div className="d-flex justify-content-between align-items-start mb-2">
+                    <h5 className="card-title mb-0 fw-semibold">{task.title}</h5>
+                    <div className="d-flex gap-2">
+                      <span
+                        className="badge"
+                        style={{ backgroundColor: getStatusColor(task.status) }}
+                      >
+                        {task.status}
+                      </span>
+                      <span
+                        className="badge"
+                        style={{ backgroundColor: getPriorityColor(task.priority) }}
+                      >
+                        {task.priority}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                {task.description && (
-                  <p className="text-sm text-gray-600 mb-2">{task.description}</p>
-                )}
-                <div className="flex gap-4 text-xs text-gray-500">
-                  {task.dueDate && (
-                    <span>📅 Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                  {task.description && (
+                    <p className="card-text text-muted small mb-2">{task.description}</p>
                   )}
-                  <span>👤 Assigned: {task.assignedTo || 'Unassigned'}</span>
-                  {task.workQueue && <span>📋 Queue: {task.workQueue}</span>}
+                  <div className="d-flex gap-3 small text-muted">
+                    {task.dueDate && (
+                      <span>📅 Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                    )}
+                    <span>👤 Assigned: {task.assignedTo || 'Unassigned'}</span>
+                    {task.workQueue && <span>📋 Queue: {task.workQueue}</span>}
+                  </div>
                 </div>
               </div>
             ))}
@@ -270,66 +273,69 @@ const TaskDetailModal = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      className="modal fade show d-block"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 1050 }}
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
     >
       <div
-        className="bg-white rounded-lg w-full max-w-2xl max-h-[80vh] overflow-y-auto"
+        className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-between items-center p-6 border-b border-gray-300 bg-[#1e3a8a]">
-          <h2 className="text-xl font-bold text-white">{task.title}</h2>
+        <div className="modal-content">
+        <div className="d-flex justify-content-between align-items-center p-4 border-bottom bg-primary" style={{ backgroundColor: 'var(--color-p2, #046b99)', color: 'white' }}>
+          <h2 className="h4 mb-0 text-white fw-bold">{task.title}</h2>
           <button
             onClick={onClose}
-            className="text-white hover:text-gray-200 text-2xl font-bold leading-none w-8 h-8 flex items-center justify-center rounded hover:bg-[#1e40af] transition-colors"
-          >
-            ×
-          </button>
+            className="btn-close btn-close-white"
+            aria-label="Close"
+          ></button>
         </div>
 
-        <div className="p-6">
+        <div className="p-4">
           {task.description && (
-            <div className="mb-6">
-              <h4 className="text-base font-semibold text-gray-900 mb-2">Description</h4>
-              <p className="text-gray-600 leading-relaxed">{task.description}</p>
+            <div className="mb-4">
+              <h4 className="h5 fw-semibold mb-2">Description</h4>
+              <p className="text-muted">{task.description}</p>
             </div>
           )}
 
-          <div className="mb-6">
-            <h4 className="text-base font-semibold text-gray-900 mb-3">Details</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1">
-                <label className="font-semibold text-gray-900 text-sm">Status:</label>
-                <span className="text-gray-600">{task.status}</span>
+          <div className="mb-4">
+            <h4 className="h5 fw-semibold mb-3">Details</h4>
+            <div className="row">
+              <div className="col-md-6 mb-3">
+                <label className="fw-semibold small">Status:</label>
+                <div className="text-muted">{task.status}</div>
               </div>
-              <div className="flex flex-col gap-1">
-                <label className="font-semibold text-gray-900 text-sm">Priority:</label>
-                <span className="text-gray-600">{task.priority}</span>
+              <div className="col-md-6 mb-3">
+                <label className="fw-semibold small">Priority:</label>
+                <div className="text-muted">{task.priority}</div>
               </div>
-              <div className="flex flex-col gap-1">
-                <label className="font-semibold text-gray-900 text-sm">Assigned To:</label>
-                <span className="text-gray-600">{task.assignedTo || 'Unassigned'}</span>
+              <div className="col-md-6 mb-3">
+                <label className="fw-semibold small">Assigned To:</label>
+                <div className="text-muted">{task.assignedTo || 'Unassigned'}</div>
               </div>
               {task.dueDate && (
-                <div className="flex flex-col gap-1">
-                  <label className="font-semibold text-gray-900 text-sm">Due Date:</label>
-                  <span className="text-gray-600">{new Date(task.dueDate).toLocaleDateString()}</span>
+                <div className="col-md-6 mb-3">
+                  <label className="fw-semibold small">Due Date:</label>
+                  <div className="text-muted">{new Date(task.dueDate).toLocaleDateString()}</div>
                 </div>
               )}
               {task.workQueue && (
-                <div className="flex flex-col gap-1">
-                  <label className="font-semibold text-gray-900 text-sm">Work Queue:</label>
-                  <span className="text-gray-600">{task.workQueue}</span>
+                <div className="col-md-6 mb-3">
+                  <label className="fw-semibold small">Work Queue:</label>
+                  <div className="text-muted">{task.workQueue}</div>
                 </div>
               )}
             </div>
           </div>
 
           {task.actionLink && (
-            <div className="mb-6">
+            <div className="mb-4">
               <a
                 href={task.actionLink}
-                className="inline-block px-4 py-2 bg-[#1e3a8a] text-white rounded hover:bg-[#1e40af] font-medium"
+                className="btn btn-primary"
               >
                 Open Related Entity
               </a>
@@ -337,21 +343,22 @@ const TaskDetailModal = ({
           )}
 
           <div>
-            <h4 className="text-base font-semibold text-gray-900 mb-3">Update Status</h4>
-            <div className="flex flex-wrap gap-2">
+            <h4 className="h5 fw-semibold mb-3">Update Status</h4>
+            <div className="d-flex flex-wrap gap-2">
               {getStatusOptions().map((status) => (
                 <button
                   key={status}
                   onClick={() => {
                     onUpdateStatus(task.id, status);
                   }}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 font-medium"
+                  className="btn btn-secondary"
                 >
                   Mark as {status.replace('_', ' ')}
                 </button>
               ))}
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>

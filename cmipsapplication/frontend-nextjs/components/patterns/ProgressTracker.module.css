@@ -1,0 +1,143 @@
+.progressTracker {
+  margin: 2rem 0;
+}
+
+.progressTrackerHorizontal {
+  position: relative;
+}
+
+.progressLine {
+  position: absolute;
+  top: 25px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: #e5e7eb;
+  z-index: 1;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: var(--theme-secondary, #3b82f6);
+  transition: width 0.3s ease;
+}
+
+.steps {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  text-align: center;
+}
+
+.stepNumber {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #e5e7eb;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.step.completed .stepNumber,
+.step.current .stepNumber {
+  background-color: var(--theme-secondary, #3b82f6);
+  color: white;
+}
+
+.step.current .stepNumber {
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.stepContent h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.stepContent p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.progressTrackerVertical {
+  display: flex;
+  flex-direction: column;
+}
+
+.progressTrackerVertical .step {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.stepConnector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 1rem;
+}
+
+.stepDot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.step.completed .stepDot,
+.step.current .stepDot {
+  background-color: var(--theme-secondary, #3b82f6);
+}
+
+.stepLine {
+  width: 2px;
+  height: 40px;
+  background-color: #e5e7eb;
+  margin-top: 0.5rem;
+}
+
+.step.completed .stepLine {
+  background-color: var(--theme-secondary, #3b82f6);
+}
+
+.progressTrackerVertical .stepContent {
+  flex: 1;
+  text-align: left;
+}
+
+@media (max-width: 767.98px) {
+  .progressTrackerHorizontal .steps {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .progressLine {
+    display: none;
+  }
+
+  .step {
+    flex-direction: row;
+    text-align: left;
+  }
+
+  .stepNumber {
+    margin-bottom: 0;
+    margin-right: 1rem;
+  }
+}
+

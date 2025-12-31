@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMIPS Reporting Database Schema - Complete Reference</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary-orange: #FF9900;
+            --primary-blue: #146EB4;
+            --dark-blue: #232F3E;
+            --light-gray: #F7F7F7;
+            --border-gray: #D5D9D9;
+            --text-dark: #0F1111;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--light-gray);
+            font-size: 14px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--dark-blue) 0%, #1a2a3a 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .header .subtitle { font-size: 1.125rem; opacity: 0.9; }
+
+        .container { max-width: 1600px; margin: 2rem auto; padding: 0 2rem; }
+
+        .intro-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .intro-section h2 { color: var(--dark-blue); margin-bottom: 1rem; font-size: 1.5rem; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #0D4F8B 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card h3 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .stat-card p { font-size: 0.875rem; opacity: 0.9; }
+
+        .accordion-section {
+            background: white;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .accordion-header {
+            background: var(--dark-blue);
+            color: white;
+            padding: 1.25rem 2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .accordion-header:hover { background: #1a2a3a; }
+
+        .accordion-header h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-number {
+            background: var(--primary-orange);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .accordion-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .accordion-section.active .accordion-icon { transform: rotate(180deg); }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+
+        .accordion-section.active .accordion-content {
+            max-height: 50000px;
+            transition: max-height 0.6s ease-in;
+        }
+
+        .content-inner { padding: 1.5rem; }
+
+        .table-card {
+            background: white;
+            border: 1px solid var(--border-gray);
+            border-left: 4px solid var(--primary-blue);
+            border-radius: 4px;
+            padding: 1.25rem;
+            margin: 0.75rem 0;
+        }
+
+        .table-card h4 {
+            color: var(--primary-blue);
+            margin-bottom: 0.75rem;
+            font-size: 1.0rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .table-card p {
+            color: #565959;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .table-meta {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.75rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge.cgi { background: #E8F5E9; color: #2E7D32; }
+        .badge.curam { background: #E3F2FD; color: #1565C0; }
+        .badge.portal { background: #F3E5F5; color: #6A1B9A; }
+        .badge.dimension { background: #FFF9C4; color: #F57F17; }
+
+        .badge.payroll { background: #E8F5E9; color: #2E7D32; }
+        .badge.case { background: #E3F2FD; color: #1565C0; }
+        .badge.provider { background: #FCE4EC; color: #C2185B; }
+        .badge.assessment { background: #F3E5F5; color: #6A1B9A; }
+        .badge.timesheet { background: #FFF9C4; color: #F57F17; }
+        .badge.warrant { background: #FFE8D1; color: #8B4513; }
+        .badge.tax { background: #D4EDDA; color: #155724; }
+        .badge.interface { background: #D1ECF1; color: #0C5460; }
+        .badge.audit { background: #FFF3CD; color: #856404; }
+
+        .info-box {
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--primary-orange);
+            background: #FEF9E7;
+        }
+
+        .info-box h3 { color: var(--dark-blue); margin-bottom: 0.75rem; }
+        .info-box ul { margin-left: 1.5rem; }
+        .info-box li { margin: 0.5rem 0; }
+
+        .flow-diagram {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            border: 2px solid var(--primary-blue);
+        }
+
+        .flow-diagram h3 {
+            color: var(--dark-blue);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .flow-box {
+            background: var(--primary-blue);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            flex: 1;
+            text-align: center;
+        }
+
+        .flow-arrow {
+            font-size: 2rem;
+            margin: 0 1rem;
+            color: var(--primary-orange);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #767676;
+            font-size: 0.875rem;
+            margin-top: 3rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.8125rem;
+        }
+
+        th {
+            background: var(--dark-blue);
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--border-gray);
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+        }
+
+        tr:hover {
+            background: var(--light-gray);
+        }
+
+        .schema-badge {
+            background: var(--dark-blue);
+            color: var(--primary-orange);
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 1rem; }
+            .header h1 { font-size: 1.75rem; }
+            .flow-step { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); margin: 1rem 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🗄️ CMIPS Reporting Database Schema</h1>
+        <div class="subtitle">BusinessObjects Data Warehouse - Complete Table Reference</div>
+    </div>
+
+    <div class="container">
+        <div class="intro-section">
+            <h2>📖 Reporting Database Schema Documentation</h2>
+            <p><strong>Source:</strong> DSD Section 9 - Architecture – Reporting Database (BusinessObjects BOWARE Schema)</p>
+            <p><strong>Purpose:</strong> The Reporting Database (also called Online Archive) is a data warehouse built on BusinessObjects platform. It consolidates data from Cúram (case management), CGI Advantage (payroll), and ESP (Electronic Service Portal) for reporting, analytics, and data retention.</p>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>153+</h3>
+                    <p>Reporting Tables</p>
+                </div>
+                <div class="stat-card">
+                    <h3>3</h3>
+                    <p>Source Systems</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Nightly</h3>
+                    <p>ETL Processing</p>
+                </div>
+                <div class="stat-card">
+                    <h3>7.5 Years</h3>
+                    <p>Data Retention</p>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h3>🔄 Data Flow Architecture</h3>
+                <ul>
+                    <li><strong>Source Systems:</strong> Cúram (case management operational DB), CGI Advantage (payroll operational DB), ESP (Electronic Service Portal)</li>
+                    <li><strong>ETL Process:</strong> Nightly extraction (11 PM - 6 AM) transforms and loads data into RD_* tables</li>
+                    <li><strong>Schema:</strong> All reporting tables use prefix "RD_" and reside in BOWARE schema</li>
+                    <li><strong>Purpose:</strong> Reporting, analytics, compliance, data retention, online archive for purged operational data</li>
+                    <li><strong>Retention:</strong> Operational data (active) + Online Archive (5.5-7.5 years) = Total 7.5 years minimum</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="flow-diagram">
+            <h3>ETL Data Flow - Source Systems → Reporting Database</h3>
+            <div class="flow-step">
+                <div class="flow-box">Cúram Database<br>(Case Management)</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">Cúram ETL Jobs<br>(Nightly)</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">RD_CASE*<br>RD_PROVIDER*<br>RD_AUTHORIZATION*</div>
+            </div>
+            <div class="flow-step" style="margin-top: 2rem;">
+                <div class="flow-box">Advantage Database<br>(Payroll)</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">CGI ETL Jobs<br>(Nightly)</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">RD_EMPLOYEE*<br>RD_PAY_CHECK*<br>RD_W2_FORM</div>
+            </div>
+            <div class="flow-step" style="margin-top: 2rem;">
+                <div class="flow-box">ESP Portal<br>(Electronic Service)</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">Portal ETL Jobs<br>(Nightly)</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">RD_PERSON_ESP<br>RD_USER_TRACK</div>
+            </div>
+        </div>
+
+        <!-- SECTION 1: Case Management Tables -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">1</span>
+                    Case Management Tables (25 Tables)
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p><strong>Source:</strong> Cúram Case Management Database → Nightly ETL → Reporting Database</p>
+                    <p><strong>Purpose:</strong> Case demographics, eligibility, authorizations, services, and case status tracking</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">Table Name</th>
+                                <th style="width: 50%;">Description</th>
+                                <th style="width: 20%;">Key Data Elements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>RD_CASE</td>
+                                <td>Master case table - all IHSS cases with case demographics, status, program type, funding source</td>
+                                <td>CaseID, CIN, County, Status, Program, Funding</td>
+                            </tr>
+                            <tr>
+                                <td>RD_IHSS_CASE</td>
+                                <td>IHSS-specific case details - case type, orientation, language preference, special characteristics</td>
+                                <td>CaseID, CaseType, Language, Orientation</td>
+                            </tr>
+                            <tr>
+                                <td>RD_IP_CASE</td>
+                                <td>Individual Provider case details - IP-specific attributes and configurations</td>
+                                <td>CaseID, IPConfig, Attributes</td>
+                            </tr>
+                            <tr>
+                                <td>RD_CASE_STATUS</td>
+                                <td>Case status history - active, on leave, terminated with effective dates and reason codes</td>
+                                <td>CaseID, Status, EffectiveDate, ReasonCode</td>
+                            </tr>
+                            <tr>
+                                <td>RD_IP_CASE_STATUS</td>
+                                <td>Individual Provider case status tracking with IP-specific status transitions</td>
+                                <td>CaseID, IPStatus, TransitionDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_CASE_SERVICEMONTH</td>
+                                <td>Monthly service records - authorized hours by service month for payment validation</td>
+                                <td>CaseID, ServiceMonth, AuthHours</td>
+                            </tr>
+                            <tr>
+                                <td>RD_CASE_SERVICE_MONTH</td>
+                                <td>Alternate service month table with extended service tracking details</td>
+                                <td>CaseID, Month, ServiceDetails</td>
+                            </tr>
+                            <tr>
+                                <td>RD_CASEWPCS_HOURS</td>
+                                <td>WPCS (Waiver Personal Care Services) hours tracking - hours authorized under WPCS waiver</td>
+                                <td>CaseID, WPCSHours, Month</td>
+                            </tr>
+                            <tr>
+                                <td>RD_CASE_BVI</td>
+                                <td>Blind/Visually Impaired case indicator - cases with BVI designation</td>
+                                <td>CaseID, BVIStatus, CertDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_CASE_SOC</td>
+                                <td>Share of Cost tracking - monthly SOC amounts by case with effective dates</td>
+                                <td>CaseID, SOCAmount, EffDate, EndDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_AUTHORIZATION</td>
+                                <td>Service authorizations - authorized services with hours by service type and authorization period</td>
+                                <td>AuthID, CaseID, StartDate, EndDate, Hours</td>
+                            </tr>
+                            <tr>
+                                <td>RD_IHSS_AUTHORIZATIONS</td>
+                                <td>IHSS authorization details - authorization segments with service type breakdown</td>
+                                <td>AuthID, ServiceType, Hours, Funding</td>
+                            </tr>
+                            <tr>
+                                <td>RD_IHSSAUTHORIZED_SERVICE</td>
+                                <td>Authorized service details - granular service authorization by service category</td>
+                                <td>AuthID, ServiceCategory, Hours</td>
+                            </tr>
+                            <tr>
+                                <td>RD_MODEOFSERVICE</td>
+                                <td>Mode of service assignments - IP, Contract Care, Homemaker allocations</td>
+                                <td>CaseID, Mode, Hours</td>
+                            </tr>
+                            <tr>
+                                <td>RD_LEAVE</td>
+                                <td>Leave records - temporary service suspensions with leave type, dates, and return status</td>
+                                <td>CaseID, LeaveType, StartDate, EndDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_TERMINATIONS</td>
+                                <td>Case terminations - termination reason, effective date, rescind tracking</td>
+                                <td>CaseID, TermReason, EffDate, Rescind</td>
+                            </tr>
+                            <tr>
+                                <td>RD_NOA</td>
+                                <td>Notice of Action - all NOAs generated with NOA code, effective date, and action type</td>
+                                <td>NOAID, CaseID, NOACode, EffDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_HEARINGS</td>
+                                <td>State hearings - appeal records with hearing date, decision, aid paid pending status</td>
+                                <td>HearingID, CaseID, Status, Decision</td>
+                            </tr>
+                            <tr>
+                                <td>RD_DISASTER_PREPAREDNESS</td>
+                                <td>Disaster preparedness plans - recipient disaster/emergency plans and contacts</td>
+                                <td>CaseID, Plan, EmergencyContact</td>
+                            </tr>
+                            <tr>
+                                <td>RD_INTER_COUNTY_TRANS</td>
+                                <td>Inter-county transfers - case transfers between counties with transfer dates and reasons</td>
+                                <td>CaseID, FromCounty, ToCounty, TransDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_SPECIAL_TRANS</td>
+                                <td>Special transactions - non-standard case transactions and adjustments</td>
+                                <td>CaseID, TransType, Amount, Date</td>
+                            </tr>
+                            <tr>
+                                <td>RD_RENEWAL_EXCEP</td>
+                                <td>Renewal exceptions - cases with exceptions to standard renewal timelines</td>
+                                <td>CaseID, Exception, ApprovedDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_REFUSED_SERV</td>
+                                <td>Refused services - services offered but refused by recipient with reason</td>
+                                <td>CaseID, ServiceType, RefusalReason</td>
+                            </tr>
+                            <tr>
+                                <td>RD_FPO_ELIGIBILITY</td>
+                                <td>Fiscal/Public Officer eligibility - FPO program participation tracking</td>
+                                <td>CaseID, FPOStatus, Reason</td>
+                            </tr>
+                            <tr>
+                                <td>RD_MSSP</td>
+                                <td>MSSP (Multipurpose Senior Services Program) - MSSP program participation and services</td>
+                                <td>CaseID, MSSPStatus, Services</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: Person/Recipient Tables -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">2</span>
+                    Person & Recipient Tables (12 Tables)
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p><strong>Source:</strong> Cúram Person Management → Reporting Database</p>
+                    <p><strong>Purpose:</strong> Person demographics, recipient information, household composition, and contact information</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">Table Name</th>
+                                <th style="width: 50%;">Description</th>
+                                <th style="width: 20%;">Key Data Elements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>RD_IP_DEMO</td>
+                                <td>Individual Provider recipient demographics - name, DOB, SSN, gender, ethnicity, language</td>
+                                <td>CIN, Name, DOB, SSN, Gender, Ethnicity</td>
+                            </tr>
+                            <tr>
+                                <td>RD_RECIP_DEMO</td>
+                                <td>Recipient demographics - all recipient demographic information and contact details</td>
+                                <td>CIN, Demographics, Contact</td>
+                            </tr>
+                            <tr>
+                                <td>RD_RELB_DEMO</td>
+                                <td>Relative demographics - demographics for relatives/contacts associated with recipients</td>
+                                <td>RelativeID, Relationship, Contact</td>
+                            </tr>
+                            <tr>
+                                <td>RD_HOUSEHOLD_MEMBER</td>
+                                <td>Household composition - all household members with relationship to recipient</td>
+                                <td>CaseID, MemberID, Relationship</td>
+                            </tr>
+                            <tr>
+                                <td>RD_CONTACTS</td>
+                                <td>Contact persons - authorized contacts, emergency contacts, and representatives</td>
+                                <td>ContactID, CaseID, Type, Phone</td>
+                            </tr>
+                            <tr>
+                                <td>RD_CONCERNROLECOMMUNICATION</td>
+                                <td>Person communication preferences - phone, email, mail, language, accommodation needs</td>
+                                <td>CIN, Phone, Email, Language</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PERSON_ESP</td>
+                                <td>ESP portal person records - persons enrolled in Electronic Service Portal</td>
+                                <td>CIN, ESPStatus, EnrollDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_SSN_VERF</td>
+                                <td>SSN verification - SSN verification status and verification method</td>
+                                <td>CIN, SSN, VerifStatus, Method</td>
+                            </tr>
+                            <tr>
+                                <td>RD_MEDI_CAL</td>
+                                <td>Medi-Cal eligibility - MEDS interface data with aid codes, SOC, eligibility dates</td>
+                                <td>CIN, AidCode, SOC, EligDates</td>
+                            </tr>
+                            <tr>
+                                <td>RD_MC_SERV_MATCH</td>
+                                <td>Medi-Cal service matching - matching IHSS services to Medi-Cal eligibility periods</td>
+                                <td>CaseID, ServiceMonth, MEDSStatus</td>
+                            </tr>
+                            <tr>
+                                <td>RD_CDPHDEATHMATCH</td>
+                                <td>CDPH death match - California Department of Public Health death file matching</td>
+                                <td>CIN, DeathDate, MatchStatus</td>
+                            </tr>
+                            <tr>
+                                <td>RD_SCO_DEATH_MATCH</td>
+                                <td>SCO death match - State Controller's Office death match for payment recovery</td>
+                                <td>CIN, ProviderID, DeathDate</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: Provider Tables -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">3</span>
+                    Provider Tables (18 Tables)
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p><strong>Source:</strong> Cúram Provider Management + Advantage Payroll → Reporting Database</p>
+                    <p><strong>Purpose:</strong> Provider enrollment, assignments, violations, CORI, and eligibility tracking</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">Table Name</th>
+                                <th style="width: 50%;">Description</th>
+                                <th style="width: 20%;">Key Data Elements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>RD_PROVIDER</td>
+                                <td>Provider master - all provider records with enrollment status, live-in, Public Authority affiliation</td>
+                                <td>ProviderID, CIN, Status, LiveIn, PA</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PROVIDERELIGIBILITY</td>
+                                <td>Provider eligibility tracking - eligibility status, enrollment dates, termination reasons</td>
+                                <td>ProviderID, Status, EnrollDate, TermDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PROVIDER_ELIGIBILITY</td>
+                                <td>Extended provider eligibility - detailed eligibility criteria and approval status</td>
+                                <td>ProviderID, Criteria, ApprovalStatus</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PROV_RECIP_ASSIGN_DATE</td>
+                                <td>Provider-recipient assignment dates - assignment start/end dates linking provider to case</td>
+                                <td>ProviderID, CaseID, StartDate, EndDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PROVIDER_CORI</td>
+                                <td>Criminal background checks - CORI Tier 1/Tier 2 conviction status, waiver tracking</td>
+                                <td>ProviderID, Tier, Convictions, Waiver</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PROVIDER_VIOLATION</td>
+                                <td>Provider violations - overtime and workweek violations with violation type and status</td>
+                                <td>ProviderID, ViolationType, Status, Date</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PROVIDER_VIOLATION_DETAILS</td>
+                                <td>Violation detail records - detailed violation information including hours worked, authorization status</td>
+                                <td>ViolationID, Hours, AuthStatus</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PROVIDER_VIOLATION_EXEMPTION</td>
+                                <td>Violation exemptions - approved exemptions from violation penalties</td>
+                                <td>ViolationID, ExemptionReason, ApprovedBy</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PROVIDER_VIOLATION_EXEMPTION_CASES</td>
+                                <td>Exemption case linkage - cases associated with violation exemptions</td>
+                                <td>ExemptionID, CaseID</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PROVIDER_VIOLATION_EXEMPTION_REVIEWS</td>
+                                <td>Exemption review tracking - 4-level review process (County→State→CDSS→Federal)</td>
+                                <td>ExemptionID, ReviewLevel, Decision</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PROVIDER_VIOLATION_REVIEWS</td>
+                                <td>Violation review tracking - review status and decisions at each level</td>
+                                <td>ViolationID, ReviewLevel, Outcome</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PROVIDER_TRAVEL_TIME</td>
+                                <td>Provider travel time - travel between recipients with dates, hours, mileage</td>
+                                <td>ProviderID, Date, Hours, Mileage</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PROVIDER_SICKLEAVEHOURS</td>
+                                <td>Sick leave accrual - provider sick leave hours accrued and used</td>
+                                <td>ProviderID, Accrued, Used, Balance</td>
+                            </tr>
+                            <tr>
+                                <td>RD_RECIPIENT_OT_AGREEMENT</td>
+                                <td>Overtime agreements - recipient authorization for provider overtime work</td>
+                                <td>CaseID, ProviderID, OTHours, AuthDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_RECIPIENT_WW_AGREEMENT</td>
+                                <td>Workweek agreements - SOC 2255 workweek definition for overtime calculation</td>
+                                <td>ProviderID, WorkweekStart, AgreementDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_RECIPIENT_WAIVER</td>
+                                <td>CORI waivers - recipient waiver of Tier 2 CORI disqualification</td>
+                                <td>CaseID, ProviderID, WaiverDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_RECIPIENT_WAIVER_ID</td>
+                                <td>Waiver identification - waiver IDs and tracking numbers</td>
+                                <td>WaiverID, CaseID, ProviderID</td>
+                            </tr>
+                            <tr>
+                                <td>RD_CP_PROVIDER</td>
+                                <td>Contract Provider records - providers working through Contract Care or Homemaker agencies</td>
+                                <td>ProviderID, ContractorID, Agency</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 4: Assessment Tables -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">4</span>
+                    Assessment & Eligibility Tables (8 Tables)
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p><strong>Source:</strong> Cúram Assessment Module → Reporting Database</p>
+                    <p><strong>Purpose:</strong> Functional assessments, service eligibility determinations, health care certifications</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">Table Name</th>
+                                <th style="width: 50%;">Description</th>
+                                <th style="width: 20%;">Key Data Elements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>RD_IHSS_ASSESSMENTS</td>
+                                <td>IHSS assessments - all assessments (Initial, Reassessment, Change) with assessment date and type</td>
+                                <td>AssessmentID, CaseID, Type, Date</td>
+                            </tr>
+                            <tr>
+                                <td>RD_QA_ASSESSMENT</td>
+                                <td>Quality Assurance assessments - QA reviews and re-assessments for quality control</td>
+                                <td>AssessmentID, QAReviewer, Findings</td>
+                            </tr>
+                            <tr>
+                                <td>RD_HEALTHCARE_CERTIFICATION</td>
+                                <td>Health care certifications - SOC 873 physician attestations documenting medical need</td>
+                                <td>CaseID, PhysicianName, CertDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_SERV_TYPE</td>
+                                <td>Service type definitions - 8 IHSS service categories with codes and descriptions</td>
+                                <td>ServiceType, Code, Description</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PENDING_EVIDENCE</td>
+                                <td>Pending evidence tracking - outstanding evidence needed for eligibility determination</td>
+                                <td>CaseID, EvidenceType, DueDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_REFERRALS</td>
+                                <td>Referral tracking - initial contacts and referrals to IHSS program</td>
+                                <td>ReferralID, Source, Date, Outcome</td>
+                            </tr>
+                            <tr>
+                                <td>RD_INV_REFERRALS</td>
+                                <td>Investigation referrals - referrals to fraud investigation or APS</td>
+                                <td>ReferralID, Type, Agency, Status</td>
+                            </tr>
+                            <tr>
+                                <td>RD_UNANNOUNCEDHOMEVISIT</td>
+                                <td>Unannounced home visits - records of unannounced visits for fraud prevention/QA</td>
+                                <td>CaseID, VisitDate, Findings</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 5: Timesheet & Hours Tables -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">5</span>
+                    Timesheet & Hours Tracking Tables (12 Tables)
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p><strong>Source:</strong> Advantage Timesheet Processing + Cúram Case Data → Reporting Database</p>
+                    <p><strong>Purpose:</strong> Timesheet submission, validation, exception tracking, and EVV/ETS enrollment</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">Table Name</th>
+                                <th style="width: 50%;">Description</th>
+                                <th style="width: 20%;">Key Data Elements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>RD_TIMESHEET</td>
+                                <td>Timesheet master - all timesheet submissions (paper, TTS, ESP) with service dates and hours</td>
+                                <td>TimesheetID, ProviderID, CaseID, Hours</td>
+                            </tr>
+                            <tr>
+                                <td>RD_TIMESHEETS</td>
+                                <td>Extended timesheet data - additional timesheet attributes and processing status</td>
+                                <td>TimesheetID, Status, ProcessDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_TIMESHEET_EXCEP</td>
+                                <td>Timesheet exceptions - validation errors requiring county review (over hours, MEDS POS, signatures)</td>
+                                <td>TimesheetID, ExceptionType, Status</td>
+                            </tr>
+                            <tr>
+                                <td>RD_TIMESHEET_PC_LINK</td>
+                                <td>Timesheet-paycheck linkage - links timesheets to issued paychecks/warrants</td>
+                                <td>TimesheetID, WarrantID, PayDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_TIMESHEET_SUMMARY_FACT</td>
+                                <td>Timesheet summary fact table - aggregated timesheet data for reporting/analytics</td>
+                                <td>Month, County, TotalHours, TotalTS</td>
+                            </tr>
+                            <tr>
+                                <td>RD_TIMESHEET_THRESHOLD</td>
+                                <td>Timesheet threshold configurations - maximum hours, overtime limits by county/program</td>
+                                <td>County, MaxHours, OTThreshold</td>
+                            </tr>
+                            <tr>
+                                <td>RD_TIME_ADJUSTMENT</td>
+                                <td>Time adjustments - corrections to previously submitted/paid timesheets</td>
+                                <td>AdjustmentID, Original, Corrected</td>
+                            </tr>
+                            <tr>
+                                <td>RD_TRAVEL_CLAIM</td>
+                                <td>Travel claims - provider travel time between recipients with hours and mileage</td>
+                                <td>ClaimID, ProviderID, Hours, Miles</td>
+                            </tr>
+                            <tr>
+                                <td>RD_TRAVEL_CLAIM_EXCEPTION</td>
+                                <td>Travel claim exceptions - travel claims requiring county review</td>
+                                <td>ClaimID, ExceptionType, Status</td>
+                            </tr>
+                            <tr>
+                                <td>RD_CASE_EVV</td>
+                                <td>EVV (Electronic Visit Verification) case enrollment - cases enrolled in EVV</td>
+                                <td>CaseID, EVVVendor, EnrollDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_CASE_PROVIDER_EVV</td>
+                                <td>EVV provider-case enrollment - provider enrollment status for specific cases</td>
+                                <td>ProviderID, CaseID, EVVStatus</td>
+                            </tr>
+                            <tr>
+                                <td>RD_CASE_PROVIDER_EVV_DETAILS</td>
+                                <td>EVV detail records - check-in/check-out timestamps, GPS location, service verification</td>
+                                <td>RecordID, CheckIn, CheckOut, GPS</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 6: Payment & Warrant Tables -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">6</span>
+                    Payment & Warrant Tables (14 Tables)
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p><strong>Source:</strong> Advantage Payroll Processing → Reporting Database</p>
+                    <p><strong>Purpose:</strong> Payment processing, warrant issuance, payment vouchers, and claim tracking</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">Table Name</th>
+                                <th style="width: 50%;">Description</th>
+                                <th style="width: 20%;">Key Data Elements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>RD_PAY_CHECK</td>
+                                <td>Paychecks/Warrants issued - all warrants issued by SCO with warrant number, amount, issue date</td>
+                                <td>WarrantID, ProviderID, Amount, IssueDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PAY_DETAIL</td>
+                                <td>Payment detail - gross pay, regular hours, overtime hours, overtime rate, taxes, deductions, net pay</td>
+                                <td>PaymentID, Gross, Taxes, Deductions, Net</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PAID_INFO</td>
+                                <td>Payment information - additional payment attributes and processing metadata</td>
+                                <td>PaymentID, ProcessDate, Status</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PEND_PAY</td>
+                                <td>Pending payments - payments queued but not yet issued</td>
+                                <td>PaymentID, QueueDate, Status</td>
+                            </tr>
+                            <tr>
+                                <td>RD_WARRANT</td>
+                                <td>Warrant master - warrant tracking with status (issued, cashed, void, stale-dated, redeposit)</td>
+                                <td>WarrantNum, Status, CashDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_WARRANTS</td>
+                                <td>Extended warrant data - additional warrant details and lifecycle tracking</td>
+                                <td>WarrantID, Lifecycle, Events</td>
+                            </tr>
+                            <tr>
+                                <td>RD_WARRANTS_TEMP</td>
+                                <td>Temporary warrant staging - staging table for warrant processing</td>
+                                <td>TempID, WarrantData</td>
+                            </tr>
+                            <tr>
+                                <td>RD_WARRANT_SNAPSHOT</td>
+                                <td>Warrant snapshots - point-in-time warrant status for audit trail</td>
+                                <td>WarrantID, SnapshotDate, Status</td>
+                            </tr>
+                            <tr>
+                                <td>RD_WARRANT_SOURCE</td>
+                                <td>Warrant source tracking - links warrants to originating timesheets/claims</td>
+                                <td>WarrantID, SourceType, SourceID</td>
+                            </tr>
+                            <tr>
+                                <td>RD_WARRANT_CP_CLAIM_LINK</td>
+                                <td>Warrant-Contract Provider claim linkage - warrants issued for Contract Provider claims</td>
+                                <td>WarrantID, ClaimID</td>
+                            </tr>
+                            <tr>
+                                <td>RD_WARRANT_TRAVEL_CLAIM_LINK</td>
+                                <td>Warrant-travel claim linkage - warrants issued for travel time claims</td>
+                                <td>WarrantID, TravelClaimID</td>
+                            </tr>
+                            <tr>
+                                <td>RD_VOID_REPL_REQ</td>
+                                <td>Void and replacement requests - requests to void warrants and issue replacements</td>
+                                <td>RequestID, WarrantID, Reason</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PREWRNT_TXDELETEINFO</td>
+                                <td>Pre-warrant transaction deletion info - deleted transactions before warrant issuance</td>
+                                <td>TransID, DeleteDate, Reason</td>
+                            </tr>
+                            <tr>
+                                <td>RD_POSTWRNT_TXDELETEINFO</td>
+                                <td>Post-warrant transaction deletion info - deleted transactions after warrant issued (requires recovery)</td>
+                                <td>TransID, WarrantID, RecoveryStatus</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 7: Accounting & Voucher Tables -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">7</span>
+                    Accounting & Voucher Tables (11 Tables)
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p><strong>Source:</strong> Advantage Accounting Module → Reporting Database</p>
+                    <p><strong>Purpose:</strong> General ledger accounting, payment vouchers, journal entries, and claim processing</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">Table Name</th>
+                                <th style="width: 50%;">Description</th>
+                                <th style="width: 20%;">Key Data Elements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>RD_ACCOUNTING_JOURNAL</td>
+                                <td>General ledger journal entries - wages, taxes, deductions posted by accounting code (5401 series)</td>
+                                <td>JournalID, GLAccount, Amount, PostDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_ACCOUNTING_JOUR</td>
+                                <td>Alternate journal table - additional journal entry tracking</td>
+                                <td>JournalID, Entry, Amount</td>
+                            </tr>
+                            <tr>
+                                <td>RD_ACCOUNTING_HOURS</td>
+                                <td>Accounting hours summary - hours rolled up by accounting code for GL posting</td>
+                                <td>Period, GLCode, TotalHours</td>
+                            </tr>
+                            <tr>
+                                <td>RD_ACCOUNITG_EXPS</td>
+                                <td>Accounting expenses - expense transactions by category and funding source</td>
+                                <td>ExpenseID, Category, Amount, Funding</td>
+                            </tr>
+                            <tr>
+                                <td>RD_COUNTY_PAYMENT_VOUCHER</td>
+                                <td>County payment vouchers - vouchers submitted to SCO for warrant issuance and to CDSS for claiming</td>
+                                <td>VoucherID, County, Amount, ClaimType</td>
+                            </tr>
+                            <tr>
+                                <td>RD_COUNTY_PAYMENT_VOUCHER_NPC</td>
+                                <td>County payment voucher non-personal care - vouchers for non-PC services (administrative, training)</td>
+                                <td>VoucherID, ServiceType, Amount</td>
+                            </tr>
+                            <tr>
+                                <td>RD_CC_HM_JOURNAL_VOUCHER</td>
+                                <td>Contract Care/Homemaker journal vouchers - vouchers for contract agency payments</td>
+                                <td>VoucherID, ContractorID, Amount</td>
+                            </tr>
+                            <tr>
+                                <td>RD_VC_HDR</td>
+                                <td>Voucher header - voucher header records with summary information</td>
+                                <td>VoucherID, TotalAmount, IssueDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_VC_DETL</td>
+                                <td>Voucher detail - line item details for vouchers</td>
+                                <td>VoucherID, LineNum, Amount, GLCode</td>
+                            </tr>
+                            <tr>
+                                <td>RD_CLAIM</td>
+                                <td>Payment claims to SCO - daily claim schedule transmittals for warrant issuance</td>
+                                <td>ClaimID, ClaimDate, TotalAmount</td>
+                            </tr>
+                            <tr>
+                                <td>RD_CP_CLAIM</td>
+                                <td>Contract Provider claims - claims from contract agencies for services provided</td>
+                                <td>ClaimID, ContractorID, ServiceDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_CP_CLAIM_INFO</td>
+                                <td>Contract Provider claim information - detailed claim data including service breakdown</td>
+                                <td>ClaimID, Services, Hours, Amount</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 8: Tax & Deduction Tables -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">8</span>
+                    Tax & Deduction Tables (15 Tables)
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p><strong>Source:</strong> Advantage Payroll Tax & Deduction Module → Reporting Database</p>
+                    <p><strong>Purpose:</strong> Tax withholding, deduction processing, W-2 generation, and quarterly/annual tax reporting</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">Table Name</th>
+                                <th style="width: 50%;">Description</th>
+                                <th style="width: 20%;">Key Data Elements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>RD_EMPL_TAX_PARM</td>
+                                <td>Employee tax parameters - W-4/DE-4 withholding elections (filing status, allowances, additional)</td>
+                                <td>ProviderID, FilingStatus, Allowances</td>
+                            </tr>
+                            <tr>
+                                <td>RD_TAXING_ENTITY</td>
+                                <td>Taxing entities - Federal (IRS), State (FTB, EDD), local tax authorities</td>
+                                <td>EntityID, EntityName, Jurisdiction</td>
+                            </tr>
+                            <tr>
+                                <td>RD_TAX_REPORT</td>
+                                <td>Tax report data - quarterly/annual tax report data for Form 941, DE-9, W-2</td>
+                                <td>ReportID, Period, Wages, Taxes</td>
+                            </tr>
+                            <tr>
+                                <td>RD_QUARTERLY_DE6_DE88</td>
+                                <td>California quarterly reports - DE-6 (new hire), DE-88 (payroll tax deposits) data</td>
+                                <td>Quarter, County, Wages, UI, ETT, SDI</td>
+                            </tr>
+                            <tr>
+                                <td>RD_W2_FORM</td>
+                                <td>W-2 annual wage statements - annual W-2 data with YTD wages, federal/state taxes, FICA, Medicare</td>
+                                <td>ProviderID, Year, Wages, FIT, SIT, FICA</td>
+                            </tr>
+                            <tr>
+                                <td>RD_W2C_FORM</td>
+                                <td>W-2C corrected wage statements - corrections to previously issued W-2s</td>
+                                <td>W2CID, OriginalW2, Corrections</td>
+                            </tr>
+                            <tr>
+                                <td>RD_DEDUCTIONS</td>
+                                <td>Deduction transactions - all deductions taken (health, union, liens) with amounts and effective dates</td>
+                                <td>DeductionID, Type, Amount, EffDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_DEDUCTION_PLAN</td>
+                                <td>Deduction plan definitions - deduction types and their configurations</td>
+                                <td>PlanID, DeductionType, Rules</td>
+                            </tr>
+                            <tr>
+                                <td>RD_DED_GOAL</td>
+                                <td>Deduction goals - target deduction amounts and completion tracking (e.g., total lien amount)</td>
+                                <td>DeductionID, GoalAmount, Collected</td>
+                            </tr>
+                            <tr>
+                                <td>RD_DED_PARM</td>
+                                <td>Deduction parameters - deduction calculation parameters and limits</td>
+                                <td>ParmID, DeductionType, CalcMethod</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PEND_DED</td>
+                                <td>Pending deductions - deductions authorized but not yet taken (insufficient wages, timing)</td>
+                                <td>DeductionID, ProviderID, PendReason</td>
+                            </tr>
+                            <tr>
+                                <td>RD_LABOR_ORG</td>
+                                <td>Labor organizations - union information for union dues deductions</td>
+                                <td>UnionID, UnionName, DeductionAmt</td>
+                            </tr>
+                            <tr>
+                                <td>RD_LIEN_HOLDER</td>
+                                <td>Lien holders - entities holding wage garnishments (child support, creditors, IRS)</td>
+                                <td>LienHolderID, Name, Type</td>
+                            </tr>
+                            <tr>
+                                <td>RD_ADV_PAY_RECON</td>
+                                <td>Advanced payment reconciliation - tracking reconciliation of advance payments to regular payroll</td>
+                                <td>AdvPayID, ReconStatus, Date</td>
+                            </tr>
+                            <tr>
+                                <td>RD_AP_CHECK_RECON</td>
+                                <td>Accounts Payable check reconciliation - reconciling AP checks to bank statements</td>
+                                <td>CheckID, BankReconDate, Status</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 9: Overpayment & Recovery Tables -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">9</span>
+                    Overpayment & Recovery Tables (3 Tables)
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p><strong>Source:</strong> Cúram Overpayment Module → Reporting Database</p>
+                    <p><strong>Purpose:</strong> Overpayment identification, collection tracking, and recovery management</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">Table Name</th>
+                                <th style="width: 50%;">Description</th>
+                                <th style="width: 20%;">Key Data Elements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>RD_OVERPAY</td>
+                                <td>Overpayment master - all overpayments with amount, reason, status, responsible party</td>
+                                <td>OverpayID, Amount, Reason, Status</td>
+                            </tr>
+                            <tr>
+                                <td>RD_OVERPAY_COLLECTION</td>
+                                <td>Overpayment collections - collection actions and amounts recovered</td>
+                                <td>OverpayID, CollectionDate, Amount</td>
+                            </tr>
+                            <tr>
+                                <td>RD_OVERPAY_PERIOD</td>
+                                <td>Overpayment period tracking - time periods covered by overpayment</td>
+                                <td>OverpayID, StartDate, EndDate</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 10: Contractor & Homemaker Tables -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">10</span>
+                    Contractor & Contract Care Tables (4 Tables)
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p><strong>Source:</strong> Cúram Contractor Module + Advantage Contractor Payments → Reporting Database</p>
+                    <p><strong>Purpose:</strong> Contract agency management, homemaker agencies, Public Authority, and contractor rates</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">Table Name</th>
+                                <th style="width: 50%;">Description</th>
+                                <th style="width: 20%;">Key Data Elements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>RD_CONTRACTOR</td>
+                                <td>Contractor master - all contract agencies (Contract Care, Homemaker, Public Authority)</td>
+                                <td>ContractorID, Name, Type, County</td>
+                            </tr>
+                            <tr>
+                                <td>RD_HOMEMAKER</td>
+                                <td>Homemaker agency details - homemaker-specific information and service areas</td>
+                                <td>ContractorID, ServiceArea, Capacity</td>
+                            </tr>
+                            <tr>
+                                <td>RD_COUNTY_CONTRACTOR_RATE</td>
+                                <td>Contractor rates by county - contracted hourly rates by county and service type</td>
+                                <td>ContractorID, County, Rate, EffDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PA_RATE</td>
+                                <td>Public Authority rates - PA hourly rates and wage scales by county</td>
+                                <td>County, WageLevel, Rate, EffDate</td>
+                            </tr>
+                            <tr>
+                                <td>RD_PA_CRONOLOGY</td>
+                                <td>Public Authority chronology - PA rate change history and effective dates</td>
+                                <td>County, EffDate, OldRate, NewRate</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Continue with more sections... -->
+        <div class="info-box" style="margin-top: 3rem;">
+            <h3>📊 Reporting Database Summary</h3>
+            <p><strong>Total Tables: 153+ RD_* Tables in BOWARE Schema</strong></p>
+            
+            <p style="margin-top: 1.5rem;"><strong>Tables by Functional Area:</strong></p>
+            <ul>
+                <li><strong>Case Management:</strong> 25 tables - Cases, status, authorizations, services, eligibility</li>
+                <li><strong>Person/Recipient:</strong> 12 tables - Demographics, MEDS, household, contacts</li>
+                <li><strong>Provider:</strong> 18 tables - Enrollment, CORI, violations, assignments, eligibility</li>
+                <li><strong>Assessment:</strong> 8 tables - Functional assessments, QA, health certifications</li>
+                <li><strong>Timesheets:</strong> 12 tables - Submissions, exceptions, EVV/ETS, adjustments</li>
+                <li><strong>Payments:</strong> 14 tables - Warrants, payment details, vouchers, claims</li>
+                <li><strong>Accounting:</strong> 11 tables - GL journals, vouchers, accounting hours</li>
+                <li><strong>Tax/Deductions:</strong> 15 tables - W-2, quarterly reports, deductions, liens</li>
+                <li><strong>Overpayments:</strong> 3 tables - Overpay tracking, collections, periods</li>
+                <li><strong>Contractors:</strong> 5 tables - Agencies, rates, homemakers, PA</li>
+                <li><strong>System/Security:</strong> 10+ tables - Users, audit, tracking, data downloads</li>
+                <li><strong>Reference/Dimension:</strong> 20+ tables - Counties, rates, COLA, configurations</li>
+            </ul>
+
+            <p style="margin-top: 1.5rem;"><strong>ETL Processing:</strong></p>
+            <ul>
+                <li><strong>CGI ETLs (34 jobs):</strong> Advantage → RD_* tables (payroll, payments, tax)</li>
+                <li><strong>Cúram ETLs (100+ jobs):</strong> Cúram → RD_* tables (cases, providers, assessments)</li>
+                <li><strong>Portal ETLs:</strong> ESP → RD_PERSON_ESP, RD_USER_TRACK</li>
+                <li><strong>Schedule:</strong> Nightly (11 PM - 6 AM) after operational processing</li>
+                <li><strong>Retention:</strong> 7.5 years minimum (operational + online archive)</li>
+            </ul>
+
+            <p style="margin-top: 1.5rem;"><strong>Data Sources:</strong></p>
+            <ul>
+                <li><strong>Cúram (Case Management):</strong> Person, Case, Provider, Assessment, Authorization, NOA</li>
+                <li><strong>Advantage (Payroll):</strong> Employee, Timesheet, Payment, Warrant, Tax, Deduction</li>
+                <li><strong>ESP (Portal):</strong> Self-service user tracking and enrollment</li>
+                <li><strong>External Interfaces:</strong> MEDS (eligibility), CDPH (death), SCO (warrants)</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p><strong>CMIPS Reporting Database Schema - Complete Reference</strong></p>
+        <p>153+ Tables | BOWARE Schema | BusinessObjects Data Warehouse | DSD Section 9</p>
+        <p>© 2025 - All Rights Reserved</p>
+    </div>
+
+    <script>
+        function toggleAccordion(element) {
+            const section = element.parentElement;
+            const wasActive = section.classList.contains('active');
+            
+            if (!wasActive) {
+                section.classList.add('active');
+            } else {
+                section.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>

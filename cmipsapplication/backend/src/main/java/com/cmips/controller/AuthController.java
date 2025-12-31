@@ -20,6 +20,12 @@ public class AuthController {
     @Value("${keycloak.realm}")
     private String realm;
 
+    @Value("${keycloak.resource:cmips-frontend}")
+    private String clientId;
+
+    @Value("${keycloak.credentials.secret:UnpJullDQX23tenZ4IsTuGkY8QzBlcFd}")
+    private String clientSecret;
+
     @Autowired
     private RestTemplate restTemplate;
 
@@ -40,8 +46,8 @@ public class AuthController {
             String requestBody = "username=" + username +
                                "&password=" + password +
                                "&grant_type=password" +
-                               "&client_id=cmips-backend" +
-                               "&client_secret=X6282J5tQzu2tzqLcglKmjhwfidB0vh9";
+                               "&client_id=" + clientId +
+                               "&client_secret=" + clientSecret;
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -80,8 +86,8 @@ public class AuthController {
             
             String requestBody = "grant_type=refresh_token" +
                                "&refresh_token=" + refreshToken +
-                               "&client_id=cmips-backend" +
-                               "&client_secret=X6282J5tQzu2tzqLcglKmjhwfidB0vh9";
+                               "&client_id=" + clientId +
+                               "&client_secret=" + clientSecret;
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);

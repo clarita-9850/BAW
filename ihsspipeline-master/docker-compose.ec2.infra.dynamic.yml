@@ -1,0 +1,41 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.5
+    container_name: keycloak
+    ports: [ "8083:8080" ]
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin123
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://database-1.cqn2wg0syn5v.us-east-1.rds.amazonaws.com:5432/database1?sslmode=require
+      KC_DB_USERNAME: ${KC_DB_USERNAME}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      KC_HEALTH_ENABLED: true
+      KC_METRICS_ENABLED: true
+      KC_HTTP_ENABLED: true
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+      JAVA_OPTS_APPEND: "-Xmx384M -Xms192M"
+    restart: unless-stopped
+    command: start-dev
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog
+    ports: [ "1025:1025", "8025:8025" ]
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 64m
+

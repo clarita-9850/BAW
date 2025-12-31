@@ -1,0 +1,2168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMIPS Database Architecture Document</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+        
+        :root {
+            --primary: #0F172A;
+            --secondary: #1E293B;
+            --accent: #3B82F6;
+            --accent-light: #60A5FA;
+            --bg: #F8FAFC;
+            --surface: #FFFFFF;
+            --border: #E2E8F0;
+            --text: #1E293B;
+            --text-secondary: #64748B;
+            --code-bg: #F1F5F9;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Epilogue', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            font-size: 16px;
+        }
+        
+        /* Layout */
+        .container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Navigation */
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+        
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+        
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .sidebar-header p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .nav-menu {
+            list-style: none;
+        }
+        
+        .nav-menu li {
+            margin-bottom: 0.25rem;
+        }
+        
+        .nav-menu a {
+            display: block;
+            padding: 0.625rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-menu a:hover {
+            color: var(--accent);
+            background: var(--code-bg);
+            border-left-color: var(--accent);
+        }
+        
+        .nav-menu a.active {
+            color: var(--accent);
+            background: var(--code-bg);
+            border-left-color: var(--accent);
+        }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            padding: 3rem;
+            margin: 0 auto;
+        }
+        
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            line-height: 1.3;
+            color: var(--primary);
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-top: 0;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        h2 {
+            font-size: 2rem;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        h3 {
+            font-size: 1.5rem;
+            color: var(--secondary);
+        }
+        
+        h4 {
+            font-size: 1.25rem;
+            color: var(--secondary);
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--surface);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        thead {
+            background: var(--primary);
+            color: white;
+        }
+        
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        tbody tr:hover {
+            background: var(--code-bg);
+        }
+        
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* Code Blocks */
+        pre {
+            background: var(--primary);
+            color: #E2E8F0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        code {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.875em;
+            background: var(--code-bg);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            color: var(--accent);
+        }
+        
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+        
+        /* Diagrams */
+        .diagram {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .diagram pre {
+            background: transparent;
+            color: var(--text);
+            padding: 0;
+            margin: 0;
+            box-shadow: none;
+            font-size: 0.8125rem;
+            line-height: 1.4;
+        }
+        
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .badge-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .badge-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .badge-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        /* Info Boxes */
+        .info-box {
+            background: var(--surface);
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-box h4 {
+            margin-top: 0;
+            color: var(--accent);
+        }
+        
+        /* Horizontal Rule */
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+        
+        /* Links */
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        a:hover {
+            color: var(--accent-light);
+            text-decoration: underline;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+        
+        /* Print Styles */
+        @media print {
+            .sidebar {
+                display: none;
+            }
+            
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-content {
+                max-width: 100%;
+                padding: 1rem;
+            }
+            
+            pre, .diagram {
+                page-break-inside: avoid;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: static;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>CMIPS Database</h1>
+                <p>Architecture Document</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#overview">1. Overview</a></li>
+                <li><a href="#schema-architecture">2. Schema Architecture</a></li>
+                <li><a href="#keycloak-schema">3. Keycloak Schema</a></li>
+                <li><a href="#application-data-schema">4. Application Data Schema</a></li>
+                <li><a href="#entity-relationship-diagrams">5. Entity Relationship Diagrams</a></li>
+                <li><a href="#data-flow-architecture">6. Data Flow Architecture</a></li>
+                <li><a href="#security-access-control">7. Security & Access Control</a></li>
+                <li><a href="#business-rules-implementation">8. Business Rules Implementation</a></li>
+                <li><a href="#query-patterns-indexing-strategy">9. Query Patterns & Indexing Strategy</a></li>
+                <li><a href="#data-migration-maintenance">10. Data Migration & Maintenance</a></li>
+                <li><a href="#appendix-a">Appendix A: Complete ER Diagram</a></li>
+                <li><a href="#appendix-b">Appendix B: Glossary</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h1>CMIPS Database Architecture Document</h1>
+
+            <section id="overview">
+                <h2>1. Overview</h2>
+
+                <h3>1.1 System Context</h3>
+                <p>CMIPS (Case Management Information Processing System) is a comprehensive IHSS (In-Home Supportive Services) management application that handles:</p>
+                <ul>
+                    <li><strong>Recipients</strong>: Individuals receiving in-home care services</li>
+                    <li><strong>Providers</strong>: Caregivers providing services to recipients</li>
+                    <li><strong>Cases</strong>: Eligibility and service authorization records</li>
+                    <li><strong>Timesheets</strong>: Work hours tracking and payroll integration</li>
+                    <li><strong>Compliance</strong>: Overtime violations, background checks, certifications</li>
+                </ul>
+
+                <h3>1.2 Database Technology Stack</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Technology</th>
+                            <th>Version</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>RDBMS</td>
+                            <td>PostgreSQL</td>
+                            <td>15.x</td>
+                            <td>Primary data storage</td>
+                        </tr>
+                        <tr>
+                            <td>ORM</td>
+                            <td>Hibernate/JPA</td>
+                            <td>6.x</td>
+                            <td>Object-relational mapping</td>
+                        </tr>
+                        <tr>
+                            <td>Framework</td>
+                            <td>Spring Data JPA</td>
+                            <td>3.x</td>
+                            <td>Repository abstraction</td>
+                        </tr>
+                        <tr>
+                            <td>Identity</td>
+                            <td>Keycloak</td>
+                            <td>22.x</td>
+                            <td>Identity & Access Management</td>
+                        </tr>
+                        <tr>
+                            <td>Messaging</td>
+                            <td>Apache Kafka</td>
+                            <td>7.5.x</td>
+                            <td>Event-driven processing</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>1.3 Database Connection Details</h3>
+                <pre><code>Primary Database:
+  Host: localhost (postgres container)
+  Port: 5432
+  Database: cmips_mvp
+  Username: cmips_user
+  Schema: public (application), keycloak (IAM)
+
+Keycloak Database:
+  Host: localhost (keycloak container - embedded H2 or external PostgreSQL)
+  Port: 8080 (Keycloak service)
+  Realm: cmips</code></pre>
+            </section>
+
+            <section id="schema-architecture">
+                <h2>2. Schema Architecture</h2>
+
+                <h3>2.1 Dual-Schema Design</h3>
+                <p>The CMIPS application uses a <strong>dual-schema architecture</strong> to separate concerns:</p>
+
+                <div class="diagram">
+                    <pre>┌─────────────────────────────────────────────────────────────────────┐
+│                        PostgreSQL Instance                           │
+│  ┌────────────────────────┐    ┌────────────────────────────────┐   │
+│  │   KEYCLOAK SCHEMA      │    │   APPLICATION DATA SCHEMA      │   │
+│  │   (Identity & Access)  │    │   (Business Data)              │   │
+│  │                        │    │                                │   │
+│  │  ┌──────────────────┐  │    │  ┌──────────────────────────┐  │   │
+│  │  │ realm            │  │    │  │ recipients               │  │   │
+│  │  │ user_entity      │  │    │  │ providers                │  │   │
+│  │  │ user_role_mapping│  │    │  │ cases                    │  │   │
+│  │  │ client           │  │    │  │ provider_assignments     │  │   │
+│  │  │ client_scope     │  │    │  │ service_eligibility      │  │   │
+│  │  │ resource_server  │  │    │  │ timesheets               │  │   │
+│  │  │ policy           │  │    │  │ tasks                    │  │   │
+│  │  │ permission       │  │    │  │ notifications            │  │   │
+│  │  │ ...              │  │    │  │ overtime_violations      │  │   │
+│  │  └──────────────────┘  │    │  │ ...                      │  │   │
+│  │                        │    │  └──────────────────────────┘  │   │
+│  └────────────────────────┘    └────────────────────────────────┘   │
+│                                                                      │
+│                    ┌───────────────────────┐                        │
+│                    │   SHARED REFERENCE    │                        │
+│                    │   (username/userId)   │                        │
+│                    └───────────────────────┘                        │
+└─────────────────────────────────────────────────────────────────────┘</pre>
+                </div>
+
+                <h3>2.2 Schema Separation Benefits</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Benefit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Security</strong></td>
+                            <td>IAM data isolated from business data</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scalability</strong></td>
+                            <td>Keycloak can be externalized independently</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Maintenance</strong></td>
+                            <td>Separate backup/restore strategies</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Compliance</strong></td>
+                            <td>Clear audit boundaries for PII</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Performance</strong></td>
+                            <td>Independent tuning and optimization</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="keycloak-schema">
+                <h2>3. Keycloak Schema</h2>
+
+                <h3>3.1 Purpose</h3>
+                <p>The Keycloak schema manages:</p>
+                <ul>
+                    <li>User authentication and credentials</li>
+                    <li>Role-based access control (RBAC)</li>
+                    <li>OAuth2/OIDC token management</li>
+                    <li>Fine-grained authorization policies</li>
+                    <li>Session management</li>
+                </ul>
+
+                <h3>3.2 Core Keycloak Tables</h3>
+                <div class="diagram">
+                    <pre>┌─────────────────────────────────────────────────────────────────────┐
+│                     KEYCLOAK SCHEMA TABLES                          │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  REALM CONFIGURATION                                                 │
+│  ├── realm                    # Realm definitions (cmips)            │
+│  ├── realm_attribute          # Realm-level settings                 │
+│  └── realm_default_groups     # Default group assignments            │
+│                                                                      │
+│  USER MANAGEMENT                                                     │
+│  ├── user_entity              # User accounts                        │
+│  ├── user_attribute           # Custom user attributes               │
+│  ├── credential               # Password/credentials                 │
+│  ├── user_federation_provider # LDAP/AD integration                  │
+│  └── federated_identity       # Social login mappings                │
+│                                                                      │
+│  ROLE & GROUP MANAGEMENT                                             │
+│  ├── keycloak_role            # Role definitions                     │
+│  ├── user_role_mapping        # User-to-role assignments             │
+│  ├── keycloak_group           # Group definitions                    │
+│  ├── user_group_membership    # User-to-group assignments            │
+│  └── group_role_mapping       # Group-to-role assignments            │
+│                                                                      │
+│  CLIENT (APPLICATION) MANAGEMENT                                     │
+│  ├── client                   # Registered clients (frontend/backend)│
+│  ├── client_scope             # Client-level scopes                  │
+│  ├── client_scope_role_mapping# Scope-to-role mappings               │
+│  └── protocol_mapper          # Token claim mappers                  │
+│                                                                      │
+│  AUTHORIZATION SERVICES (UMA)                                        │
+│  ├── resource_server          # Resource server config               │
+│  ├── resource_server_resource # Protected resources                  │
+│  ├── resource_server_scope    # Resource scopes                      │
+│  ├── resource_server_policy   # Authorization policies               │
+│  └── resource_server_perm_ticket # Permission tickets                │
+│                                                                      │
+│  SESSION MANAGEMENT                                                  │
+│  ├── user_session             # Active sessions                      │
+│  ├── client_session           # Client sessions                      │
+│  └── offline_user_session     # Offline tokens                       │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘</pre>
+                </div>
+
+                <h3>3.3 CMIPS Keycloak Configuration</h3>
+
+                <h4>Realm: <code>cmips</code></h4>
+                <pre><code>Realm Settings:
+├── Name: cmips
+├── Display Name: CMIPS - Case Management System
+├── Login Theme: keycloak
+├── Token Lifespan: 5 minutes (access), 30 minutes (SSO)
+└── Password Policy: Special + uppercase + lowercase + digits + min 8 chars</code></pre>
+
+                <h4>Registered Clients</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Client ID</th>
+                            <th>Type</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>cmips-frontend</td>
+                            <td>Public</td>
+                            <td>React/Angular frontend application</td>
+                        </tr>
+                        <tr>
+                            <td>cmips-backend</td>
+                            <td>Confidential</td>
+                            <td>Spring Boot REST API</td>
+                        </tr>
+                        <tr>
+                            <td>cmips-admin</td>
+                            <td>Confidential</td>
+                            <td>Administrative console</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Realm Roles</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Role</th>
+                            <th>Description</th>
+                            <th>Permissions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>SYSTEM_ADMIN</td>
+                            <td>Full system access</td>
+                            <td>All CRUD operations, system configuration</td>
+                        </tr>
+                        <tr>
+                            <td>COUNTY_ADMIN</td>
+                            <td>County-level administrator</td>
+                            <td>Manage users, cases, providers within county</td>
+                        </tr>
+                        <tr>
+                            <td>SOCIAL_WORKER</td>
+                            <td>Case manager</td>
+                            <td>Create/update cases, assign providers, review timesheets</td>
+                        </tr>
+                        <tr>
+                            <td>RECIPIENT</td>
+                            <td>Service recipient</td>
+                            <td>View own case, approve timesheets, manage providers</td>
+                        </tr>
+                        <tr>
+                            <td>PROVIDER</td>
+                            <td>Care provider</td>
+                            <td>Submit timesheets, view assignments, update availability</td>
+                        </tr>
+                        <tr>
+                            <td>AUDITOR</td>
+                            <td>Read-only auditor</td>
+                            <td>View all data, generate reports, no modifications</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="application-data-schema">
+                <h2>4. Application Data Schema</h2>
+
+                <h3>4.1 Core Tables Overview</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Tables</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Identity</strong></td>
+                            <td>recipients, providers</td>
+                            <td>Core identity records</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Case Management</strong></td>
+                            <td>cases, service_eligibility, provider_assignments</td>
+                            <td>Service authorization and provider assignment</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Timekeeping</strong></td>
+                            <td>timesheets, timesheet_entries, evv_records</td>
+                            <td>Work hours tracking and verification</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Compliance</strong></td>
+                            <td>overtime_violations, provider_cori, health_care_certifications</td>
+                            <td>Regulatory compliance tracking</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Workflow</strong></td>
+                            <td>tasks, work_queue_submissions, notifications</td>
+                            <td>Task management and notifications</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Documentation</strong></td>
+                            <td>case_notes, case_contacts</td>
+                            <td>Case documentation and communication</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Audit</strong></td>
+                            <td>audit_log</td>
+                            <td>Change tracking and compliance</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>4.2 Recipients Table</h3>
+                <pre><code>CREATE TABLE recipients (
+    id BIGSERIAL PRIMARY KEY,
+    cin VARCHAR(20) UNIQUE NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100) NOT NULL,
+    suffix VARCHAR(10),
+    date_of_birth DATE NOT NULL,
+    ssn_encrypted VARCHAR(255),
+    gender VARCHAR(20),
+    email VARCHAR(255),
+    phone VARCHAR(20),
+    
+    -- Address
+    address_line1 VARCHAR(255),
+    address_line2 VARCHAR(255),
+    city VARCHAR(100),
+    state VARCHAR(2) DEFAULT 'CA',
+    zip_code VARCHAR(10),
+    county VARCHAR(50) NOT NULL,
+    
+    -- Emergency Contact
+    emergency_contact_name VARCHAR(200),
+    emergency_contact_phone VARCHAR(20),
+    emergency_contact_relationship VARCHAR(50),
+    
+    -- Status
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    
+    -- Metadata
+    keycloak_user_id UUID,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(100),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(100),
+    
+    CONSTRAINT chk_recipient_status CHECK (status IN ('ACTIVE', 'INACTIVE', 'DECEASED', 'TRANSFERRED'))
+);
+
+CREATE INDEX idx_recipients_cin ON recipients(cin);
+CREATE INDEX idx_recipients_status ON recipients(status);
+CREATE INDEX idx_recipients_county ON recipients(county);
+CREATE INDEX idx_recipients_keycloak_user_id ON recipients(keycloak_user_id);</code></pre>
+
+                <h3>4.3 Providers Table</h3>
+                <pre><code>CREATE TABLE providers (
+    id BIGSERIAL PRIMARY KEY,
+    provider_number VARCHAR(20) UNIQUE NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100) NOT NULL,
+    suffix VARCHAR(10),
+    date_of_birth DATE NOT NULL,
+    ssn_encrypted VARCHAR(255) NOT NULL,
+    gender VARCHAR(20),
+    email VARCHAR(255),
+    phone VARCHAR(20),
+    
+    -- Address
+    address_line1 VARCHAR(255),
+    address_line2 VARCHAR(255),
+    city VARCHAR(100),
+    state VARCHAR(2) DEFAULT 'CA',
+    zip_code VARCHAR(10),
+    county VARCHAR(50) NOT NULL,
+    
+    -- Employment
+    hire_date DATE,
+    termination_date DATE,
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    provider_type VARCHAR(50) NOT NULL,
+    
+    -- Background Check
+    background_check_status VARCHAR(20),
+    background_check_date DATE,
+    background_check_expiration DATE,
+    
+    -- Training & Certification
+    orientation_completed BOOLEAN DEFAULT FALSE,
+    orientation_date DATE,
+    cpr_certified BOOLEAN DEFAULT FALSE,
+    cpr_expiration DATE,
+    
+    -- Metadata
+    keycloak_user_id UUID,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(100),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(100),
+    
+    CONSTRAINT chk_provider_status CHECK (status IN ('ACTIVE', 'INACTIVE', 'TERMINATED', 'SUSPENDED')),
+    CONSTRAINT chk_provider_type CHECK (provider_type IN ('INDIVIDUAL', 'AGENCY', 'PUBLIC_AUTHORITY'))
+);
+
+CREATE INDEX idx_providers_number ON providers(provider_number);
+CREATE INDEX idx_providers_status ON providers(status);
+CREATE INDEX idx_providers_county ON providers(county);
+CREATE INDEX idx_providers_keycloak_user_id ON providers(keycloak_user_id);
+CREATE INDEX idx_providers_background_check_exp ON providers(background_check_expiration);</code></pre>
+
+                <h3>4.4 Cases Table</h3>
+                <pre><code>CREATE TABLE cases (
+    id BIGSERIAL PRIMARY KEY,
+    case_number VARCHAR(20) UNIQUE NOT NULL,
+    recipient_id BIGINT NOT NULL REFERENCES recipients(id),
+    
+    -- Case Details
+    case_status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    case_type VARCHAR(50) NOT NULL,
+    program_type VARCHAR(50) NOT NULL,
+    
+    -- Eligibility
+    eligibility_start_date DATE NOT NULL,
+    eligibility_end_date DATE,
+    redetermination_date DATE,
+    
+    -- Service Authorization
+    authorized_hours_per_month DECIMAL(6,2),
+    authorized_services TEXT[], -- Array of service types
+    service_mode VARCHAR(20), -- INDIVIDUAL or SHARED
+    
+    -- Financial
+    share_of_cost DECIMAL(10,2) DEFAULT 0.00,
+    
+    -- Case Management
+    assigned_social_worker VARCHAR(100),
+    supervisor VARCHAR(100),
+    
+    -- Flags
+    is_protective_supervision BOOLEAN DEFAULT FALSE,
+    is_higher_than_guidelines BOOLEAN DEFAULT FALSE,
+    requires_live_in BOOLEAN DEFAULT FALSE,
+    
+    -- Metadata
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(100),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(100),
+    
+    CONSTRAINT chk_case_status CHECK (case_status IN ('PENDING', 'ACTIVE', 'SUSPENDED', 'CLOSED', 'TERMINATED')),
+    CONSTRAINT chk_case_type CHECK (case_type IN ('NEW', 'RENEWAL', 'REASSESSMENT', 'APPEAL')),
+    CONSTRAINT chk_program_type CHECK (program_type IN ('IHSS', 'WPCS'))
+);
+
+CREATE INDEX idx_cases_number ON cases(case_number);
+CREATE INDEX idx_cases_recipient ON cases(recipient_id);
+CREATE INDEX idx_cases_status ON cases(case_status);
+CREATE INDEX idx_cases_social_worker ON cases(assigned_social_worker);
+CREATE INDEX idx_cases_redetermination ON cases(redetermination_date);</code></pre>
+
+                <h3>4.5 Provider Assignments Table</h3>
+                <pre><code>CREATE TABLE provider_assignments (
+    id BIGSERIAL PRIMARY KEY,
+    case_id BIGINT NOT NULL REFERENCES cases(id),
+    provider_id BIGINT NOT NULL REFERENCES providers(id),
+    service_eligibility_id BIGINT REFERENCES service_eligibility(id),
+    
+    -- Assignment Details
+    assignment_status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    assignment_start_date DATE NOT NULL,
+    assignment_end_date DATE,
+    
+    -- Hours
+    authorized_hours_per_week DECIMAL(6,2),
+    authorized_hours_per_month DECIMAL(6,2),
+    
+    -- Relationship
+    provider_relationship VARCHAR(50),
+    is_live_in BOOLEAN DEFAULT FALSE,
+    
+    -- Special Flags
+    exempt_from_overtime BOOLEAN DEFAULT FALSE,
+    requires_workweek_agreement BOOLEAN DEFAULT FALSE,
+    
+    -- Metadata
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(100),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(100),
+    
+    CONSTRAINT chk_assignment_status CHECK (assignment_status IN ('ACTIVE', 'INACTIVE', 'TERMINATED', 'SUSPENDED')),
+    CONSTRAINT uq_case_provider UNIQUE(case_id, provider_id, assignment_start_date)
+);
+
+CREATE INDEX idx_assignments_case ON provider_assignments(case_id);
+CREATE INDEX idx_assignments_provider ON provider_assignments(provider_id);
+CREATE INDEX idx_assignments_status ON provider_assignments(assignment_status);
+CREATE INDEX idx_assignments_dates ON provider_assignments(assignment_start_date, assignment_end_date);</code></pre>
+
+                <h3>4.6 Timesheets Table</h3>
+                <pre><code>CREATE TABLE timesheets (
+    id BIGSERIAL PRIMARY KEY,
+    timesheet_number VARCHAR(30) UNIQUE NOT NULL,
+    provider_assignment_id BIGINT NOT NULL REFERENCES provider_assignments(id),
+    
+    -- Period
+    pay_period_start DATE NOT NULL,
+    pay_period_end DATE NOT NULL,
+    
+    -- Status
+    timesheet_status VARCHAR(20) NOT NULL DEFAULT 'DRAFT',
+    
+    -- Hours Summary
+    total_hours DECIMAL(6,2) DEFAULT 0.00,
+    regular_hours DECIMAL(6,2) DEFAULT 0.00,
+    overtime_hours DECIMAL(6,2) DEFAULT 0.00,
+    
+    -- Submission
+    submitted_at TIMESTAMP,
+    submitted_by VARCHAR(100),
+    
+    -- Approval
+    approved_at TIMESTAMP,
+    approved_by VARCHAR(100),
+    approval_method VARCHAR(20), -- ELECTRONIC, SIGNATURE, TELEPHONIC
+    
+    -- Rejection
+    rejected_at TIMESTAMP,
+    rejected_by VARCHAR(100),
+    rejection_reason TEXT,
+    
+    -- Payment
+    payment_processed_at TIMESTAMP,
+    payment_amount DECIMAL(10,2),
+    
+    -- EVV
+    requires_evv BOOLEAN DEFAULT FALSE,
+    evv_compliant BOOLEAN,
+    
+    -- Metadata
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(100),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(100),
+    
+    CONSTRAINT chk_timesheet_status CHECK (timesheet_status IN ('DRAFT', 'SUBMITTED', 'APPROVED', 'REJECTED', 'PROCESSING', 'PAID', 'VOID')),
+    CONSTRAINT chk_approval_method CHECK (approval_method IN ('ELECTRONIC', 'SIGNATURE', 'TELEPHONIC'))
+);
+
+CREATE INDEX idx_timesheets_number ON timesheets(timesheet_number);
+CREATE INDEX idx_timesheets_assignment ON timesheets(provider_assignment_id);
+CREATE INDEX idx_timesheets_status ON timesheets(timesheet_status);
+CREATE INDEX idx_timesheets_period ON timesheets(pay_period_start, pay_period_end);
+CREATE INDEX idx_timesheets_submitted ON timesheets(submitted_at);</code></pre>
+
+                <h3>4.7 Overtime Violations Table</h3>
+                <pre><code>CREATE TABLE overtime_violations (
+    id BIGSERIAL PRIMARY KEY,
+    provider_id BIGINT NOT NULL REFERENCES providers(id),
+    case_id BIGINT REFERENCES cases(id),
+    
+    -- Violation Details
+    violation_type VARCHAR(50) NOT NULL,
+    violation_date DATE NOT NULL,
+    workweek_start DATE NOT NULL,
+    workweek_end DATE NOT NULL,
+    
+    -- Hours
+    total_hours_worked DECIMAL(6,2),
+    weekly_limit DECIMAL(6,2),
+    overtime_hours DECIMAL(6,2),
+    
+    -- Status
+    violation_status VARCHAR(20) NOT NULL DEFAULT 'DETECTED',
+    resolution_date DATE,
+    resolution_notes TEXT,
+    
+    -- Reference
+    related_timesheet_id BIGINT REFERENCES timesheets(id),
+    
+    -- Metadata
+    detected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    detected_by VARCHAR(100),
+    resolved_at TIMESTAMP,
+    resolved_by VARCHAR(100),
+    
+    CONSTRAINT chk_violation_type CHECK (violation_type IN ('WEEKLY_OVERTIME', 'DAILY_OVERTIME', 'CONSECUTIVE_DAYS', 'SHARED_CARE')),
+    CONSTRAINT chk_violation_status CHECK (violation_status IN ('DETECTED', 'ACKNOWLEDGED', 'RESOLVED', 'WAIVED'))
+);
+
+CREATE INDEX idx_violations_provider ON overtime_violations(provider_id);
+CREATE INDEX idx_violations_case ON overtime_violations(case_id);
+CREATE INDEX idx_violations_status ON overtime_violations(violation_status);
+CREATE INDEX idx_violations_date ON overtime_violations(violation_date);
+CREATE INDEX idx_violations_workweek ON overtime_violations(workweek_start, workweek_end);</code></pre>
+            </section>
+
+            <section id="entity-relationship-diagrams">
+                <h2>5. Entity Relationship Diagrams</h2>
+
+                <h3>5.1 Core Entities ERD</h3>
+                <div class="diagram">
+                    <pre>┌────────────────────────────────────────────────────────────────────────────┐
+│                      CORE ENTITIES RELATIONSHIP                            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────┐
+    │   RECIPIENTS    │
+    │ ─────────────── │
+    │ PK: id          │
+    │ UK: cin         │
+    │ ─────────────── │
+    │ first_name      │
+    │ last_name       │
+    │ date_of_birth   │
+    │ county          │
+    │ status          │
+    └────────┬────────┘
+             │
+             │ 1:N
+             ▼
+    ┌─────────────────┐          ┌─────────────────────┐
+    │     CASES       │          │ SERVICE_ELIGIBILITY │
+    │ ─────────────── │          │ ─────────────────── │
+    │ PK: id          │          │ PK: id              │
+    │ UK: case_number │◀────────▶│ FK: case_id         │
+    │ FK: recipient_id│   1:N    │ ─────────────────── │
+    │ ─────────────── │          │ service_code        │
+    │ case_status     │          │ units_authorized    │
+    │ program_type    │          │ effective_date      │
+    │ auth_hours/mo   │          │ expiration_date     │
+    └────────┬────────┘          └──────────┬──────────┘
+             │                              │
+             │                              │
+             │         ┌────────────────────┘
+             │         │
+             │ N       │ 1
+             │         │
+             ▼         ▼
+    ┌─────────────────────────┐
+    │ PROVIDER_ASSIGNMENTS    │
+    │ ─────────────────────── │
+    │ PK: id                  │
+    │ FK: case_id             │
+    │ FK: provider_id         │
+    │ FK: service_elig_id     │
+    │ ─────────────────────── │
+    │ assignment_status       │
+    │ start_date              │
+    │ auth_hours_per_week     │
+    │ is_live_in              │
+    └─────────────────────────┘
+             ▲
+             │ N:1
+             │
+    ┌────────┴────────┐
+    │   PROVIDERS     │
+    │ ─────────────── │
+    │ PK: id          │
+    │ UK: prov_number │
+    │ ─────────────── │
+    │ first_name      │
+    │ last_name       │
+    │ date_of_birth   │
+    │ county          │
+    │ status          │
+    │ provider_type   │
+    └─────────────────┘</pre>
+                </div>
+
+                <h3>5.2 Timesheet ERD</h3>
+                <div class="diagram">
+                    <pre>┌────────────────────────────────────────────────────────────────────────────┐
+│                     TIMESHEET ENTITIES RELATIONSHIP                         │
+└────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────────────┐
+    │ PROVIDER_ASSIGNMENTS    │
+    │ ─────────────────────── │
+    │ PK: id                  │
+    └─────────┬───────────────┘
+              │
+              │ 1:N
+              ▼
+    ┌─────────────────────┐
+    │    TIMESHEETS       │
+    │ ─────────────────── │
+    │ PK: id              │
+    │ UK: timesheet_num   │
+    │ FK: assignment_id   │
+    │ ─────────────────── │
+    │ pay_period_start    │
+    │ pay_period_end      │
+    │ timesheet_status    │
+    │ total_hours         │
+    │ submitted_at        │
+    │ approved_at         │
+    └─────────┬───────────┘
+              │
+              │ 1:N
+              ▼
+    ┌─────────────────────────┐          ┌─────────────────────┐
+    │  TIMESHEET_ENTRIES      │          │    EVV_RECORDS      │
+    │ ─────────────────────── │          │ ─────────────────── │
+    │ PK: id                  │          │ PK: id              │
+    │ FK: timesheet_id        │◀────────▶│ FK: entry_id        │
+    │ ─────────────────────── │   1:1    │ ─────────────────── │
+    │ service_date            │          │ check_in_time       │
+    │ service_type            │          │ check_out_time      │
+    │ hours_worked            │          │ gps_latitude        │
+    │ is_overtime             │          │ gps_longitude       │
+    └─────────────────────────┘          │ location_verified   │
+                                         └─────────────────────┘</pre>
+                </div>
+
+                <h3>5.3 Compliance ERD</h3>
+                <div class="diagram">
+                    <pre>┌────────────────────────────────────────────────────────────────────────────┐
+│                    COMPLIANCE ENTITIES RELATIONSHIP                         │
+└────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────┐
+    │   PROVIDERS     │
+    │ ─────────────── │
+    │ PK: id          │
+    └────────┬────────┘
+             │
+             ├──────────────────┬──────────────────┬──────────────────┐
+             │                  │                  │                  │
+             │ 1:N              │ 1:N              │ 1:N              │ 1:N
+             ▼                  ▼                  ▼                  ▼
+    ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+    │ PROVIDER_CORI   │ │HEALTH_CARE_CERT │ │OVERTIME_VIOLAT. │ │PROVIDER_TRAINING│
+    │ ─────────────── │ │ ─────────────── │ │ ─────────────── │ │ ─────────────── │
+    │ PK: id          │ │ PK: id          │ │ PK: id          │ │ PK: id          │
+    │ FK: provider_id │ │ FK: provider_id │ │ FK: provider_id │ │ FK: provider_id │
+    │ ─────────────── │ │ ─────────────── │ │ ─────────────── │ │ ─────────────── │
+    │ conviction_date │ │ cert_type       │ │ violation_type  │ │ training_type   │
+    │ conviction_type │ │ cert_number     │ │ violation_date  │ │ completion_date │
+    │ tier_level      │ │ issue_date      │ │ workweek_start  │ │ expiration_date │
+    │ exemption_granted│ │ expiration_date │ │ total_hours     │ │ status          │
+    └─────────────────┘ └─────────────────┘ │ violation_status│ └─────────────────┘
+                                            └─────────────────┘</pre>
+                </div>
+            </section>
+
+            <section id="data-flow-architecture">
+                <h2>6. Data Flow Architecture</h2>
+
+                <h3>6.1 Request Flow (Authentication & Authorization)</h3>
+                <div class="diagram">
+                    <pre>┌────────────────────────────────────────────────────────────────────────────┐
+│                        REQUEST AUTHENTICATION FLOW                          │
+└────────────────────────────────────────────────────────────────────────────┘
+
+   ┌──────────┐           ┌──────────┐           ┌──────────┐
+   │  Client  │           │ Keycloak │           │  CMIPS   │
+   │(Browser) │           │  Server  │           │ Backend  │
+   └────┬─────┘           └────┬─────┘           └────┬─────┘
+        │                      │                      │
+        │  1. Login Request    │                      │
+        │─────────────────────▶│                      │
+        │   (username/password)│                      │
+        │                      │                      │
+        │  2. Access Token     │                      │
+        │◀─────────────────────│                      │
+        │   (JWT with roles)   │                      │
+        │                      │                      │
+        │  3. API Request      │                      │
+        │  + Bearer Token      │                      │
+        │──────────────────────┼─────────────────────▶│
+        │                      │                      │
+        │                      │  4. Token Validation │
+        │                      │◀─────────────────────│
+        │                      │   (Verify signature) │
+        │                      │                      │
+        │                      │  5. Token Valid      │
+        │                      │─────────────────────▶│
+        │                      │                      │
+        │                      │                      │ 6. Check Authorization
+        │                      │                      │    (Roles & Permissions)
+        │                      │                      │
+        │  7. Response Data    │                      │
+        │◀─────────────────────┼──────────────────────│
+        │                      │                      │
+        ▼                      ▼                      ▼</pre>
+                </div>
+
+                <h3>6.2 Timesheet Submission Flow</h3>
+                <div class="diagram">
+                    <pre>┌────────────────────────────────────────────────────────────────────────────┐
+│                       TIMESHEET SUBMISSION WORKFLOW                         │
+└────────────────────────────────────────────────────────────────────────────┘
+
+   ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+   │ Provider │    │  CMIPS   │    │   Kafka  │    │ Overtime │    │ Payroll  │
+   │   App    │    │ Backend  │    │  Broker  │    │ Service  │    │ System   │
+   └────┬─────┘    └────┬─────┘    └────┬─────┘    └────┬─────┘    └────┬─────┘
+        │               │               │               │               │
+        │ 1. Submit     │               │               │               │
+        │  Timesheet    │               │               │               │
+        │──────────────▶│               │               │               │
+        │               │               │               │               │
+        │               │ 2. Validate   │               │               │
+        │               │  (Hours, Auth)│               │               │
+        │               │               │               │               │
+        │               │ 3. Save to DB │               │               │
+        │               │  (Status: SUBMITTED)          │               │
+        │               │               │               │               │
+        │               │ 4. Publish Event              │               │
+        │               │──────────────▶│               │               │
+        │               │  TimeSheetSubmitted           │               │
+        │               │               │               │               │
+        │               │               │ 5. Consume    │               │
+        │               │               │──────────────▶│               │
+        │               │               │  TimeSheetSubmitted           │
+        │               │               │               │               │
+        │               │               │               │ 6. Check OT   │
+        │               │               │               │  Violations   │
+        │               │               │               │               │
+        │               │               │ 7. Publish    │               │
+        │               │               │◀──────────────│               │
+        │               │               │  OTViolationDetected          │
+        │               │               │               │               │
+        │ 8. Notify     │               │               │               │
+        │  Recipient    │               │               │               │
+        │◀──────────────│               │               │               │
+        │               │               │               │               │
+        │               │               │               │               │
+        │ 9. Recipient  │               │               │               │
+        │  Approves     │               │               │               │
+        │──────────────▶│               │               │               │
+        │               │               │               │               │
+        │               │ 10. Update DB │               │               │
+        │               │  (Status: APPROVED)           │               │
+        │               │               │               │               │
+        │               │ 11. Publish Event             │               │
+        │               │──────────────▶│               │               │
+        │               │  TimeSheetApproved            │               │
+        │               │               │               │               │
+        │               │               │ 12. Forward   │               │
+        │               │               │──────────────────────────────▶│
+        │               │               │  to Payroll   │               │
+        │               │               │               │               │
+        ▼               ▼               ▼               ▼               ▼</pre>
+                </div>
+
+                <h3>6.3 Kafka Event Topics</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Topic Name</th>
+                            <th>Event Type</th>
+                            <th>Producers</th>
+                            <th>Consumers</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>cmips.timesheet.submitted</td>
+                            <td>TimeSheetSubmitted</td>
+                            <td>Timesheet Service</td>
+                            <td>Overtime Service, Notification Service</td>
+                        </tr>
+                        <tr>
+                            <td>cmips.timesheet.approved</td>
+                            <td>TimeSheetApproved</td>
+                            <td>Timesheet Service</td>
+                            <td>Payroll Integration, Audit Service</td>
+                        </tr>
+                        <tr>
+                            <td>cmips.overtime.detected</td>
+                            <td>OTViolationDetected</td>
+                            <td>Overtime Service</td>
+                            <td>Task Service, Notification Service</td>
+                        </tr>
+                        <tr>
+                            <td>cmips.case.created</td>
+                            <td>CaseCreated</td>
+                            <td>Case Service</td>
+                            <td>Task Service, Notification Service</td>
+                        </tr>
+                        <tr>
+                            <td>cmips.provider.assigned</td>
+                            <td>ProviderAssigned</td>
+                            <td>Assignment Service</td>
+                            <td>Notification Service, Audit Service</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="security-access-control">
+                <h2>7. Security & Access Control</h2>
+
+                <h3>7.1 Multi-Layer Security Architecture</h3>
+                
+                <div class="diagram">
+                    <pre>┌─────────────────────────────────────────────────────────────────────────────┐
+│                    SECURITY LAYERS                                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ LAYER 1: NETWORK SECURITY                                                   │
+│ ├── API Gateway (Kong/nginx) - Rate limiting, IP filtering                  │
+│ ├── TLS/SSL encryption for all traffic                                      │
+│ └── Container network isolation                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ LAYER 2: AUTHENTICATION (Keycloak)                                          │
+│ ├── OAuth 2.0 / OpenID Connect                                              │
+│ ├── JWT token validation                                                    │
+│ ├── Session management                                                      │
+│ └── Password policies (min 8 chars, complexity)                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ LAYER 3: AUTHORIZATION (Keycloak + Application)                             │
+│ ├── Role-Based Access Control (RBAC)                                        │
+│ │   ├── ADMIN - Full system access                                          │
+│ │   ├── SUPERVISOR - Oversight and approval                                 │
+│ │   ├── CASE_WORKER - Case management                                       │
+│ │   ├── PROVIDER - Limited self-service                                     │
+│ │   └── RECIPIENT - View-only                                               │
+│ ├── Resource-Based Access Control (UMA)                                     │
+│ │   └── Fine-grained permissions per resource/scope                         │
+│ └── Field-Level Authorization                                               │
+│     └── SSN masking, salary hiding based on role                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ LAYER 4: DATA SECURITY                                                      │
+│ ├── Encryption at rest (PostgreSQL TDE or disk encryption)                  │
+│ ├── Column-level encryption for PII (SSN, etc.)                             │
+│ ├── Audit logging for all data access                                       │
+│ └── Data masking in non-production environments                             │
+└─────────────────────────────────────────────────────────────────────────────┘</pre>
+                </div>
+
+                <h3>7.2 Role-Permission Matrix</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Resource</th>
+                            <th>ADMIN</th>
+                            <th>SUPERVISOR</th>
+                            <th>CASE_WORKER</th>
+                            <th>PROVIDER</th>
+                            <th>RECIPIENT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Cases</strong></td>
+                            <td>CRUD</td>
+                            <td>CRUD</td>
+                            <td>CRUD</td>
+                            <td>R (own)</td>
+                            <td>R (own)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Recipients</strong></td>
+                            <td>CRUD</td>
+                            <td>CRUD</td>
+                            <td>CRUD</td>
+                            <td>R (assigned)</td>
+                            <td>R (own)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Providers</strong></td>
+                            <td>CRUD</td>
+                            <td>CRUD</td>
+                            <td>CRU</td>
+                            <td>RU (own)</td>
+                            <td>R (assigned)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Timesheets</strong></td>
+                            <td>CRUD + Approve</td>
+                            <td>CRUD + Approve</td>
+                            <td>CRU</td>
+                            <td>CRUD (own)</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SSN (view full)</strong></td>
+                            <td>Yes</td>
+                            <td>Yes</td>
+                            <td>No</td>
+                            <td>No</td>
+                            <td>No</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Salary (view)</strong></td>
+                            <td>Yes</td>
+                            <td>Yes</td>
+                            <td>No</td>
+                            <td>No</td>
+                            <td>No</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Overtime Violations</strong></td>
+                            <td>CRUD</td>
+                            <td>CRUD + Review</td>
+                            <td>Read</td>
+                            <td>R (own)</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);"><strong>Legend:</strong> C=Create, R=Read, U=Update, D=Delete</p>
+
+                <h3>7.3 Row-Level Security (RLS)</h3>
+                <p>PostgreSQL Row-Level Security policies enforce data access based on user roles:</p>
+
+                <pre><code>-- Enable RLS on cases table
+ALTER TABLE cases ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Social workers can only see cases in their county
+CREATE POLICY social_worker_county_access ON cases
+    FOR ALL
+    TO cmips_user
+    USING (
+        county = current_setting('app.user_county')::VARCHAR
+        AND current_setting('app.user_role')::VARCHAR = 'SOCIAL_WORKER'
+    );
+
+-- Policy: Recipients can only see their own cases
+CREATE POLICY recipient_own_cases ON cases
+    FOR SELECT
+    TO cmips_user
+    USING (
+        recipient_id IN (
+            SELECT id FROM recipients
+            WHERE keycloak_user_id = current_setting('app.user_id')::UUID
+        )
+        AND current_setting('app.user_role')::VARCHAR = 'RECIPIENT'
+    );
+
+-- Policy: System admins can see all cases
+CREATE POLICY admin_all_access ON cases
+    FOR ALL
+    TO cmips_user
+    USING (current_setting('app.user_role')::VARCHAR = 'SYSTEM_ADMIN');
+
+-- Policy: Auditors have read-only access to all cases
+CREATE POLICY auditor_read_access ON cases
+    FOR SELECT
+    TO cmips_user
+    USING (current_setting('app.user_role')::VARCHAR = 'AUDITOR');</code></pre>
+
+                <h3>7.4 Data Encryption</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data Type</th>
+                            <th>Encryption Method</th>
+                            <th>Key Management</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>SSN</td>
+                            <td>AES-256 at application layer</td>
+                            <td>AWS KMS / HashiCorp Vault</td>
+                        </tr>
+                        <tr>
+                            <td>Passwords</td>
+                            <td>bcrypt (Keycloak)</td>
+                            <td>N/A (hashing)</td>
+                        </tr>
+                        <tr>
+                            <td>Data at Rest</td>
+                            <td>PostgreSQL TDE</td>
+                            <td>Database master key</td>
+                        </tr>
+                        <tr>
+                            <td>Data in Transit</td>
+                            <td>TLS 1.3</td>
+                            <td>SSL certificates</td>
+                        </tr>
+                        <tr>
+                            <td>Tokens</td>
+                            <td>JWT signed with RS256</td>
+                            <td>Keycloak realm keys</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>7.5 Audit Trail Implementation</h3>
+                <pre><code>-- Audit table for tracking all changes
+CREATE TABLE audit_log (
+    id                  BIGSERIAL PRIMARY KEY,
+    table_name          VARCHAR(100) NOT NULL,
+    record_id           BIGINT NOT NULL,
+    action              VARCHAR(10) NOT NULL,  -- INSERT, UPDATE, DELETE
+    old_values          JSONB,
+    new_values          JSONB,
+    changed_fields      TEXT[],
+    user_id             VARCHAR(100) NOT NULL,
+    user_roles          TEXT[],
+    ip_address          VARCHAR(45),
+    user_agent          VARCHAR(255),
+    created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Index for common queries
+CREATE INDEX idx_audit_table_record ON audit_log(table_name, record_id);
+CREATE INDEX idx_audit_user ON audit_log(user_id);
+CREATE INDEX idx_audit_created ON audit_log(created_at);
+
+-- Trigger function for automatic auditing
+CREATE OR REPLACE FUNCTION audit_trigger_func()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO audit_log (
+        table_name, record_id, action,
+        old_values, new_values,
+        user_id, created_at
+    ) VALUES (
+        TG_TABLE_NAME,
+        COALESCE(NEW.id, OLD.id),
+        TG_OP,
+        CASE WHEN TG_OP != 'INSERT' THEN row_to_json(OLD)::jsonb END,
+        CASE WHEN TG_OP != 'DELETE' THEN row_to_json(NEW)::jsonb END,
+        current_setting('app.current_user', true),
+        CURRENT_TIMESTAMP
+    );
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Apply trigger to sensitive tables
+CREATE TRIGGER audit_recipients AFTER INSERT OR UPDATE OR DELETE
+    ON recipients FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
+
+CREATE TRIGGER audit_providers AFTER INSERT OR UPDATE OR DELETE
+    ON providers FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
+
+CREATE TRIGGER audit_cases AFTER INSERT OR UPDATE OR DELETE
+    ON cases FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();</code></pre>
+            </section>
+
+            <section id="business-rules-implementation">
+                <h2>8. Business Rules Implementation</h2>
+
+                <h3>8.1 Overtime Violation Detection</h3>
+                <pre><code>CREATE OR REPLACE FUNCTION check_overtime_violations(
+    p_provider_id BIGINT,
+    p_workweek_start DATE,
+    p_workweek_end DATE
+)
+RETURNS TABLE(
+    violation_type VARCHAR,
+    total_hours DECIMAL,
+    limit_hours DECIMAL,
+    excess_hours DECIMAL
+) AS $$
+DECLARE
+    v_total_hours DECIMAL;
+    v_weekly_limit DECIMAL := 66.00; -- California IHSS weekly limit
+BEGIN
+    -- Calculate total hours for the workweek
+    SELECT SUM(te.hours_worked)
+    INTO v_total_hours
+    FROM timesheet_entries te
+    JOIN timesheets ts ON te.timesheet_id = ts.id
+    JOIN provider_assignments pa ON ts.provider_assignment_id = pa.id
+    WHERE pa.provider_id = p_provider_id
+      AND te.service_date BETWEEN p_workweek_start AND p_workweek_end
+      AND ts.timesheet_status IN ('SUBMITTED', 'APPROVED');
+    
+    -- Check for weekly overtime violation
+    IF v_total_hours > v_weekly_limit THEN
+        RETURN QUERY SELECT
+            'WEEKLY_OVERTIME'::VARCHAR,
+            v_total_hours,
+            v_weekly_limit,
+            (v_total_hours - v_weekly_limit) AS excess;
+    END IF;
+    
+    RETURN;
+END;
+$$ LANGUAGE plpgsql;</code></pre>
+
+                <h3>8.2 Provider Assignment Validation</h3>
+                <pre><code>CREATE OR REPLACE FUNCTION validate_provider_assignment(
+    p_case_id BIGINT,
+    p_provider_id BIGINT,
+    p_start_date DATE
+)
+RETURNS BOOLEAN AS $$
+DECLARE
+    v_case_status VARCHAR;
+    v_provider_status VARCHAR;
+    v_has_valid_background BOOLEAN;
+    v_has_orientation BOOLEAN;
+    v_cori_tier INTEGER;
+    v_exemption_granted BOOLEAN;
+BEGIN
+    -- Check case status
+    SELECT case_status INTO v_case_status
+    FROM cases WHERE id = p_case_id;
+    
+    IF v_case_status NOT IN ('ACTIVE', 'PENDING') THEN
+        RAISE EXCEPTION 'Case must be ACTIVE or PENDING for assignment';
+    END IF;
+    
+    -- Check provider status
+    SELECT status INTO v_provider_status
+    FROM providers WHERE id = p_provider_id;
+    
+    IF v_provider_status != 'ACTIVE' THEN
+        RAISE EXCEPTION 'Provider must be ACTIVE for assignment';
+    END IF;
+    
+    -- Check background check
+    SELECT
+        (background_check_expiration >= CURRENT_DATE) AS valid_bg,
+        orientation_completed
+    INTO v_has_valid_background, v_has_orientation
+    FROM providers
+    WHERE id = p_provider_id;
+    
+    IF NOT v_has_valid_background THEN
+        RAISE EXCEPTION 'Provider background check expired or missing';
+    END IF;
+    
+    IF NOT v_has_orientation THEN
+        RAISE EXCEPTION 'Provider must complete orientation';
+    END IF;
+    
+    -- Check CORI (Criminal Offender Record Information)
+    SELECT tier_level, exemption_granted
+    INTO v_cori_tier, v_exemption_granted
+    FROM provider_cori
+    WHERE provider_id = p_provider_id
+    ORDER BY conviction_date DESC
+    LIMIT 1;
+    
+    IF v_cori_tier IS NOT NULL THEN
+        IF v_cori_tier = 1 AND NOT COALESCE(v_exemption_granted, FALSE) THEN
+            RAISE EXCEPTION 'Provider has Tier 1 CORI without exemption';
+        END IF;
+    END IF;
+    
+    RETURN TRUE;
+END;
+$$ LANGUAGE plpgsql;</code></pre>
+
+                <h3>8.3 Service Authorization Check</h3>
+                <pre><code>CREATE OR REPLACE FUNCTION check_service_authorization(
+    p_case_id BIGINT,
+    p_service_code VARCHAR,
+    p_units_requested DECIMAL
+)
+RETURNS BOOLEAN AS $$
+DECLARE
+    v_authorized_units DECIMAL;
+    v_units_used DECIMAL;
+    v_units_available DECIMAL;
+BEGIN
+    -- Get authorized units
+    SELECT units_authorized
+    INTO v_authorized_units
+    FROM service_eligibility
+    WHERE case_id = p_case_id
+      AND service_code = p_service_code
+      AND effective_date <= CURRENT_DATE
+      AND (expiration_date IS NULL OR expiration_date >= CURRENT_DATE)
+    ORDER BY effective_date DESC
+    LIMIT 1;
+    
+    IF v_authorized_units IS NULL THEN
+        RAISE EXCEPTION 'Service % not authorized for this case', p_service_code;
+    END IF;
+    
+    -- Calculate units already used this month
+    SELECT COALESCE(SUM(te.hours_worked), 0)
+    INTO v_units_used
+    FROM timesheet_entries te
+    JOIN timesheets ts ON te.timesheet_id = ts.id
+    JOIN provider_assignments pa ON ts.provider_assignment_id = pa.id
+    WHERE pa.case_id = p_case_id
+      AND te.service_type = p_service_code
+      AND EXTRACT(YEAR FROM te.service_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+      AND EXTRACT(MONTH FROM te.service_date) = EXTRACT(MONTH FROM CURRENT_DATE)
+      AND ts.timesheet_status IN ('APPROVED', 'PROCESSING', 'PAID');
+    
+    v_units_available := v_authorized_units - v_units_used;
+    
+    IF p_units_requested > v_units_available THEN
+        RAISE EXCEPTION 'Requested units (%) exceed available authorization (% remaining)',
+            p_units_requested, v_units_available;
+    END IF;
+    
+    RETURN TRUE;
+END;
+$$ LANGUAGE plpgsql;</code></pre>
+
+                <h3>8.4 Share of Cost Calculation</h3>
+                <pre><code>CREATE OR REPLACE FUNCTION calculate_share_of_cost(
+    p_case_id BIGINT,
+    p_calculation_date DATE
+)
+RETURNS DECIMAL AS $$
+DECLARE
+    v_recipient_income DECIMAL;
+    v_allowed_deductions DECIMAL;
+    v_maintenance_need DECIMAL := 1354.00; -- 2024 CA maintenance need standard
+    v_share_of_cost DECIMAL;
+BEGIN
+    -- Get recipient income (would come from financial assessment)
+    SELECT total_monthly_income, total_deductions
+    INTO v_recipient_income, v_allowed_deductions
+    FROM recipient_financial_assessment
+    WHERE case_id = p_case_id
+      AND assessment_date <= p_calculation_date
+    ORDER BY assessment_date DESC
+    LIMIT 1;
+    
+    -- SOC = (Income - Deductions) - Maintenance Need
+    v_share_of_cost := (v_recipient_income - v_allowed_deductions) - v_maintenance_need;
+    
+    -- SOC cannot be negative
+    IF v_share_of_cost < 0 THEN
+        v_share_of_cost := 0;
+    END IF;
+    
+    RETURN v_share_of_cost;
+END;
+$$ LANGUAGE plpgsql;</code></pre>
+            </section>
+
+            <section id="query-patterns-indexing-strategy">
+                <h2>9. Query Patterns & Indexing Strategy</h2>
+
+                <h3>9.1 Common Query Patterns</h3>
+
+                <h4>Find Active Cases by Social Worker</h4>
+                <pre><code>SELECT
+    c.case_number,
+    c.case_status,
+    r.first_name || ' ' || r.last_name AS recipient_name,
+    r.county,
+    c.authorized_hours_per_month,
+    COUNT(pa.id) AS provider_count
+FROM cases c
+JOIN recipients r ON c.recipient_id = r.id
+LEFT JOIN provider_assignments pa ON c.id = pa.case_id AND pa.assignment_status = 'ACTIVE'
+WHERE c.assigned_social_worker = :social_worker_username
+  AND c.case_status = 'ACTIVE'
+GROUP BY c.id, r.id
+ORDER BY r.last_name, r.first_name;
+
+-- Indexes supporting this query:
+-- idx_cases_social_worker, idx_cases_status, idx_assignments_case</code></pre>
+
+                <h4>Timesheet Approval Workflow Query</h4>
+                <pre><code>SELECT
+    ts.timesheet_number,
+    ts.pay_period_start,
+    ts.pay_period_end,
+    p.first_name || ' ' || p.last_name AS provider_name,
+    r.first_name || ' ' || r.last_name AS recipient_name,
+    ts.total_hours,
+    ts.submitted_at,
+    CASE
+        WHEN ts.requires_evv THEN 'EVV Required'
+        ELSE 'Standard'
+    END AS timesheet_type
+FROM timesheets ts
+JOIN provider_assignments pa ON ts.provider_assignment_id = pa.id
+JOIN providers p ON pa.provider_id = p.id
+JOIN cases c ON pa.case_id = c.id
+JOIN recipients r ON c.recipient_id = r.id
+WHERE ts.timesheet_status = 'SUBMITTED'
+  AND r.keycloak_user_id = :recipient_keycloak_id
+ORDER BY ts.submitted_at ASC;
+
+-- Indexes: idx_timesheets_status, idx_recipients_keycloak_user_id</code></pre>
+
+                <h4>Overtime Violation Report</h4>
+                <pre><code>SELECT
+    p.provider_number,
+    p.first_name || ' ' || p.last_name AS provider_name,
+    ov.workweek_start,
+    ov.workweek_end,
+    ov.total_hours_worked,
+    ov.weekly_limit,
+    ov.overtime_hours,
+    ov.violation_status
+FROM overtime_violations ov
+JOIN providers p ON ov.provider_id = p.id
+WHERE ov.violation_date BETWEEN :start_date AND :end_date
+  AND ov.violation_status = 'DETECTED'
+ORDER BY ov.overtime_hours DESC;
+
+-- Indexes: idx_violations_date, idx_violations_status</code></pre>
+
+                <h3>9.2 Indexing Strategy</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Index Type</th>
+                            <th>Use Case</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>B-tree (Default)</strong></td>
+                            <td>Exact matches, range queries, ORDER BY</td>
+                            <td><code>CREATE INDEX idx_cases_status ON cases(case_status)</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Composite</strong></td>
+                            <td>Multi-column filters, JOIN optimization</td>
+                            <td><code>CREATE INDEX idx_assignments_dates ON provider_assignments(assignment_start_date, assignment_end_date)</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Partial</strong></td>
+                            <td>Frequent WHERE clause conditions</td>
+                            <td><code>CREATE INDEX idx_active_cases ON cases(id) WHERE case_status = 'ACTIVE'</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>GIN (Generalized Inverted)</strong></td>
+                            <td>Array and JSONB searches</td>
+                            <td><code>CREATE INDEX idx_cases_services ON cases USING GIN(authorized_services)</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>BRIN (Block Range)</strong></td>
+                            <td>Large tables with natural ordering</td>
+                            <td><code>CREATE INDEX idx_audit_timestamp ON audit_log USING BRIN(event_timestamp)</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>9.3 Index Maintenance</h3>
+                <pre><code>-- Reindex concurrently (no table locks)
+REINDEX INDEX CONCURRENTLY idx_cases_status;
+
+-- Find unused indexes
+SELECT
+    schemaname || '.' || tablename AS table_name,
+    indexname,
+    idx_scan,
+    pg_size_pretty(pg_relation_size(indexrelid)) AS index_size
+FROM pg_stat_user_indexes
+WHERE idx_scan = 0
+  AND indexrelname NOT LIKE '%_pkey'
+ORDER BY pg_relation_size(indexrelid) DESC;
+
+-- Find duplicate indexes
+SELECT
+    pg_size_pretty(SUM(pg_relation_size(idx))::BIGINT) AS total_size,
+    array_agg(indexrelname) AS indexes,
+    tablename
+FROM (
+    SELECT
+        indexrelid::regclass AS idx,
+        indrelid::regclass AS tablename,
+        (indrelid::text ||E'\n'|| indclass::text ||E'\n'|| indkey::text ||E'\n'||
+         COALESCE(indexprs::text,'')||E'\n' || COALESCE(indpred::text,'')) AS key
+    FROM pg_index
+) sub
+GROUP BY tablename, key
+HAVING COUNT(*) > 1
+ORDER BY SUM(pg_relation_size(idx)) DESC;</code></pre>
+            </section>
+
+            <section id="data-migration-maintenance">
+                <h2>10. Data Migration & Maintenance</h2>
+
+                <h3>10.1 Flyway Migration Structure</h3>
+                <pre><code>db/migration/
+├── V1__initial_schema.sql
+├── V2__add_recipients_table.sql
+├── V3__add_providers_table.sql
+├── V4__add_cases_table.sql
+├── V5__add_provider_assignments.sql
+├── V6__add_service_eligibility.sql
+├── V7__add_timesheets.sql
+├── V8__add_overtime_violations.sql
+├── V9__add_tasks_notifications.sql
+├── V10__add_audit_triggers.sql
+└── V11__add_indexes.sql</code></pre>
+
+                <h3>10.2 Backup Strategy</h3>
+                <pre><code>Backup Strategy:
+  Full Backup:
+    Frequency: Daily at 2:00 AM
+    Retention: 30 days
+    Storage: S3/Cloud Storage
+
+  Incremental Backup:
+    Frequency: Every 4 hours
+    Retention: 7 days
+
+  Transaction Log Backup:
+    Frequency: Every 15 minutes
+    Retention: 24 hours
+
+  Point-in-Time Recovery: Enabled
+
+  Backup Verification:
+    Frequency: Weekly
+    Test restore to staging environment</code></pre>
+
+                <h3>10.3 Data Retention Policies</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data Category</th>
+                            <th>Retention Period</th>
+                            <th>Archive Strategy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Active Cases</td>
+                            <td>Indefinite</td>
+                            <td>N/A</td>
+                        </tr>
+                        <tr>
+                            <td>Closed Cases</td>
+                            <td>7 years</td>
+                            <td>Move to archive schema</td>
+                        </tr>
+                        <tr>
+                            <td>Timesheets</td>
+                            <td>5 years</td>
+                            <td>Compress and archive</td>
+                        </tr>
+                        <tr>
+                            <td>Audit Logs</td>
+                            <td>10 years</td>
+                            <td>Cold storage</td>
+                        </tr>
+                        <tr>
+                            <td>Notifications</td>
+                            <td>1 year</td>
+                            <td>Delete</td>
+                        </tr>
+                        <tr>
+                            <td>Session Data</td>
+                            <td>30 days</td>
+                            <td>Delete</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>10.4 Performance Monitoring</h3>
+                <pre><code>-- Query to identify slow queries
+SELECT
+    query,
+    calls,
+    total_time / 1000 as total_seconds,
+    mean_time / 1000 as mean_seconds,
+    rows
+FROM pg_stat_statements
+WHERE total_time > 1000  -- queries taking more than 1 second
+ORDER BY total_time DESC
+LIMIT 20;
+
+-- Table bloat monitoring
+SELECT
+    schemaname || '.' || relname as table_name,
+    pg_size_pretty(pg_total_relation_size(relid)) as total_size,
+    n_live_tup as live_tuples,
+    n_dead_tup as dead_tuples,
+    ROUND(n_dead_tup * 100.0 / NULLIF(n_live_tup + n_dead_tup, 0), 2) as dead_ratio
+FROM pg_stat_user_tables
+WHERE n_dead_tup > 1000
+ORDER BY dead_ratio DESC;
+
+-- Index usage statistics
+SELECT
+    schemaname || '.' || relname as table_name,
+    indexrelname as index_name,
+    idx_scan as times_used,
+    pg_size_pretty(pg_relation_size(indexrelid)) as index_size
+FROM pg_stat_user_indexes
+ORDER BY idx_scan ASC
+LIMIT 20;  -- Least used indexes (candidates for removal)</code></pre>
+            </section>
+
+            <section id="appendix-a">
+                <h2>Appendix A: Complete ER Diagram</h2>
+                <div class="diagram">
+                    <pre>┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│                           CMIPS DATABASE - COMPLETE ER DIAGRAM                          │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
+
+                                    ┌─────────────────┐
+                                    │    KEYCLOAK     │
+                                    │   (External)    │
+                                    └────────┬────────┘
+                                             │
+                                             │ username/user_id reference
+                                             ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                        │
+│     ┌─────────────┐                    ┌─────────────┐                                │
+│     │   PERSONS   │                    │ RECIPIENTS  │◀────────────────────┐          │
+│     │  (generic)  │                    │             │                     │          │
+│     └─────────────┘                    └──────┬──────┘                     │          │
+│                                               │                            │          │
+│                                               │ 1:N                        │          │
+│     ┌─────────────┐                          ▼                            │          │
+│     │  PROVIDERS  │◀─────────┐        ┌─────────────┐        ┌───────────────────┐   │
+│     │             │          │        │    CASES    │        │SERVICE_ELIGIBILITY│   │
+│     └──────┬──────┘          │        │             │        │                   │   │
+│            │                 │        └──────┬──────┘        └─────────┬─────────┘   │
+│            │                 │               │                         │             │
+│            │                 │ N:M           │ 1:N                     │ N:1         │
+│            │                 │               ▼                         │             │
+│            │          ┌──────┴────────────────────┐                    │             │
+│            │          │   PROVIDER_ASSIGNMENTS    │◀───────────────────┘             │
+│            │          │                           │                                   │
+│            │          └───────────────────────────┘                                   │
+│            │                                                                          │
+│            │ 1:N                                                                      │
+│            ▼                                                                          │
+│     ┌─────────────────┐       ┌─────────────┐       ┌─────────────┐                  │
+│     │OVERTIME_VIOLAT. │       │ PROVIDER_   │       │HEALTH_CARE_ │                  │
+│     │                 │       │ CORI        │       │CERTIFICATIONS│                  │
+│     └─────────────────┘       └─────────────┘       └─────────────┘                  │
+│                                                                                        │
+│     ┌─────────────┐       ┌─────────────┐       ┌─────────────┐       ┌───────────┐  │
+│     │ TIMESHEETS  │       │   TASKS     │       │NOTIFICATIONS│       │WORK_QUEUE │  │
+│     │             │       │             │       │             │       │_SUBS      │  │
+│     └─────────────┘       └─────────────┘       └─────────────┘       └───────────┘  │
+│           │                     │                     │                     │        │
+│           └─────────────────────┴─────────────────────┴─────────────────────┘        │
+│                                         │                                             │
+│                               user_id (Keycloak ref)                                  │
+│                                                                                        │
+│     ┌─────────────┐       ┌─────────────┐       ┌─────────────┐                      │
+│     │ CASE_NOTES  │       │CASE_CONTACTS│       │ EVV_RECORDS │                      │
+│     │             │       │             │       │             │                      │
+│     └─────────────┘       └─────────────┘       └─────────────┘                      │
+│                                                                                        │
+│     ┌─────────────┐                                                                   │
+│     │ AUDIT_LOG   │  ◀──── All tables trigger audit events                           │
+│     │             │                                                                   │
+│     └─────────────┘                                                                   │
+│                                                                                        │
+└────────────────────────────────────────────────────────────────────────────────────────┘</pre>
+                </div>
+            </section>
+
+            <section id="appendix-b">
+                <h2>Appendix B: Glossary</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Term</th>
+                            <th>Definition</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>CIN</strong></td>
+                            <td>Client Index Number - Cross-system identifier for recipients</td>
+                        </tr>
+                        <tr>
+                            <td><strong>IHSS</strong></td>
+                            <td>In-Home Supportive Services</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WPCS</strong></td>
+                            <td>Waiver Personal Care Services</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SOC</strong></td>
+                            <td>Share of Cost - Recipient's cost contribution</td>
+                        </tr>
+                        <tr>
+                            <td><strong>HTG</strong></td>
+                            <td>Higher Than Guidelines - Service hours indicator</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EVV</strong></td>
+                            <td>Electronic Visit Verification</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DOJ</strong></td>
+                            <td>Department of Justice (for background checks)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>PA</strong></td>
+                            <td>Public Authority (provider organization)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CORI</strong></td>
+                            <td>Criminal Offender Record Information</td>
+                        </tr>
+                        <tr>
+                            <td><strong>UMA</strong></td>
+                            <td>User-Managed Access (Keycloak authorization)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>RBAC</strong></td>
+                            <td>Role-Based Access Control</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <footer style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--text-secondary); font-size: 0.875rem;">
+                <p><strong>Document Version:</strong> 1.0</p>
+                <p><strong>Last Updated:</strong> December 2025</p>
+                <p><strong>Author:</strong> CMIPS Development Team</p>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    // Update active state
+                    document.querySelectorAll('.nav-menu a').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Highlight active section on scroll
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-menu a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

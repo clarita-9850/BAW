@@ -1,0 +1,4 @@
+id,stringField,intField,longField,doubleField,booleanField,bigDecimalField,localDateField,localDateTimeField,instantField,statusField
+1,Hello World,42,9876543210,3.14159,true,12345.6789,2024-01-15,2024-01-15T10:30:00,2024-01-15T10:30:00Z,ACTIVE
+2,Test String,100,1234567890,2.71828,false,99999.9999,2024-02-20,2024-02-20T14:45:30,2024-02-20T14:45:30Z,INACTIVE
+3,Another Value,-50,5555555555,1.41421,true,0.0001,2024-03-10,2024-03-10T08:15:00,2024-03-10T08:15:00Z,PENDING

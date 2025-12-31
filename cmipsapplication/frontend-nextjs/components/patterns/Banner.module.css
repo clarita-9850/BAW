@@ -1,0 +1,38 @@
+.heroBanner {
+  background: linear-gradient(135deg, var(--theme-primary, #1e3a8a) 0%, var(--theme-secondary, #3b82f6) 100%);
+  color: white;
+  padding: 4rem 0;
+  margin-bottom: 2rem;
+}
+
+.heroContent h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.heroDescription {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.heroImage {
+  text-align: center;
+}
+
+.heroImage img {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 991.98px) {
+  .heroContent h1 {
+    font-size: 2.5rem;
+  }
+
+  .heroBanner {
+    padding: 2rem 0;
+  }
+}
+

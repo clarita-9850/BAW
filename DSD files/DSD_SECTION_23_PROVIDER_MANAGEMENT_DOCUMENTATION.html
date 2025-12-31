@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSD Section 23 - Provider Management Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-orange: #FF9900;
+            --primary-blue: #146EB4;
+            --dark-blue: #232F3E;
+            --light-gray: #F7F7F7;
+            --border-gray: #D5D9D9;
+            --text-dark: #0F1111;
+            --success-green: #00A65A;
+            --warning-orange: #FFC107;
+            --danger-red: #DC3545;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--light-gray);
+            font-size: 14px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--dark-blue) 0%, #1a2a3a 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            font-size: 1.125rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .intro-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .intro-section h2 {
+            color: var(--dark-blue);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .intro-section p {
+            margin-bottom: 0.75rem;
+            color: #565959;
+        }
+
+        .accordion-section {
+            background: white;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .accordion-header {
+            background: var(--dark-blue);
+            color: white;
+            padding: 1.5rem 2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .accordion-header:hover {
+            background: #1a2a3a;
+        }
+
+        .accordion-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-number {
+            background: var(--primary-orange);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        .accordion-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .accordion-section.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+
+        .accordion-section.active .accordion-content {
+            max-height: 10000px;
+            transition: max-height 0.6s ease-in;
+        }
+
+        .content-inner {
+            padding: 2rem;
+        }
+
+        .sub-accordion {
+            margin: 1rem 0;
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+        }
+
+        .sub-accordion-header {
+            background: var(--light-gray);
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .sub-accordion-header:hover {
+            background: #EAEDED;
+        }
+
+        .sub-accordion-header h3 {
+            color: var(--primary-blue);
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .sub-accordion-icon {
+            color: var(--primary-blue);
+            transition: transform 0.3s;
+        }
+
+        .sub-accordion.active .sub-accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .sub-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .sub-accordion.active .sub-accordion-content {
+            max-height: 5000px;
+            transition: max-height 0.5s ease-in;
+        }
+
+        .sub-content-inner {
+            padding: 1.5rem;
+            background: white;
+        }
+
+        h3 {
+            color: var(--primary-blue);
+            font-size: 1.25rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        h4 {
+            color: var(--text-dark);
+            font-size: 1.125rem;
+            margin: 1rem 0 0.75rem;
+        }
+
+        ul, ol {
+            margin: 1rem 0 1rem 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        .info-box {
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+
+        .info-box.primary {
+            background: #FEF9E7;
+            border-color: var(--primary-orange);
+        }
+
+        .info-box.success {
+            background: #E8F5E9;
+            border-color: var(--success-green);
+        }
+
+        .info-box.info {
+            background: #E3F2FD;
+            border-color: var(--primary-blue);
+        }
+
+        .info-box.warning {
+            background: #FFF9E6;
+            border-color: var(--warning-orange);
+        }
+
+        .info-box.danger {
+            background: #FFEBEE;
+            border-color: var(--danger-red);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        th {
+            background: var(--dark-blue);
+            color: white;
+            padding: 0.875rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        td {
+            padding: 0.875rem;
+            border-bottom: 1px solid var(--border-gray);
+            font-size: 0.875rem;
+        }
+
+        tr:hover {
+            background: var(--light-gray);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+
+        .badge.primary {
+            background: #FFF3CD;
+            color: #856404;
+        }
+
+        .badge.success {
+            background: #D4EDDA;
+            color: #155724;
+        }
+
+        .badge.info {
+            background: #D1ECF1;
+            color: #0C5460;
+        }
+
+        .badge.danger {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+
+        code {
+            background: #F4F4F4;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875em;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .feature-card {
+            background: var(--light-gray);
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--primary-blue);
+        }
+
+        .feature-card h4 {
+            margin-top: 0;
+            font-size: 1rem;
+        }
+
+        .workflow-step {
+            background: white;
+            border-left: 3px solid var(--primary-blue);
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 4px;
+        }
+
+        .workflow-step h4 {
+            margin: 0 0 0.5rem 0;
+            color: var(--primary-blue);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #767676;
+            font-size: 0.875rem;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            .header h1 {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>👤 DSD Section 23</h1>
+        <div class="subtitle">Provider Management - Complete Technical Documentation</div>
+    </div>
+
+    <div class="container">
+        <div class="intro-section">
+            <h2>📖 Document Overview</h2>
+            <p><strong>Document Title:</strong> DSD Section 23 - Recipient Case Management & Ongoing Services - Provider Management</p>
+            <p><strong>Scope:</strong> Complete technical specifications for managing IHSS providers including enrollment, assignment, compliance, and payment</p>
+            <p><strong>Audience:</strong> County staff, provider coordinators, payroll administrators, system developers, and business analysts</p>
+            <p><strong>Purpose:</strong> Define all processes for provider lifecycle management from enrollment through termination, including FLSA compliance and overtime tracking</p>
+            <p><strong>Complexity:</strong> 380+ error messages, 330+ business rules, 120+ screen designs</p>
+        </div>
+
+        <!-- Section 1: Provider Enrollment & Lifecycle -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">1</span>
+                    Provider Enrollment & Lifecycle Management
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <h3>Overview</h3>
+                    <p>Complete provider lifecycle management from initial enrollment through assignment, maintenance, and termination.</p>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Create & Enroll Provider</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Provider Enrollment Process:</h4>
+                                <div class="workflow-step">
+                                    <h4>Step 1: Person Search</h4>
+                                    <p>Search for provider in system to avoid duplicate enrollments. Search by SSN, name, or Person ID.</p>
+                                </div>
+                                <div class="workflow-step">
+                                    <h4>Step 2: Create Provider Person</h4>
+                                    <p>If not found, create new provider person record with demographic information.</p>
+                                </div>
+                                <div class="workflow-step">
+                                    <h4>Step 3: Provider Enrollment</h4>
+                                    <p>Complete enrollment forms including W-4, DE-4, I-9, Provider Enrollment Application.</p>
+                                </div>
+                                <div class="workflow-step">
+                                    <h4>Step 4: Background Check (CORI)</h4>
+                                    <p>Criminal Offender Record Information check required before approval.</p>
+                                </div>
+                                <div class="workflow-step">
+                                    <h4>Step 5: Enrollment Approval</h4>
+                                    <p>Supervisor reviews and approves or rejects enrollment.</p>
+                                </div>
+
+                                <h4>Required Information:</h4>
+                                <ul>
+                                    <li><strong>Personal Information:</strong> Name, address, phone, email, SSN, date of birth</li>
+                                    <li><strong>Tax Information:</strong> W-4 (federal), DE-4 (state) withholding elections</li>
+                                    <li><strong>I-9 Employment Eligibility:</strong> Citizenship/work authorization documentation</li>
+                                    <li><strong>Direct Deposit:</strong> Bank account information for electronic payment</li>
+                                    <li><strong>Emergency Contact:</strong> Person to contact in emergency</li>
+                                </ul>
+
+                                <div class="info-box warning">
+                                    <h4>Provider Eligibility Requirements</h4>
+                                    <ul>
+                                        <li>Must be at least 18 years old</li>
+                                        <li>Must have valid Social Security Number</li>
+                                        <li>Must pass criminal background check</li>
+                                        <li>Cannot be recipient's legally responsible relative (unless exception applies)</li>
+                                        <li>Cannot have disqualifying criminal convictions (unless recipient waiver granted)</li>
+                                    </ul>
+                                </div>
+
+                                <h4>Provider Types:</h4>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th>Special Rules</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Individual Provider</td>
+                                            <td>Independent contractor providing services</td>
+                                            <td>Most common provider type</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Live-in Provider</td>
+                                            <td>Resides in recipient's home</td>
+                                            <td>Different overtime rules apply</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Parent as Provider</td>
+                                            <td>Parent of minor recipient</td>
+                                            <td>Requires special approval</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Spouse as Provider</td>
+                                            <td>Spouse of recipient</td>
+                                            <td>Limited circumstances</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Provider Assignment to Cases</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <p>Assign approved providers to recipient cases with specific hours and start dates.</p>
+                                <h4>Assignment Requirements:</h4>
+                                <ul>
+                                    <li><strong>Provider Status:</strong> Must be approved and active</li>
+                                    <li><strong>Case Status:</strong> Case must have approved/authorized hours</li>
+                                    <li><strong>Assignment Start Date:</strong> Cannot be before case authorization</li>
+                                    <li><strong>Provider Hours:</strong> Cannot exceed case authorized hours</li>
+                                    <li><strong>Relationship Check:</strong> System validates provider-recipient relationship</li>
+                                </ul>
+
+                                <h4>Case Provider Operations:</h4>
+                                <ul>
+                                    <li><strong>Assign Provider:</strong> Add provider to recipient case</li>
+                                    <li><strong>Create/Modify Hours:</strong> Set IHSS hours for provider</li>
+                                    <li><strong>WPCS Details:</strong> Assign Waiver Personal Care Service hours (if applicable)</li>
+                                    <li><strong>View Provider Hours History:</strong> Track all hour changes</li>
+                                    <li><strong>Leave/Terminate Provider:</strong> End provider assignment</li>
+                                </ul>
+
+                                <div class="info-box info">
+                                    <h4>Multiple Providers per Case</h4>
+                                    <p>A recipient case can have multiple assigned providers. Total hours assigned to all providers cannot exceed the case's authorized hours.</p>
+                                </div>
+
+                                <h4>Provider Hours Types:</h4>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Hour Type</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>IHSS Hours</td>
+                                            <td>Regular In-Home Supportive Services hours</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WPCS Hours</td>
+                                            <td>Waiver Personal Care Services hours (additional)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Backup Provider Hours</td>
+                                            <td>Hours for backup/secondary provider</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Travel Time Hours</td>
+                                            <td>Compensation for travel between recipient locations</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Maintain Provider Information</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Modifiable Provider Information:</h4>
+                                <ul>
+                                    <li><strong>Demographics:</strong> Name, address, phone, email</li>
+                                    <li><strong>Tax Withholding:</strong> W-4 and DE-4 updates</li>
+                                    <li><strong>Direct Deposit:</strong> Bank account changes</li>
+                                    <li><strong>Timesheet Preferences:</strong> TTS, ESP, paper timesheet selection</li>
+                                    <li><strong>Communication Preferences:</strong> Email, text, phone notifications</li>
+                                    <li><strong>Benefits Enrollment:</strong> Health benefits deduction elections</li>
+                                </ul>
+
+                                <h4>Provider Status Values:</h4>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Status</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="badge info">Pending</span></td>
+                                            <td>Enrollment submitted, awaiting approval</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge success">Approved</span></td>
+                                            <td>Enrollment approved, provider can be assigned</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge success">Active</span></td>
+                                            <td>Provider is assigned to one or more cases</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge primary">Inactive</span></td>
+                                            <td>Provider not currently assigned to any cases</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge danger">Rejected</span></td>
+                                            <td>Enrollment rejected (failed background check, etc.)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge danger">Ineligible</span></td>
+                                            <td>Provider made ineligible (fraud, policy violation)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Terminate Provider</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Provider Termination Reasons:</h4>
+                                <ul>
+                                    <li><strong>Provider Request:</strong> Provider no longer wishes to provide services</li>
+                                    <li><strong>Recipient Request:</strong> Recipient no longer wants this provider</li>
+                                    <li><strong>No Longer Providing Services:</strong> Provider stopped working</li>
+                                    <li><strong>Policy Violation:</strong> Provider violated IHSS policies</li>
+                                    <li><strong>Fraud:</strong> Provider committed timesheet fraud or other fraud</li>
+                                    <li><strong>Failed Background Check:</strong> New criminal conviction</li>
+                                    <li><strong>Deceased:</strong> Provider has died</li>
+                                </ul>
+
+                                <h4>Termination Process:</h4>
+                                <ol>
+                                    <li><strong>Leave/Terminate Assignment:</strong> End specific case assignments first</li>
+                                    <li><strong>Set Termination Date:</strong> Last date provider worked</li>
+                                    <li><strong>Document Reason:</strong> Select termination reason and add notes</li>
+                                    <li><strong>Final Timesheet:</strong> Ensure final timesheet is submitted/processed</li>
+                                    <li><strong>Provider Status:</strong> System updates provider to Inactive status</li>
+                                </ol>
+
+                                <div class="info-box warning">
+                                    <h4>Termination vs. Ineligible</h4>
+                                    <p><strong>Terminate:</strong> Ends provider's work assignments but provider can be re-enrolled in the future.</p>
+                                    <p><strong>Ineligible:</strong> Provider is permanently barred from IHSS (serious fraud, abuse). Cannot be re-enrolled without state approval.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: CORI Background Checks -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">2</span>
+                    CORI - Criminal Background Checks
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p>Criminal Offender Record Information (CORI) background checks are mandatory for all IHSS providers.</p>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>CORI Requirements & Process</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>When CORI is Required:</h4>
+                                <ul>
+                                    <li><strong>Initial Enrollment:</strong> All new provider applicants</li>
+                                    <li><strong>Re-enrollment:</strong> Providers returning after 12+ months inactive</li>
+                                    <li><strong>Periodic Re-check:</strong> Counties may require periodic re-checks</li>
+                                    <li><strong>Cause-based Check:</strong> If provider is arrested or charged with crime</li>
+                                </ul>
+
+                                <h4>CORI Checks Include:</h4>
+                                <div class="feature-grid">
+                                    <div class="feature-card">
+                                        <h4>State Criminal History</h4>
+                                        <p>California Department of Justice (DOJ) criminal record check</p>
+                                    </div>
+                                    <div class="feature-card">
+                                        <h4>National Sex Offender Registry</h4>
+                                        <p>FBI National Sex Offender Registry check</p>
+                                    </div>
+                                    <div class="feature-card">
+                                        <h4>Child Abuse Registry</h4>
+                                        <p>Check for substantiated child abuse reports</p>
+                                    </div>
+                                    <div class="feature-card">
+                                        <h4>Excluded Provider List</h4>
+                                        <p>Federal/State lists of excluded healthcare providers</p>
+                                    </div>
+                                </div>
+
+                                <h4>CORI Operations:</h4>
+                                <ul>
+                                    <li><strong>Create CORI:</strong> Initiate background check request</li>
+                                    <li><strong>View CORI:</strong> Review background check results</li>
+                                    <li><strong>Modify CORI:</strong> Update CORI information</li>
+                                    <li><strong>Inactivate CORI:</strong> Close CORI record</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Disqualifying Convictions</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Tier 1 - Permanently Disqualifying (No Waiver):</h4>
+                                <ul>
+                                    <li>Murder</li>
+                                    <li>Rape</li>
+                                    <li>Child molestation</li>
+                                    <li>Sexual abuse of a minor</li>
+                                    <li>Kidnapping</li>
+                                    <li>Human trafficking</li>
+                                </ul>
+                                <div class="info-box danger">
+                                    <h4>Tier 1 Convictions</h4>
+                                    <p>Providers with Tier 1 convictions can NEVER be approved for IHSS, regardless of how long ago the conviction occurred. No waiver or exception possible.</p>
+                                </div>
+
+                                <h4>Tier 2 - Disqualifying (Waiver Possible):</h4>
+                                <ul>
+                                    <li>Elder abuse</li>
+                                    <li>Dependent adult abuse</li>
+                                    <li>Assault with deadly weapon</li>
+                                    <li>Battery causing serious injury</li>
+                                    <li>Robbery</li>
+                                    <li>Burglary of residence</li>
+                                    <li>Fraud against government program</li>
+                                    <li>Drug trafficking</li>
+                                    <li>Theft from elder/dependent adult</li>
+                                </ul>
+
+                                <h4>Tier 2 Waiver Options:</h4>
+                                <div class="feature-grid">
+                                    <div class="feature-card">
+                                        <h4>General Exception</h4>
+                                        <p>County may grant exception if conviction was 10+ years ago and provider demonstrates rehabilitation</p>
+                                    </div>
+                                    <div class="feature-card">
+                                        <h4>Recipient Waiver</h4>
+                                        <p>Recipient may waive disqualifying conviction to hire preferred provider</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Recipient Waiver -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">3</span>
+                    Recipient Waiver Process
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p>Recipients may waive certain criminal background disqualifications to hire their preferred provider.</p>
+
+                    <div class="info-box warning">
+                        <h4>Waiver Requirements</h4>
+                        <ul>
+                            <li>Only applies to Tier 2 disqualifying convictions</li>
+                            <li>Recipient must be fully informed of provider's criminal history</li>
+                            <li>Recipient must sign written waiver acknowledging risks</li>
+                            <li>County must approve waiver request</li>
+                            <li>Waiver is case-specific (applies only to that recipient-provider relationship)</li>
+                        </ul>
+                    </div>
+
+                    <h4>Recipient Waiver Process:</h4>
+                    <div class="workflow-step">
+                        <h4>Step 1: Provider Background Check Returns Tier 2 Conviction</h4>
+                        <p>Provider enrollment is initially denied due to disqualifying conviction.</p>
+                    </div>
+                    <div class="workflow-step">
+                        <h4>Step 2: Recipient Requests Waiver</h4>
+                        <p>Recipient indicates desire to hire provider despite criminal history.</p>
+                    </div>
+                    <div class="workflow-step">
+                        <h4>Step 3: Criminal History Disclosure</h4>
+                        <p>County provides recipient with full details of provider's conviction(s).</p>
+                    </div>
+                    <div class="workflow-step">
+                        <h4>Step 4: Recipient Signs Waiver Form</h4>
+                        <p>Recipient completes and signs SOC 2298 - Recipient Waiver form, acknowledging they understand the risks.</p>
+                    </div>
+                    <div class="workflow-step">
+                        <h4>Step 5: County Reviews Waiver Request</h4>
+                        <p>County reviews waiver considering nature of conviction, time elapsed, and recipient's wishes.</p>
+                    </div>
+                    <div class="workflow-step">
+                        <h4>Step 6: County Approves or Denies</h4>
+                        <p>County makes final determination. If approved, provider can be hired for that specific case only.</p>
+                    </div>
+
+                    <h4>Waiver Operations:</h4>
+                    <ul>
+                        <li><strong>Create Recipient Waiver:</strong> Document waiver request and form</li>
+                        <li><strong>View Recipient Waiver:</strong> Review waiver details</li>
+                        <li><strong>Modify Recipient Waiver:</strong> Update waiver information</li>
+                        <li><strong>Inactivate Recipient Waiver:</strong> End waiver (provider no longer works for recipient)</li>
+                    </ul>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Waiver Field</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Waiver Request Date</td>
+                                <td>Date recipient requested waiver</td>
+                            </tr>
+                            <tr>
+                                <td>Waiver Form Signed Date</td>
+                                <td>Date recipient signed SOC 2298 form</td>
+                            </tr>
+                            <tr>
+                                <td>County Decision</td>
+                                <td>Approved or Denied</td>
+                            </tr>
+                            <tr>
+                                <td>County Decision Date</td>
+                                <td>Date county made decision</td>
+                            </tr>
+                            <tr>
+                                <td>Conviction Details</td>
+                                <td>Description of provider's criminal conviction</td>
+                            </tr>
+                            <tr>
+                                <td>Waiver Justification</td>
+                                <td>Why recipient wants to hire this provider despite conviction</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box primary">
+                        <h4>Waiver Scope</h4>
+                        <p>Recipient waivers are case-specific. If the provider wants to work for a different recipient, that recipient must also sign a waiver.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Travel Time -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">4</span>
+                    Provider Travel Time Compensation
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p>Providers who work for multiple recipients may be eligible for travel time compensation when traveling directly from one recipient to another.</p>
+
+                    <div class="info-box info">
+                        <h4>Travel Time Eligibility</h4>
+                        <p>Travel time is compensable when a provider travels directly between two recipient homes during their workday. Travel from home to first recipient or from last recipient to home is NOT compensable.</p>
+                    </div>
+
+                    <h4>Travel Time Rules:</h4>
+                    <ul>
+                        <li><strong>Between Recipients Only:</strong> Must travel directly from Recipient A to Recipient B</li>
+                        <li><strong>Same Workday:</strong> Both work shifts must be on the same day</li>
+                        <li><strong>Reasonable Route:</strong> Most direct route between locations</li>
+                        <li><strong>No Detours:</strong> Cannot claim travel time for personal errands en route</li>
+                        <li><strong>County-Approved:</strong> Travel time must be pre-approved by county</li>
+                    </ul>
+
+                    <h4>Travel Time Calculation:</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Distance</th>
+                                <th>Typical Travel Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>0-5 miles</td>
+                                <td>0.25 hours (15 minutes)</td>
+                            </tr>
+                            <tr>
+                                <td>5-10 miles</td>
+                                <td>0.5 hours (30 minutes)</td>
+                            </tr>
+                            <tr>
+                                <td>10-20 miles</td>
+                                <td>0.75 hours (45 minutes)</td>
+                            </tr>
+                            <tr>
+                                <td>20+ miles</td>
+                                <td>1.0+ hours (based on actual travel time)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Travel Time Operations:</h4>
+                    <ul>
+                        <li><strong>Create Travel Time:</strong> Set up travel time between two recipients</li>
+                        <li><strong>Select Traveling From Recipient:</strong> Choose origin recipient</li>
+                        <li><strong>Select Traveling To Recipient:</strong> Choose destination recipient</li>
+                        <li><strong>View Travel Time:</strong> Review travel time details</li>
+                        <li><strong>Modify Travel Time:</strong> Update travel hours or dates</li>
+                        <li><strong>Leave/Terminate Travel Time:</strong> End travel time authorization</li>
+                        <li><strong>Travel Time History:</strong> Track all travel time changes</li>
+                    </ul>
+
+                    <div class="info-box warning">
+                        <h4>Travel Time & Overtime</h4>
+                        <p>Travel time counts toward provider's weekly hours for overtime calculation. If travel time causes provider to exceed 40 hours/week, overtime pay applies.</p>
+                    </div>
+
+                    <h4>Example Travel Time Scenario:</h4>
+                    <p><strong>Provider Schedule:</strong></p>
+                    <ul>
+                        <li>8:00 AM - 12:00 PM: Work for Recipient A (4 hours)</li>
+                        <li>12:00 PM - 12:30 PM: Travel from A to B (0.5 hours - compensable)</li>
+                        <li>12:30 PM - 4:30 PM: Work for Recipient B (4 hours)</li>
+                    </ul>
+                    <p><strong>Total Compensable Hours:</strong> 8.5 hours (8 work hours + 0.5 travel hours)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Provider Workweek Agreement -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">5</span>
+                    Provider Workweek Agreement (SOC 2255)
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p>Provider Workweek Agreements define the 7-day workweek period used to calculate overtime for FLSA compliance.</p>
+
+                    <div class="info-box primary">
+                        <h4>What is a Workweek?</h4>
+                        <p>Under the Fair Labor Standards Act (FLSA), overtime is calculated based on a fixed 7-consecutive-day workweek. The Provider Workweek Agreement (SOC 2255) establishes which 7 days constitute the provider's workweek.</p>
+                    </div>
+
+                    <h4>Workweek Requirements:</h4>
+                    <ul>
+                        <li><strong>7 Consecutive Days:</strong> Must be fixed 7-day period (e.g., Sunday-Saturday, Monday-Sunday)</li>
+                        <li><strong>Same for All Recipients:</strong> Provider uses same workweek for all their recipient cases</li>
+                        <li><strong>Cannot Change Frequently:</strong> Workweek should remain consistent; changes require new agreement</li>
+                        <li><strong>Signed Agreement Required:</strong> Provider and recipient(s) must sign SOC 2255 form</li>
+                    </ul>
+
+                    <h4>Common Workweek Configurations:</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Workweek</th>
+                                <th>Days</th>
+                                <th>When Used</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Sunday - Saturday</td>
+                                <td>Sun, Mon, Tue, Wed, Thu, Fri, Sat</td>
+                                <td>Most common - matches calendar week</td>
+                            </tr>
+                            <tr>
+                                <td>Monday - Sunday</td>
+                                <td>Mon, Tue, Wed, Thu, Fri, Sat, Sun</td>
+                                <td>Common for business week alignment</td>
+                            </tr>
+                            <tr>
+                                <td>Saturday - Friday</td>
+                                <td>Sat, Sun, Mon, Tue, Wed, Thu, Fri</td>
+                                <td>Less common, but valid</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Provider Workweek Agreement Operations:</h4>
+                    <ul>
+                        <li><strong>Create Workweek Agreement:</strong> Establish workweek definition</li>
+                        <li><strong>Select Recipient(s):</strong> Apply workweek to all recipients provider works for</li>
+                        <li><strong>View Workweek Agreement:</strong> Review current workweek</li>
+                        <li><strong>Modify Workweek Agreement:</strong> Update workweek (requires new signed form)</li>
+                        <li><strong>Inactivate Workweek Agreement:</strong> End agreement when provider stops working</li>
+                        <li><strong>Workweek Agreement History:</strong> Track all workweek changes</li>
+                    </ul>
+
+                    <div class="info-box warning">
+                        <h4>Importance of Workweek Agreement</h4>
+                        <p>Without a properly executed Provider Workweek Agreement, the system cannot accurately calculate overtime. This can result in underpayment to providers and FLSA violations for the county.</p>
+                    </div>
+
+                    <h4>Example:</h4>
+                    <p><strong>Provider's Workweek:</strong> Sunday through Saturday</p>
+                    <p><strong>Hours Worked:</strong></p>
+                    <ul>
+                        <li>Sunday: 6 hours</li>
+                        <li>Monday: 8 hours</li>
+                        <li>Tuesday: 8 hours</li>
+                        <li>Wednesday: 10 hours</li>
+                        <li>Thursday: 8 hours</li>
+                        <li>Friday: 4 hours</li>
+                        <li>Saturday: 0 hours</li>
+                    </ul>
+                    <p><strong>Total Weekly Hours:</strong> 44 hours</p>
+                    <p><strong>Overtime Calculation:</strong> 4 hours over 40 hours = 4 hours at time-and-a-half rate</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: Provider Overtime Violations -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">6</span>
+                    Provider Overtime Violations & Tracking
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p>Comprehensive tracking system for detecting and managing provider overtime violations to ensure FLSA compliance.</p>
+
+                    <div class="info-box danger">
+                        <h4>What is an Overtime Violation?</h4>
+                        <p>An overtime violation occurs when a provider works more than 40 hours in their defined workweek for a single recipient WITHOUT an approved Recipient Overtime Agreement in place.</p>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Automatic Overtime Detection</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>System Monitoring:</h4>
+                                <p>CMIPS automatically detects overtime violations by:</p>
+                                <ul>
+                                    <li><strong>Timesheet Review:</strong> Analyzes submitted timesheets for hours over 40/week</li>
+                                    <li><strong>Workweek Calculation:</strong> Uses provider's defined workweek period</li>
+                                    <li><strong>Agreement Check:</strong> Verifies if Recipient Overtime Agreement exists</li>
+                                    <li><strong>Violation Generation:</strong> Creates violation record if no agreement found</li>
+                                </ul>
+
+                                <h4>Violation Detection Triggers:</h4>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Scenario</th>
+                                            <th>Violation?</th>
+                                            <th>Explanation</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>45 hours in week, no OT agreement</td>
+                                            <td><span class="badge danger">YES</span></td>
+                                            <td>Violation - worked over 40 without authorization</td>
+                                        </tr>
+                                        <tr>
+                                            <td>45 hours in week, OT agreement in place</td>
+                                            <td><span class="badge success">NO</span></td>
+                                            <td>Legal - overtime pre-authorized</td>
+                                        </tr>
+                                        <tr>
+                                            <td>50 hours across 2 recipients</td>
+                                            <td><span class="badge success">NO</span></td>
+                                            <td>Legal - overtime applies per recipient, not total</td>
+                                        </tr>
+                                        <tr>
+                                            <td>35 hours in week</td>
+                                            <td><span class="badge success">NO</span></td>
+                                            <td>No violation - under 40 hours</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Violation Review Process</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <p>Multi-level review process for overtime violations with county, state, and CDSS involvement.</p>
+
+                                <h4>Review Levels:</h4>
+                                <div class="workflow-step">
+                                    <h4>Level 1: County Review</h4>
+                                    <p>County caseworker reviews violation, determines if legitimate or error.</p>
+                                    <ul>
+                                        <li><strong>Sustained:</strong> Violation is confirmed</li>
+                                        <li><strong>Not Sustained:</strong> Violation was system error or other non-violation</li>
+                                        <li><strong>County Supervisor Approval:</strong> Supervisor must approve county decision</li>
+                                    </ul>
+                                </div>
+
+                                <div class="workflow-step">
+                                    <h4>Level 2: County Dispute (Optional)</h4>
+                                    <p>If county disagrees with state assessment, county can dispute.</p>
+                                    <ul>
+                                        <li><strong>Dispute Reason:</strong> County explains why they disagree</li>
+                                        <li><strong>Supporting Documentation:</strong> County provides evidence</li>
+                                        <li><strong>County Supervisor Approval:</strong> Supervisor must approve dispute</li>
+                                    </ul>
+                                </div>
+
+                                <div class="workflow-step">
+                                    <h4>Level 3: State Review</h4>
+                                    <p>State IHSS office reviews county's determination.</p>
+                                    <ul>
+                                        <li><strong>Agree with County:</strong> Accepts county finding</li>
+                                        <li><strong>Disagree with County:</strong> Overrules county, sends to CDSS</li>
+                                        <li><strong>State Supervisor Approval:</strong> State supervisor must approve</li>
+                                    </ul>
+                                </div>
+
+                                <div class="workflow-step">
+                                    <h4>Level 4: CDSS Review (Final)</h4>
+                                    <p>California Department of Social Services makes final determination.</p>
+                                    <ul>
+                                        <li><strong>Final Decision:</strong> CDSS decision is binding</li>
+                                        <li><strong>CDSS Supervisor Approval:</strong> CDSS supervisor approves final outcome</li>
+                                    </ul>
+                                </div>
+
+                                <h4>Violation Outcomes:</h4>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Outcome</th>
+                                            <th>Result</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Not Sustained</td>
+                                            <td>Violation dismissed, no action taken</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Warning</td>
+                                            <td>First offense, provider warned, no penalty</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Penalty</td>
+                                            <td>Provider/recipient may face penalties (payment recovery, case restrictions)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Provider Ineligibility</td>
+                                            <td>Serious/repeat violations may result in provider being barred from IHSS</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Violation Tracking & History</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Violation Operations:</h4>
+                                <ul>
+                                    <li><strong>View Overtime Violations:</strong> See all violations for provider</li>
+                                    <li><strong>Violation Details History:</strong> Complete timeline of violation</li>
+                                    <li><strong>Modify County Review:</strong> County staff updates review decision</li>
+                                    <li><strong>Modify County Supervisor Review:</strong> Supervisor approves county review</li>
+                                    <li><strong>Modify County Dispute:</strong> County files dispute with state</li>
+                                    <li><strong>Modify Dispute Supervisor:</strong> Supervisor approves dispute</li>
+                                    <li><strong>Modify State Review:</strong> State updates their review</li>
+                                    <li><strong>Modify State Supervisor Review:</strong> State supervisor approval</li>
+                                    <li><strong>Modify CDSS Review:</strong> CDSS enters final determination</li>
+                                    <li><strong>Modify CDSS Supervisor Review:</strong> CDSS supervisor approval</li>
+                                </ul>
+
+                                <h4>Violation Tracking Report Shows:</h4>
+                                <ul>
+                                    <li>Violation date and hours worked</li>
+                                    <li>Recipient case involved</li>
+                                    <li>County review status and outcome</li>
+                                    <li>State review status and outcome</li>
+                                    <li>CDSS final determination</li>
+                                    <li>Any penalties imposed</li>
+                                    <li>Pattern of violations (first, second, repeat offender)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 7: Overtime Exemptions -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">7</span>
+                    Overtime Violation Exemptions
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p>Extraordinary circumstances may warrant exemption from overtime violation penalties.</p>
+
+                    <div class="info-box warning">
+                        <h4>Exemption Purpose</h4>
+                        <p>Overtime exemptions are granted only in extraordinary circumstances where the overtime violation was unavoidable and necessary for recipient health/safety.</p>
+                    </div>
+
+                    <h4>Qualifying Extraordinary Circumstances:</h4>
+                    <ul>
+                        <li><strong>Emergency Medical Situation:</strong> Recipient had medical emergency requiring extended provider presence</li>
+                        <li><strong>Hospitalization:</strong> Recipient hospitalized, provider needed for continuity of care</li>
+                        <li><strong>Natural Disaster:</strong> Earthquake, fire, flood required provider to stay beyond normal hours</li>
+                        <li><strong>Sudden Provider Unavailability:</strong> Backup provider suddenly unavailable, primary provider had to cover</li>
+                        <li><strong>COVID-19 or Pandemic:</strong> Pandemic-related circumstances prevented normal staffing</li>
+                    </ul>
+
+                    <h4>Exemption Request Process:</h4>
+                    <div class="workflow-step">
+                        <h4>Step 1: Exemption Request</h4>
+                        <p>County or provider requests exemption, explaining extraordinary circumstances.</p>
+                    </div>
+                    <div class="workflow-step">
+                        <h4>Step 2: Documentation</h4>
+                        <p>Provide supporting documentation (hospital records, emergency reports, etc.).</p>
+                    </div>
+                    <div class="workflow-step">
+                        <h4>Step 3: County Review</h4>
+                        <p>County reviews circumstances and makes recommendation.</p>
+                    </div>
+                    <div class="workflow-step">
+                        <h4>Step 4: State Approval</h4>
+                        <p>State IHSS office reviews and approves or denies exemption.</p>
+                    </div>
+
+                    <h4>Exemption Operations:</h4>
+                    <ul>
+                        <li><strong>Create Overtime Exemption:</strong> Request exemption for specific violation</li>
+                        <li><strong>View Overtime Exemption:</strong> Review exemption details</li>
+                        <li><strong>Modify Overtime Exemption:</strong> Update exemption information</li>
+                        <li><strong>Inactivate Overtime Exemption:</strong> Withdraw exemption request</li>
+                        <li><strong>Exemption History:</strong> Track all exemption requests and outcomes</li>
+                    </ul>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Exemption Status</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge primary">Requested</span></td>
+                                <td>Exemption request submitted, pending review</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge info">Under Review</span></td>
+                                <td>County or state currently reviewing request</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge success">Approved</span></td>
+                                <td>Exemption granted, violation excused</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge danger">Denied</span></td>
+                                <td>Exemption denied, violation stands</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box primary">
+                        <h4>Exemption vs. Overtime Agreement</h4>
+                        <p><strong>Overtime Exemption:</strong> Excuses an overtime violation that already occurred due to extraordinary circumstances.</p>
+                        <p><strong>Recipient Overtime Agreement:</strong> Pre-authorizes provider to regularly work over 40 hours/week, preventing violations from occurring.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 8: Provider Benefits & Deductions -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">8</span>
+                    Provider Benefits & Deductions
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p>Management of provider health benefits enrollment and payroll deductions.</p>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Health Benefits Enrollment</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Eligible Providers:</h4>
+                                <p>Providers who work a minimum number of hours per month may be eligible for health benefits through the county's provider benefits program.</p>
+
+                                <h4>Typical Benefits Available:</h4>
+                                <ul>
+                                    <li><strong>Medical Insurance:</strong> Health coverage for provider</li>
+                                    <li><strong>Dental Insurance:</strong> Dental coverage</li>
+                                    <li><strong>Vision Insurance:</strong> Vision coverage</li>
+                                    <li><strong>Dependent Coverage:</strong> Coverage for provider's family members</li>
+                                </ul>
+
+                                <h4>Benefits Deduction Operations:</h4>
+                                <ul>
+                                    <li><strong>Create Benefits Deduction:</strong> Enroll provider in benefits</li>
+                                    <li><strong>View Benefits Deduction:</strong> Review current benefits enrollment</li>
+                                    <li><strong>Modify Benefits Deduction:</strong> Change benefits elections (during open enrollment or qualifying event)</li>
+                                    <li><strong>Terminate Benefits:</strong> End benefits coverage</li>
+                                </ul>
+
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Deduction Type</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Medical - Employee Only</td>
+                                            <td>Coverage for provider only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Medical - Employee + Spouse</td>
+                                            <td>Coverage for provider and spouse</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Medical - Employee + Children</td>
+                                            <td>Coverage for provider and children</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Medical - Family</td>
+                                            <td>Coverage for provider, spouse, and children</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Dental</td>
+                                            <td>Dental insurance</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Vision</td>
+                                            <td>Vision insurance</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Payroll Deductions</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Automatic Deductions:</h4>
+                                <ul>
+                                    <li><strong>Federal Income Tax:</strong> Based on W-4 elections</li>
+                                    <li><strong>State Income Tax:</strong> Based on DE-4 elections</li>
+                                    <li><strong>Social Security Tax (FICA):</strong> 6.2% of gross wages</li>
+                                    <li><strong>Medicare Tax:</strong> 1.45% of gross wages</li>
+                                    <li><strong>State Disability Insurance (SDI):</strong> California SDI withholding</li>
+                                </ul>
+
+                                <h4>Voluntary Deductions:</h4>
+                                <ul>
+                                    <li><strong>Health Benefits Premium:</strong> Employee share of health insurance</li>
+                                    <li><strong>Union Dues:</strong> If provider is union member</li>
+                                    <li><strong>Retirement Contributions:</strong> 401(k) or other retirement plans (if available)</li>
+                                </ul>
+
+                                <div class="info-box info">
+                                    <h4>Deduction Priority</h4>
+                                    <p>When provider's paycheck is not enough to cover all deductions:</p>
+                                    <ol>
+                                        <li>Mandatory taxes (FICA, Medicare, federal/state income tax)</li>
+                                        <li>Court-ordered garnishments</li>
+                                        <li>Health benefits premiums</li>
+                                        <li>Other voluntary deductions</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 9: Provider Sick Leave -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">9</span>
+                    Provider Sick Leave
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p>California law requires paid sick leave for IHSS providers.</p>
+
+                    <div class="info-box success">
+                        <h4>Sick Leave Accrual</h4>
+                        <p>Providers accrue 1 hour of paid sick leave for every 30 hours worked, up to a maximum accrual cap.</p>
+                    </div>
+
+                    <h4>Sick Leave Rules:</h4>
+                    <ul>
+                        <li><strong>Accrual Rate:</strong> 1 hour per 30 hours worked</li>
+                        <li><strong>Maximum Accrual:</strong> Typically 48 hours (varies by county)</li>
+                        <li><strong>Usage Cap:</strong> Can use up to 24 hours per year</li>
+                        <li><strong>Eligibility:</strong> Available after 90 days of employment</li>
+                        <li><strong>Carryover:</strong> Unused hours carry over to next year (up to cap)</li>
+                    </ul>
+
+                    <h4>Sick Leave Usage:</h4>
+                    <p>Providers can use sick leave for:</p>
+                    <ul>
+                        <li>Provider's own illness or medical appointments</li>
+                        <li>Care for sick family member</li>
+                        <li>Preventive care (doctor visits, health screenings)</li>
+                        <li>Domestic violence, sexual assault, or stalking situations</li>
+                    </ul>
+
+                    <h4>Sick Leave Operations:</h4>
+                    <ul>
+                        <li><strong>View Sick Leave Hours:</strong> Check provider's current accrued balance</li>
+                        <li><strong>View Sick Leave Details:</strong> See accrual and usage history</li>
+                        <li><strong>Sick Leave on Timesheet:</strong> Provider marks hours as sick leave when submitting timesheet</li>
+                    </ul>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Hours Accrued</td>
+                                <td>Total sick leave hours earned to date</td>
+                            </tr>
+                            <tr>
+                                <td>Hours Used</td>
+                                <td>Sick leave hours used to date</td>
+                            </tr>
+                            <tr>
+                                <td>Hours Available</td>
+                                <td>Current balance available for use</td>
+                            </tr>
+                            <tr>
+                                <td>Year-to-Date Used</td>
+                                <td>Hours used in current calendar year</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box primary">
+                        <h4>Sick Leave Payment</h4>
+                        <p>When provider uses sick leave, they are paid at their regular hourly rate. Sick leave hours do not count toward overtime calculation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 10: Electronic Systems & Communications -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">10</span>
+                    Electronic Systems & Provider Communications
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Timesheet System Options</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Available Timesheet Methods:</h4>
+                                <div class="feature-grid">
+                                    <div class="feature-card">
+                                        <h4>TTS - Telephone Timesheet</h4>
+                                        <p>Providers call toll-free number to submit timesheets by phone</p>
+                                    </div>
+                                    <div class="feature-card">
+                                        <h4>ESP - Electronic Services Portal</h4>
+                                        <p>Providers submit timesheets online via web portal</p>
+                                    </div>
+                                    <div class="feature-card">
+                                        <h4>Paper Timesheet</h4>
+                                        <p>Traditional paper SOC 2261 timesheets mailed to county</p>
+                                    </div>
+                                </div>
+
+                                <h4>TTS Operations:</h4>
+                                <ul>
+                                    <li><strong>View Timesheet Preferences:</strong> Check provider's current timesheet method</li>
+                                    <li><strong>Register Provider for TTS:</strong> Enroll in Telephone Timesheet System</li>
+                                    <li><strong>Reset TTS Passcode:</strong> Generate new passcode if provider forgot</li>
+                                    <li><strong>Reset TTS Registration Code:</strong> Generate new registration code</li>
+                                </ul>
+
+                                <h4>E-Timesheet Enrollment:</h4>
+                                <p>Providers who use TTS or ESP must be enrolled in the electronic timesheet system. The E-Timesheet Enrollment List shows all providers and their timesheet method preference.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Provider Communications</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Communication Preferences:</h4>
+                                <ul>
+                                    <li><strong>Email:</strong> Provider can receive notifications via email</li>
+                                    <li><strong>Text/SMS:</strong> Provider can receive text message alerts</li>
+                                    <li><strong>Phone:</strong> Provider prefers phone calls</li>
+                                    <li><strong>Mail:</strong> Provider prefers postal mail</li>
+                                </ul>
+
+                                <h4>Notification Types:</h4>
+                                <ul>
+                                    <li>Timesheet reminders</li>
+                                    <li>Timesheet rejection notifications</li>
+                                    <li>Payment confirmations</li>
+                                    <li>Case assignment changes</li>
+                                    <li>Important policy updates</li>
+                                    <li>Training opportunities</li>
+                                </ul>
+
+                                <h4>Operations:</h4>
+                                <ul>
+                                    <li><strong>Modify Notification Preferences:</strong> Update how provider wants to be contacted</li>
+                                    <li><strong>Verify Cell Phone Number:</strong> Confirm provider's mobile number for text alerts</li>
+                                    <li><strong>Message Center:</strong> Provider can view messages from county</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Electronic Forms & Documents</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Electronic Forms System:</h4>
+                                <p>Counties can send forms electronically to providers through ESP or email.</p>
+
+                                <h4>Operations:</h4>
+                                <ul>
+                                    <li><strong>Create Electronic Form:</strong> Generate form to send to provider</li>
+                                    <li><strong>Send Form to CSP:</strong> Send to Community Services Portal</li>
+                                    <li><strong>Send Form to ESP:</strong> Send via Electronic Services Portal</li>
+                                    <li><strong>View Electronic Forms:</strong> See forms sent to provider</li>
+                                    <li><strong>Electronic Forms History:</strong> Track form submission and completion</li>
+                                    <li><strong>Accept Electronic Form:</strong> Provider completes and submits form</li>
+                                    <li><strong>Reject Electronic Form:</strong> Provider declines to complete form</li>
+                                    <li><strong>Edit Electronic Form:</strong> Make corrections to form</li>
+                                    <li><strong>Completed Electronic Forms:</strong> View provider-completed forms</li>
+                                </ul>
+
+                                <h4>Common Electronic Forms:</h4>
+                                <ul>
+                                    <li>W-4 (Federal Tax Withholding)</li>
+                                    <li>DE-4 (State Tax Withholding)</li>
+                                    <li>Provider Enrollment Application</li>
+                                    <li>Direct Deposit Authorization</li>
+                                    <li>Provider Workweek Agreement (SOC 2255)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Provider Attachments & Documents</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Document Management:</h4>
+                                <p>Upload and store provider-related documents in CMIPS.</p>
+
+                                <h4>Operations:</h4>
+                                <ul>
+                                    <li><strong>Provider Attachments:</strong> View all documents for provider</li>
+                                    <li><strong>Upload Attachment:</strong> Add new document</li>
+                                    <li><strong>Modify Attachment Description:</strong> Update document description</li>
+                                    <li><strong>Archive Attachment:</strong> Remove document from active view</li>
+                                    <li><strong>Restore Attachment:</strong> Bring archived document back</li>
+                                    <li><strong>Attachments History:</strong> Track all document changes</li>
+                                </ul>
+
+                                <h4>Common Attachments:</h4>
+                                <ul>
+                                    <li>Signed enrollment forms</li>
+                                    <li>I-9 employment eligibility documents</li>
+                                    <li>Background check results</li>
+                                    <li>Signed agreements and waivers</li>
+                                    <li>Medical documentation (if needed for sick leave)</li>
+                                    <li>Direct deposit voided check</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>DSD Section 23 - Provider Management Documentation</strong></p>
+        <p>IHSS CMIPS System | Technical Specification Document</p>
+        <p>© 2025 - All Rights Reserved</p>
+    </div>
+
+    <script>
+        function toggleAccordion(element) {
+            const section = element.parentElement;
+            const wasActive = section.classList.contains('active');
+            
+            document.querySelectorAll('.accordion-section').forEach(s => {
+                s.classList.remove('active');
+            });
+            
+            if (!wasActive) {
+                section.classList.add('active');
+            }
+        }
+
+        function toggleSubAccordion(element) {
+            const subSection = element.parentElement;
+            subSection.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

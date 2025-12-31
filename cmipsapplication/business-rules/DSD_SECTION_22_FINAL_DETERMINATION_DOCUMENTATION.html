@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSD Section 22 - Final Determination Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-orange: #FF9900;
+            --primary-blue: #146EB4;
+            --dark-blue: #232F3E;
+            --light-gray: #F7F7F7;
+            --border-gray: #D5D9D9;
+            --text-dark: #0F1111;
+            --success-green: #00A65A;
+            --warning-orange: #FFC107;
+            --danger-red: #DC3545;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--light-gray);
+            font-size: 14px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--dark-blue) 0%, #1a2a3a 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            font-size: 1.125rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .intro-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .intro-section h2 {
+            color: var(--dark-blue);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .intro-section p {
+            margin-bottom: 0.75rem;
+            color: #565959;
+        }
+
+        .accordion-section {
+            background: white;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .accordion-header {
+            background: var(--dark-blue);
+            color: white;
+            padding: 1.5rem 2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .accordion-header:hover {
+            background: #1a2a3a;
+        }
+
+        .accordion-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-number {
+            background: var(--primary-orange);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        .accordion-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .accordion-section.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+
+        .accordion-section.active .accordion-content {
+            max-height: 15000px;
+            transition: max-height 0.6s ease-in;
+        }
+
+        .content-inner {
+            padding: 2rem;
+        }
+
+        .sub-accordion {
+            margin: 1rem 0;
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+        }
+
+        .sub-accordion-header {
+            background: var(--light-gray);
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .sub-accordion-header:hover {
+            background: #EAEDED;
+        }
+
+        .sub-accordion-header h3 {
+            color: var(--primary-blue);
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .sub-accordion-icon {
+            color: var(--primary-blue);
+            transition: transform 0.3s;
+        }
+
+        .sub-accordion.active .sub-accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .sub-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .sub-accordion.active .sub-accordion-content {
+            max-height: 8000px;
+            transition: max-height 0.5s ease-in;
+        }
+
+        .sub-content-inner {
+            padding: 1.5rem;
+            background: white;
+        }
+
+        h3 {
+            color: var(--primary-blue);
+            font-size: 1.25rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        h4 {
+            color: var(--text-dark);
+            font-size: 1.125rem;
+            margin: 1rem 0 0.75rem;
+        }
+
+        ul, ol {
+            margin: 1rem 0 1rem 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        .info-box {
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+
+        .info-box.primary {
+            background: #FEF9E7;
+            border-color: var(--primary-orange);
+        }
+
+        .info-box.success {
+            background: #E8F5E9;
+            border-color: var(--success-green);
+        }
+
+        .info-box.info {
+            background: #E3F2FD;
+            border-color: var(--primary-blue);
+        }
+
+        .info-box.warning {
+            background: #FFF9E6;
+            border-color: var(--warning-orange);
+        }
+
+        .info-box.danger {
+            background: #FFEBEE;
+            border-color: var(--danger-red);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        th {
+            background: var(--dark-blue);
+            color: white;
+            padding: 0.875rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        td {
+            padding: 0.875rem;
+            border-bottom: 1px solid var(--border-gray);
+            font-size: 0.875rem;
+        }
+
+        tr:hover {
+            background: var(--light-gray);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+
+        .badge.primary {
+            background: #FFF3CD;
+            color: #856404;
+        }
+
+        .badge.success {
+            background: #D4EDDA;
+            color: #155724;
+        }
+
+        .badge.info {
+            background: #D1ECF1;
+            color: #0C5460;
+        }
+
+        .badge.danger {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+
+        code {
+            background: #F4F4F4;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875em;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .feature-card {
+            background: var(--light-gray);
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--primary-blue);
+        }
+
+        .feature-card h4 {
+            margin-top: 0;
+            font-size: 1rem;
+        }
+
+        .workflow-step {
+            background: white;
+            border-left: 3px solid var(--primary-blue);
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 4px;
+        }
+
+        .workflow-step h4 {
+            margin: 0 0 0.5rem 0;
+            color: var(--primary-blue);
+        }
+
+        .noa-code {
+            background: var(--light-gray);
+            padding: 0.5rem 1rem;
+            margin: 0.5rem 0;
+            border-left: 3px solid var(--primary-orange);
+            border-radius: 4px;
+        }
+
+        .noa-code strong {
+            color: var(--primary-orange);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #767676;
+            font-size: 0.875rem;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            .header h1 {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>✅ DSD Section 22</h1>
+        <div class="subtitle">Final Determination, Assign Modes of Service - Complete Technical Documentation</div>
+    </div>
+
+    <div class="container">
+        <div class="intro-section">
+            <h2>📖 Document Overview</h2>
+            <p><strong>Document Title:</strong> DSD Section 22 - Final Determination, Assign Modes of Service</p>
+            <p><strong>Scope:</strong> Case approval/denial process, Share of Cost processing, service mode assignment, and Notice of Action generation</p>
+            <p><strong>Audience:</strong> Caseworkers, supervisors, eligibility workers, system developers, and business analysts</p>
+            <p><strong>Purpose:</strong> Define the final determination process that moves cases from assessment to authorization, including SOC spend-down and NOA generation</p>
+            <p><strong>Key Outputs:</strong> Authorization decisions, Notices of Action (NOA), Mode of Service assignments, Share of Cost calculations</p>
+        </div>
+
+        <!-- Section 1: Final Determination Process -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">1</span>
+                    Final Determination Process
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <h3>Overview</h3>
+                    <p>Final Determination is the critical process that evaluates completed assessments and makes eligibility decisions, resulting in case approval, denial, or termination.</p>
+
+                    <div class="info-box primary">
+                        <h4>When Final Determination Occurs</h4>
+                        <p>After all evidence from the Needs Assessment has been entered into the system, the caseworker initiates Final Determination from the Evidence Home screen.</p>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Check Eligibility</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Purpose:</h4>
+                                <p>Allows caseworker to validate evidence and preview eligibility outcome WITHOUT generating Notices of Action.</p>
+
+                                <h4>What Check Eligibility Does:</h4>
+                                <ul>
+                                    <li><strong>Validates Data:</strong> Processes pending evidence against business rules</li>
+                                    <li><strong>Identifies Errors:</strong> Displays error messages for missing or invalid data</li>
+                                    <li><strong>Shows Outcome:</strong> Displays preliminary eligibility determination</li>
+                                    <li><strong>No NOA Generated:</strong> Does NOT create Notices of Action</li>
+                                    <li><strong>No Authorization:</strong> Does NOT activate the authorization</li>
+                                </ul>
+
+                                <div class="info-box info">
+                                    <h4>Use Check Eligibility When:</h4>
+                                    <ul>
+                                        <li>You want to verify all evidence is entered correctly</li>
+                                        <li>You need to preview the eligibility outcome before committing</li>
+                                        <li>You want to identify and fix errors before final submission</li>
+                                        <li>You're training new staff on case processing</li>
+                                    </ul>
+                                </div>
+
+                                <h4>Check Eligibility Process:</h4>
+                                <ol>
+                                    <li><strong>Complete Evidence Entry:</strong> Enter all assessment evidence</li>
+                                    <li><strong>Click "Check Eligibility":</strong> Initiate validation process</li>
+                                    <li><strong>Review Errors:</strong> Fix any data errors identified</li>
+                                    <li><strong>View Outcome:</strong> See preliminary approval/denial decision</li>
+                                    <li><strong>Make Corrections:</strong> Adjust evidence as needed</li>
+                                    <li><strong>Re-check:</strong> Run Check Eligibility again until satisfied</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Submit for Approval</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Purpose:</h4>
+                                <p>Formally submits the case for final determination, triggering supervisor review (if required) or immediate authorization.</p>
+
+                                <h4>Two Submission Scenarios:</h4>
+
+                                <div class="workflow-step">
+                                    <h4>Scenario 1: Supervisory Approval Required</h4>
+                                    <ol>
+                                        <li><strong>Caseworker Submits:</strong> Clicks "Submit for Approval"</li>
+                                        <li><strong>Task Created:</strong> System creates task for supervisor</li>
+                                        <li><strong>Supervisor Notified:</strong> Supervisor receives case review task</li>
+                                        <li><strong>Supervisor Reviews:</strong> Supervisor examines evidence and determination</li>
+                                        <li><strong>Supervisor Approves/Rejects:</strong> Makes final decision</li>
+                                    </ol>
+                                </div>
+
+                                <div class="workflow-step">
+                                    <h4>Scenario 2: No Supervisory Approval Required</h4>
+                                    <ol>
+                                        <li><strong>Caseworker Submits:</strong> Clicks "Submit for Approval"</li>
+                                        <li><strong>Immediate Processing:</strong> Business rules execute immediately</li>
+                                        <li><strong>Authorization Created:</strong> Case authorization is established</li>
+                                        <li><strong>NOA Generated:</strong> Notice of Action is created</li>
+                                    </ol>
+                                </div>
+
+                                <h4>What Submit for Approval Does:</h4>
+                                <ul>
+                                    <li><strong>Processes Business Rules:</strong> Runs all eligibility determination rules</li>
+                                    <li><strong>Determines Impairment Level:</strong> Calculates severity of impairment</li>
+                                    <li><strong>Determines Funding Source:</strong> Identifies appropriate funding (SSI/SSP, Residual, PCSP, etc.)</li>
+                                    <li><strong>Calculates Authorized Hours:</strong> Determines final service hours</li>
+                                    <li><strong>Generates NOA:</strong> Creates Notice of Action with all decision details</li>
+                                    <li><strong>Creates Authorization:</strong> Establishes Authorization Period and Segments</li>
+                                    <li><strong>Notifies Providers:</strong> Sends SOC 858 to affected providers</li>
+                                </ul>
+
+                                <div class="info-box warning">
+                                    <h4>Important: Cannot Undo Approval</h4>
+                                    <p>Once a case is approved and the authorization is activated, you cannot undo it. To make changes, you must conduct a new assessment (change assessment or reassessment).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Supervisor Actions</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Approve Case:</h4>
+                                <p>Supervisor approves the case, triggering the same processing as Submit for Approval:</p>
+                                <ul>
+                                    <li>Business rules process</li>
+                                    <li>Authorization created</li>
+                                    <li>NOA generated</li>
+                                    <li>Providers notified</li>
+                                    <li>Case Owner notified of approval</li>
+                                </ul>
+
+                                <h4>Reject Case:</h4>
+                                <p>Supervisor rejects the case and returns it to the caseworker:</p>
+                                <ul>
+                                    <li><strong>Rejection Reason:</strong> Supervisor must provide reason for rejection</li>
+                                    <li><strong>Task Returned:</strong> Case sent back to Case Owner as task</li>
+                                    <li><strong>Evidence Remains Pending:</strong> All evidence stays in pending status</li>
+                                    <li><strong>Caseworker Makes Changes:</strong> Case Owner revises evidence as directed</li>
+                                    <li><strong>Resubmit:</strong> Case Owner resubmits after corrections</li>
+                                </ul>
+
+                                <div class="info-box info">
+                                    <h4>Common Rejection Reasons</h4>
+                                    <ul>
+                                        <li>Missing or incomplete evidence</li>
+                                        <li>Assessment narrative needs more detail</li>
+                                        <li>Service hours don't match functional rankings</li>
+                                        <li>Incorrect program type selected</li>
+                                        <li>Need additional medical documentation</li>
+                                    </ul>
+                                </div>
+
+                                <h4>Cancel Submission:</h4>
+                                <p>Caseworker can cancel their own submission before supervisor reviews:</p>
+                                <ul>
+                                    <li>Only available before supervisor action</li>
+                                    <li>Returns case to caseworker control</li>
+                                    <li>Evidence remains pending</li>
+                                    <li>No notification sent to supervisor</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Authorization Summary</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <p>After Check Eligibility or approval, the Authorization Summary displays the complete authorization details.</p>
+
+                                <h4>Authorization Summary Shows:</h4>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Field</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Authorization Start Date</td>
+                                            <td>First day of service authorization</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Authorization End Date</td>
+                                            <td>Last day of authorization (typically 12 months)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Funding Source</td>
+                                            <td>SSI/SSP, Residual, PCSP, IPO, etc.</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Impairment Level</td>
+                                            <td>Severe Impairment or Non-Severe Impairment</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Authorized Hours (Monthly)</td>
+                                            <td>Total hours authorized per month</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Service Types</td>
+                                            <td>Breakdown by domestic, personal care, related services</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Mode of Service</td>
+                                            <td>IP (Individual Provider), CC (Contract Care), HM (Homemaker)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>NOA Codes</td>
+                                            <td>List of NOA messages that will print</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <h4>Authorization Period vs. Authorization Segment:</h4>
+                                <div class="info-box primary">
+                                    <p><strong>Authorization Period:</strong> The full date range for which the case is authorized (e.g., 01/01/2025 - 12/31/2025)</p>
+                                    <p><strong>Authorization Segment:</strong> Within the authorization period, there may be multiple segments with different authorized hours (e.g., if hours change mid-year due to a change assessment)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Share of Cost Processing -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">2</span>
+                    Share of Cost (SOC) Processing
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p>Share of Cost processing manages recipients who must pay a monthly amount before Medi-Cal or IHSS services are provided.</p>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>MEDS Share of Cost</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>What is MEDS SOC?</h4>
+                                <p>Medi-Cal recipients with income above Medi-Cal limits but below spend-down thresholds have a monthly Share of Cost. This is like an insurance deductible - they must spend this amount on medical expenses before Medi-Cal coverage begins.</p>
+
+                                <div class="info-box info">
+                                    <h4>MEDS SOC Identification</h4>
+                                    <p>Recipients with MEDS SOC have an eligibility status code that begins with '5' (e.g., 5A, 5B, 5C)</p>
+                                </div>
+
+                                <h4>MEDS SOC Trigger Process:</h4>
+                                <ol>
+                                    <li><strong>MEDS Monthly Renewal File Received:</strong> File received from MEDS daily</li>
+                                    <li><strong>Triggers Created:</strong> System creates SOC triggers for recipients with status code '5'</li>
+                                    <li><strong>Batch Jobs Process:</strong>
+                                        <ul>
+                                            <li><strong>802DPRDS:</strong> Processes Arrears recipients</li>
+                                            <li><strong>803DPRDS:</strong> Processes Advance Pay recipients</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Spend-Down Calculated:</strong> IHSS hours applied toward SOC</li>
+                                    <li><strong>SOC Hours Stored:</strong> Results saved to Case SOC Hours table</li>
+                                </ol>
+
+                                <h4>MEDS SOC Spend-Down Conditions:</h4>
+                                <p>The batch jobs perform spend-down if ALL of these conditions are met:</p>
+                                <ul>
+                                    <li>✓ Recipient has at least 1 day of eligible case status in the current month</li>
+                                    <li>✓ Recipient has at least one active provider (Arrears only; Advance Pay doesn't require active provider)</li>
+                                    <li>✓ Spend-down trigger is within 13-month range</li>
+                                    <li>✓ A spend-down has not already occurred for the full service month</li>
+                                </ul>
+
+                                <div class="info-box warning">
+                                    <h4>One Spend-Down Per Month Rule</h4>
+                                    <p>CMIPS will only spend down an entire service month ONCE. This prevents duplicate processing.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>IHSS Share of Cost</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>What is IHSS SOC?</h4>
+                                <p>IHSS Share of Cost is different from MEDS SOC. It's calculated based on income evidence entered in the IHSS assessment. If the recipient's income exceeds IHSS program limits, they may have an IHSS SOC obligation.</p>
+
+                                <h4>IHSS SOC Trigger Process:</h4>
+                                <ol>
+                                    <li><strong>Authorization Activated:</strong> Case evidence approved with IHSS SOC > $0.00</li>
+                                    <li><strong>Triggers Created:</strong> System creates IHSS SOC triggers</li>
+                                    <li><strong>Batch Jobs Process:</strong>
+                                        <ul>
+                                            <li><strong>804DPRDS:</strong> Processes Arrears recipients</li>
+                                            <li><strong>804DPRDS_AP:</strong> Processes Advance Pay recipients</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Spend-Down Calculated:</strong> IHSS hours applied toward SOC</li>
+                                    <li><strong>SOC Hours Stored:</strong> Results saved to Case SOC Hours table</li>
+                                </ol>
+
+                                <h4>IHSS SOC Spend-Down Conditions:</h4>
+                                <p>The batch jobs perform spend-down if ALL of these conditions are met:</p>
+                                <ul>
+                                    <li>✓ Most recent authorized evidence has IHSS Share of Cost dollar > $0.00</li>
+                                    <li>✓ Recipient has at least 1 day of eligible case status in the current month</li>
+                                    <li>✓ Recipient has at least one active provider (Arrears only)</li>
+                                    <li>✓ A spend-down has not already occurred for the full service month</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Spend-Down Calculation Method</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <p>CMIPS performs spend-down calculations by dividing the month into 4 work weeks and processing regular and overtime hours.</p>
+
+                                <h4>Spend-Down Process:</h4>
+                                <div class="workflow-step">
+                                    <h4>Week 1 Regular Hours</h4>
+                                    <p>Calculate: 40:00 hours × County Pay Rate</p>
+                                    <p>Subtract this amount from SOC balance</p>
+                                </div>
+
+                                <div class="workflow-step">
+                                    <h4>Week 1 Overtime Hours (if SOC remains)</h4>
+                                    <p>Calculate: Overtime Hours × 1.5 × County Pay Rate</p>
+                                    <p>Subtract this amount from SOC balance</p>
+                                </div>
+
+                                <div class="workflow-step">
+                                    <h4>Week 2 Regular Hours (if SOC remains)</h4>
+                                    <p>Calculate: 40:00 hours × County Pay Rate</p>
+                                    <p>Subtract this amount from SOC balance</p>
+                                </div>
+
+                                <div class="workflow-step">
+                                    <h4>Week 2 Overtime Hours (if SOC remains)</h4>
+                                    <p>Continue pattern through Weeks 3 and 4</p>
+                                </div>
+
+                                <div class="workflow-step">
+                                    <h4>SOC Met or Month Ends</h4>
+                                    <p>Process stops when SOC reaches $0.00 or all 4 weeks processed</p>
+                                </div>
+
+                                <h4>Example Calculation:</h4>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Week</th>
+                                            <th>Hours Type</th>
+                                            <th>Hours</th>
+                                            <th>Rate</th>
+                                            <th>Amount</th>
+                                            <th>SOC Remaining</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Starting SOC</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>$1,200.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Week 1</td>
+                                            <td>Regular</td>
+                                            <td>40</td>
+                                            <td>$18.00</td>
+                                            <td>$720.00</td>
+                                            <td>$480.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Week 1</td>
+                                            <td>Overtime</td>
+                                            <td>5</td>
+                                            <td>$27.00</td>
+                                            <td>$135.00</td>
+                                            <td>$345.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Week 2</td>
+                                            <td>Regular</td>
+                                            <td>19.17</td>
+                                            <td>$18.00</td>
+                                            <td>$345.00</td>
+                                            <td>$0.00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="info-box success">
+                                    <h4>SOC Hours Stored</h4>
+                                    <p>The calculated SOC hours are:</p>
+                                    <ul>
+                                        <li>Stored in Case SOC Hours table</li>
+                                        <li>Displayed on Case Header in CM</li>
+                                        <li>Available on Share of Cost Hours Details screen (CM)</li>
+                                        <li>Visible to recipient on ESP (if registered)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Special SOC Scenarios</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Newly Eligible Recipients:</h4>
+                                <p>CMIPS conducts spend-down for all months from authorization start date through current month.</p>
+                                <ul>
+                                    <li>If authorization begins mid-month, IP hours are prorated based on eligible days</li>
+                                    <li>Example: Authorization starts on 15th of month = 16 eligible days out of 30</li>
+                                </ul>
+
+                                <h4>Re-eligible Due to Rescinded Termination:</h4>
+                                <p>When a termination is rescinded:</p>
+                                <ul>
+                                    <li>If in current month: Spend-down based on remaining days after termination date</li>
+                                    <li>If in past month: Spend-down for current month only</li>
+                                    <li>Hours prorated if mid-month</li>
+                                </ul>
+
+                                <h4>Taken Off Leave:</h4>
+                                <p>When recipient returns from leave:</p>
+                                <ul>
+                                    <li>CMIPS conducts spend-down for any months retroactive through current month</li>
+                                    <li>If mid-month return, IP hours prorated based on eligible days</li>
+                                </ul>
+
+                                <div class="info-box warning">
+                                    <h4>Proration Rules</h4>
+                                    <p>When authorization is mid-month, IP hours used for spend-down are prorated:</p>
+                                    <p><strong>Formula:</strong> (Eligible Days / Days in Month) × Monthly IP Hours</p>
+                                    <p><strong>Example:</strong> 16 eligible days / 30 days = 53.33% of monthly hours</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Assign Modes of Service -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">3</span>
+                    Assign Modes of Service
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p>Modes of Service determine HOW IHSS services are delivered to the recipient.</p>
+
+                    <div class="info-box primary">
+                        <h4>Three Service Modes</h4>
+                        <ul>
+                            <li><strong>IP (Individual Provider):</strong> Recipient hires and supervises their own provider</li>
+                            <li><strong>CC (Contract Care):</strong> Services provided by county-contracted agency</li>
+                            <li><strong>HM (Homemaker):</strong> Services provided through homemaker/PA contract program</li>
+                        </ul>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Individual Provider (IP) Mode</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Description:</h4>
+                                <p>The most common mode. Recipient acts as employer, hiring and managing their own provider.</p>
+
+                                <h4>IP Mode Characteristics:</h4>
+                                <ul>
+                                    <li><strong>Recipient Control:</strong> Recipient chooses, hires, trains, and supervises provider</li>
+                                    <li><strong>Direct Payment:</strong> Provider paid directly by state/county</li>
+                                    <li><strong>Employer Responsibilities:</strong> Recipient handles scheduling, oversight</li>
+                                    <li><strong>Maximum Flexibility:</strong> Recipient has most control over service delivery</li>
+                                </ul>
+
+                                <h4>When IP Mode is Appropriate:</h4>
+                                <ul>
+                                    <li>Recipient is able and willing to be employer</li>
+                                    <li>Recipient can direct and supervise provider</li>
+                                    <li>Recipient has someone to be provider (family, friend, hired individual)</li>
+                                    <li>No special circumstances requiring agency services</li>
+                                </ul>
+
+                                <div class="info-box success">
+                                    <h4>Default Mode</h4>
+                                    <p>IP is the DEFAULT mode of service. When case is authorized, all hours initially default to IP mode.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Contract Care (CC) Mode</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Description:</h4>
+                                <p>Services provided by a county-contracted agency rather than individual provider.</p>
+
+                                <h4>CC Mode Characteristics:</h4>
+                                <ul>
+                                    <li><strong>Agency Provider:</strong> Licensed agency provides services</li>
+                                    <li><strong>Agency Management:</strong> Agency handles scheduling, supervision, oversight</li>
+                                    <li><strong>County Payment:</strong> County pays agency, agency pays workers</li>
+                                    <li><strong>Less Recipient Control:</strong> Recipient has less control over specific workers</li>
+                                </ul>
+
+                                <h4>When CC Mode is Required/Appropriate:</h4>
+                                <ul>
+                                    <li>Recipient unable to be employer (cognitive impairment, etc.)</li>
+                                    <li>No authorized representative available to act as employer</li>
+                                    <li>Recipient cannot find or retain individual providers</li>
+                                    <li>Protective services case requiring professional oversight</li>
+                                    <li>County determines agency services are necessary</li>
+                                </ul>
+
+                                <div class="info-box warning">
+                                    <h4>Mixed Mode: IP & CC</h4>
+                                    <p>Some recipients may have BOTH IP and CC hours:</p>
+                                    <ul>
+                                        <li>Example: Family member provides some hours (IP), agency provides backup or specialized services (CC)</li>
+                                        <li>Caseworker must specify how many hours for each mode</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Homemaker (HM) Mode</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Description:</h4>
+                                <p>Services provided through a specialized homemaker or personal assistant contract program.</p>
+
+                                <h4>HM Mode Characteristics:</h4>
+                                <ul>
+                                    <li><strong>Contract Program:</strong> Services delivered through homemaker/PA contract</li>
+                                    <li><strong>Timesheet Approval:</strong> Special timesheet approval workflow (supervisor review required)</li>
+                                    <li><strong>Invoice Processing:</strong> Different payment processing than IP</li>
+                                    <li><strong>Program-Specific:</strong> Usually limited to certain counties or programs</li>
+                                </ul>
+
+                                <h4>When HM Mode is Used:</h4>
+                                <ul>
+                                    <li>County has homemaker/PA contract program</li>
+                                    <li>Recipient qualifies for program</li>
+                                    <li>Services best delivered through contract structure</li>
+                                    <li>County chooses this mode for efficiency or oversight</li>
+                                </ul>
+
+                                <div class="info-box info">
+                                    <h4>Mixed Mode: IP & HM</h4>
+                                    <p>Recipients may have both IP and HM hours if some services are provided by individual provider and some through homemaker contract.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Mode of Service Assignment Process</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Default Assignment:</h4>
+                                <ol>
+                                    <li><strong>Mode Indicated on Program Evidence:</strong> Caseworker selects mode during assessment</li>
+                                    <li><strong>Initial Authorization:</strong> ALL hours default to IP mode</li>
+                                    <li><strong>Mixed Mode Cases:</strong> If IP & CC or IP & HM indicated, ALL hours still default to IP</li>
+                                    <li><strong>Manual Distribution Required:</strong> Caseworker must manually distribute hours on Mode of Service screen</li>
+                                </ol>
+
+                                <h4>Mode of Service Screen Operations:</h4>
+                                <ul>
+                                    <li><strong>Modes of Service List:</strong> View current mode assignments</li>
+                                    <li><strong>Modify Modes of Service:</strong> Change hour distribution between modes</li>
+                                    <li><strong>View Modes of Service:</strong> Review mode details</li>
+                                    <li><strong>Modes of Service History:</strong> Track all mode changes</li>
+                                    <li><strong>Adjusted Hours:</strong> View/modify if hours adjusted from assessed need</li>
+                                </ul>
+
+                                <h4>Subsequent Authorizations:</h4>
+                                <p>For subsequent assessments (reassessment, change assessment):</p>
+                                <ul>
+                                    <li>System adjusts IP Mode of Service hours automatically</li>
+                                    <li>If hours increase/decrease, IP mode reflects the change</li>
+                                    <li>If other modes (CC/HM) exist, those remain unchanged unless manually modified</li>
+                                </ul>
+
+                                <div class="info-box primary">
+                                    <h4>Example: Mixed Mode Assignment</h4>
+                                    <p><strong>Case:</strong> 100 hours/month authorized, IP & CC mode</p>
+                                    <p><strong>Initial Authorization:</strong> 100 hours IP, 0 hours CC</p>
+                                    <p><strong>Caseworker Action:</strong> Modify to 70 hours IP, 30 hours CC</p>
+                                    <p><strong>Result:</strong> Recipient can hire individual provider for 70 hrs, agency provides 30 hrs</p>
+                                </div>
+
+                                <h4>Mode Distribution Rules:</h4>
+                                <ul>
+                                    <li>Total hours across all modes cannot exceed authorized hours</li>
+                                    <li>At least one mode must have hours assigned</li>
+                                    <li>Hours can be distributed in any combination</li>
+                                    <li>Hours can be changed month-to-month if needed</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Notice of Action (NOA) Generation -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">4</span>
+                    Notice of Action (NOA) Generation
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p>Notices of Action are legally required notifications informing recipients of case decisions and their appeal rights.</p>
+
+                    <div class="info-box danger">
+                        <h4>NOA Legal Requirement</h4>
+                        <p>Federal and state law require counties to send written Notice of Action for ANY adverse action:</p>
+                        <ul>
+                            <li>Case denial</li>
+                            <li>Case termination</li>
+                            <li>Reduction in authorized hours</li>
+                            <li>Change in service type</li>
+                            <li>Change that affects recipient negatively</li>
+                        </ul>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>NOA Components</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Required NOA Information:</h4>
+                                <ul>
+                                    <li><strong>Action Taken:</strong> What decision was made (approved, denied, reduced, terminated)</li>
+                                    <li><strong>Effective Date:</strong> When the action takes effect</li>
+                                    <li><strong>Reason:</strong> Why the action was taken</li>
+                                    <li><strong>Factual Basis:</strong> Facts supporting the decision</li>
+                                    <li><strong>Regulations:</strong> Legal authority for the action</li>
+                                    <li><strong>Appeal Rights:</strong> How and when to file an appeal</li>
+                                    <li><strong>Aid Paid Pending:</strong> Right to continue services during appeal</li>
+                                </ul>
+
+                                <h4>NOA Message Codes:</h4>
+                                <p>CMIPS uses standardized two-letter codes to identify NOA messages. Each code represents a specific situation and generates corresponding NOA text.</p>
+
+                                <div class="info-box info">
+                                    <h4>NOA Code Format</h4>
+                                    <p>NOA codes are two letters that indicate the message type:</p>
+                                    <ul>
+                                        <li><strong>First Letter:</strong> General category (A=Approval, D=Denial, T=Termination, etc.)</li>
+                                        <li><strong>Second Letter:</strong> Specific situation within category</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Major NOA Code Categories</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Approval Codes (A*):</h4>
+                                <div class="noa-code">
+                                    <strong>AA:</strong> Application Approved - Initial approval of IHSS application
+                                </div>
+                                <div class="noa-code">
+                                    <strong>AP:</strong> Application Approved with Protective Supervision
+                                </div>
+                                <div class="noa-code">
+                                    <strong>AR:</strong> Assessment Results - Reassessment approval
+                                </div>
+                                <div class="noa-code">
+                                    <strong>AS:</strong> Approved Service Changes
+                                </div>
+
+                                <h4>Denial Codes (DN):</h4>
+                                <div class="noa-code">
+                                    <strong>DN:</strong> Application Denied - Various denial reasons
+                                </div>
+
+                                <h4>Increase/Reduction Codes (*):</h4>
+                                <div class="noa-code">
+                                    <strong>IN:</strong> Hours Increased
+                                </div>
+                                <div class="noa-code">
+                                    <strong>HR:</strong> Hours Reduced
+                                </div>
+
+                                <h4>Leave/Return Codes (L*):</h4>
+                                <div class="noa-code">
+                                    <strong>LV:</strong> Case Placed on Leave
+                                </div>
+                                <div class="noa-code">
+                                    <strong>LM:</strong> Leave Modified
+                                </div>
+
+                                <h4>Program Change Codes (P*):</h4>
+                                <div class="noa-code">
+                                    <strong>PM:</strong> Program Modified (e.g., change from Residual to SSI/SSP)
+                                </div>
+                                <div class="noa-code">
+                                    <strong>PR:</strong> Program Reduced
+                                </div>
+                                <div class="noa-code">
+                                    <strong>PS:</strong> Protective Supervision changes
+                                </div>
+
+                                <h4>Rescind Codes (R*):</h4>
+                                <div class="noa-code">
+                                    <strong>RH:</strong> Rescind with Hours Change
+                                </div>
+                                <div class="noa-code">
+                                    <strong>RM:</strong> Rescind Modified
+                                </div>
+                                <div class="noa-code">
+                                    <strong>RS:</strong> Rescind Status Change
+                                </div>
+
+                                <h4>Termination Codes (T*, S*):</h4>
+                                <div class="noa-code">
+                                    <strong>TR:</strong> Case Terminated
+                                </div>
+                                <div class="noa-code">
+                                    <strong>SC:</strong> Service Cancelled
+                                </div>
+                                <div class="noa-code">
+                                    <strong>SD:</strong> Service Discontinued
+                                </div>
+                                <div class="noa-code">
+                                    <strong>SH:</strong> Service Hours Reduced to Zero
+                                </div>
+                                <div class="noa-code">
+                                    <strong>SP:</strong> Specific Service Discontinued
+                                </div>
+
+                                <h4>Other Codes:</h4>
+                                <div class="noa-code">
+                                    <strong>FF:</strong> Failed to Follow Through (recipient didn't complete required actions)
+                                </div>
+                                <div class="noa-code">
+                                    <strong>FR:</strong> Follow-up Required
+                                </div>
+                                <div class="noa-code">
+                                    <strong>FS:</strong> Follow-up Scheduled
+                                </div>
+                                <div class="noa-code">
+                                    <strong>MS:</strong> Mode of Service Changed
+                                </div>
+                                <div class="noa-code">
+                                    <strong>OT:</strong> Overtime Agreement changes
+                                </div>
+                                <div class="noa-code">
+                                    <strong>UN:</strong> Unannounced Home Visit findings
+                                </div>
+                                <div class="noa-code">
+                                    <strong>VS:</strong> Voluntary Suspension (recipient requested services stopped)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Automatic vs. Manual NOA Messages</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Automatic NOA Messages:</h4>
+                                <p>System-generated based on business rules when case is approved:</p>
+                                <ul>
+                                    <li>Hours increased/decreased from previous authorization</li>
+                                    <li>Service types added or removed</li>
+                                    <li>Funding source changed</li>
+                                    <li>Program type changed</li>
+                                    <li>Protective supervision added/removed</li>
+                                    <li>Case terminated or denied</li>
+                                </ul>
+
+                                <h4>Manual NOA Messages:</h4>
+                                <p>Caseworker selects on Program Evidence screen:</p>
+                                <ul>
+                                    <li>Special circumstances requiring explanation</li>
+                                    <li>Policy changes affecting recipient</li>
+                                    <li>Additional information recipient needs to know</li>
+                                    <li>Follow-up actions required</li>
+                                </ul>
+
+                                <div class="info-box warning">
+                                    <h4>NOA Timing Requirements</h4>
+                                    <p><strong>Adverse Actions:</strong> NOA must be sent at least 10 days before action takes effect</p>
+                                    <p><strong>Example:</strong> To terminate case effective June 30, NOA must be sent by June 20</p>
+                                    <p><strong>Exception:</strong> When recipient safety requires immediate action (e.g., provider abuse)</p>
+                                </div>
+
+                                <h4>Provider Notification (SOC 858):</h4>
+                                <p>In addition to NOA sent to recipient, CMIPS automatically generates SOC 858 Provider Notification to active providers when:</p>
+                                <ul>
+                                    <li>Case hours change (increase or decrease)</li>
+                                    <li>Service types change</li>
+                                    <li>Case is terminated</li>
+                                    <li>Case goes on leave</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Authorization Periods & Segments -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    <span class="section-number">5</span>
+                    Authorization Periods & Segments
+                </h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <div class="content-inner">
+                    <p>Understanding how authorizations are structured in CMIPS is critical for proper case management and payment processing.</p>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Authorization Period</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Definition:</h4>
+                                <p>The Authorization Period is the full date range for which a case is authorized to receive services.</p>
+
+                                <h4>Key Characteristics:</h4>
+                                <ul>
+                                    <li><strong>Start Date:</strong> Authorization Begin Date (typically assessment date)</li>
+                                    <li><strong>End Date:</strong> Authorization End Date (typically 12 months from start)</li>
+                                    <li><strong>Duration:</strong> Usually 12 months for annual reassessments</li>
+                                    <li><strong>One Period Per Authorization:</strong> Each approved assessment creates one authorization period</li>
+                                </ul>
+
+                                <h4>Example Authorization Periods:</h4>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Assessment Type</th>
+                                            <th>Authorization Start</th>
+                                            <th>Authorization End</th>
+                                            <th>Duration</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Initial Assessment</td>
+                                            <td>01/15/2025</td>
+                                            <td>01/14/2026</td>
+                                            <td>12 months</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Reassessment</td>
+                                            <td>01/15/2026</td>
+                                            <td>01/14/2027</td>
+                                            <td>12 months</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Change Assessment</td>
+                                            <td>06/01/2026</td>
+                                            <td>01/14/2027</td>
+                                            <td>Remainder of period</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Authorization Segments</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Definition:</h4>
+                                <p>Authorization Segments are divisions within the Authorization Period representing different authorized hour levels or service configurations.</p>
+
+                                <h4>Why Segments Exist:</h4>
+                                <p>When recipient circumstances change mid-authorization period (via change assessment), authorized hours may increase or decrease. Each distinct authorization level creates a new segment.</p>
+
+                                <h4>Example: Multiple Segments</h4>
+                                <div class="info-box primary">
+                                    <p><strong>Scenario:</strong> Recipient approved for 100 hrs/month on 01/01/2025. On 07/01/2025, condition worsens and hours increased to 140 hrs/month.</p>
+                                    
+                                    <p><strong>Authorization Period:</strong> 01/01/2025 - 12/31/2025</p>
+                                    
+                                    <p><strong>Segment 1:</strong> 01/01/2025 - 06/30/2025 (100 hours/month)</p>
+                                    <p><strong>Segment 2:</strong> 07/01/2025 - 12/31/2025 (140 hours/month)</p>
+                                </div>
+
+                                <h4>Segment Rules:</h4>
+                                <ul>
+                                    <li>Segments are contiguous (no gaps between them)</li>
+                                    <li>Segments do not overlap</li>
+                                    <li>Each segment has specific authorized hours</li>
+                                    <li>Payment processing uses the segment applicable to the service month</li>
+                                </ul>
+
+                                <h4>Case Service Month:</h4>
+                                <p>For payment purposes, CMIPS creates Case Service Month records based on authorization segments:</p>
+                                <ul>
+                                    <li>Each calendar month within a segment gets a Case Service Month record</li>
+                                    <li>Record contains authorized hours for that month</li>
+                                    <li>Timesheets are validated against Case Service Month hours</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub-accordion">
+                        <div class="sub-accordion-header" onclick="toggleSubAccordion(this)">
+                            <h3>Payment Continuation</h3>
+                            <span class="sub-accordion-icon">▼</span>
+                        </div>
+                        <div class="sub-accordion-content">
+                            <div class="sub-content-inner">
+                                <h4>Continuous Authorization Principle:</h4>
+                                <p>CMIPS allows continuation of payments against the current active authorization until the case is no longer eligible (terminated).</p>
+
+                                <h4>What This Means:</h4>
+                                <ul>
+                                    <li><strong>No Payment Gap:</strong> Services continue uninterrupted even during reassessment</li>
+                                    <li><strong>Current Authorization Used:</strong> Payments process against most recent authorization</li>
+                                    <li><strong>Until Termination:</strong> Continues until case is explicitly terminated</li>
+                                    <li><strong>Reassessment Doesn't Stop Payment:</strong> Payment continues during annual reassessment process</li>
+                                </ul>
+
+                                <div class="info-box success">
+                                    <h4>Practical Impact</h4>
+                                    <p>If recipient's annual reassessment is due December 1st but not completed until January 15th, services and payments continue without interruption using the previous year's authorization. Once new authorization is approved, it becomes effective immediately.</p>
+                                </div>
+
+                                <div class="info-box warning">
+                                    <h4>Retroactive Adjustments</h4>
+                                    <p>If new authorization has different hours than previous authorization:</p>
+                                    <ul>
+                                        <li><strong>Hours Increase:</strong> Retroactive payment made for difference</li>
+                                        <li><strong>Hours Decrease:</strong> System may initiate overpayment recovery</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>DSD Section 22 - Final Determination Documentation</strong></p>
+        <p>IHSS CMIPS System | Technical Specification Document</p>
+        <p>© 2025 - All Rights Reserved</p>
+    </div>
+
+    <script>
+        function toggleAccordion(element) {
+            const section = element.parentElement;
+            const wasActive = section.classList.contains('active');
+            
+            document.querySelectorAll('.accordion-section').forEach(s => {
+                s.classList.remove('active');
+            });
+            
+            if (!wasActive) {
+                section.classList.add('active');
+            }
+        }
+
+        function toggleSubAccordion(element) {
+            const subSection = element.parentElement;
+            subSection.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

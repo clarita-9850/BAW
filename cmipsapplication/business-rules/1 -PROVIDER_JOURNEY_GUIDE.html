@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provider Journey Guide - IHSS CMIPS</title>
+    <style>
+        :root {
+            --primary-color: #FF9900;
+            --primary-dark: #E88300;
+            --accent-color: #146EB4;
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F7F7F7;
+            --bg-tertiary: #EAEDED;
+            --text-primary: #0F1111;
+            --text-secondary: #565959;
+            --text-muted: #767676;
+            --border-color: #D5D9D9;
+            --code-bg: #232F3E;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+            font-size: 14px;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.688rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 1rem;
+        }
+
+        .nav-menu li {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-menu a {
+            display: block;
+            padding: 0.5rem 0.75rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.813rem;
+            font-weight: 400;
+            border-radius: 0;
+            transition: all 0.15s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-menu a:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-left-color: var(--primary-color);
+        }
+
+        .nav-menu a.active {
+            background: #FEF9E7;
+            color: var(--text-primary);
+            font-weight: 700;
+            border-left-color: var(--primary-color);
+        }
+
+        .nav-section-header {
+            padding: 1rem 0.75rem 0.5rem;
+            font-size: 0.688rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 3rem;
+            max-width: 1400px;
+        }
+
+        .page-header {
+            background: var(--code-bg);
+            color: white;
+            padding: 2.5rem 3rem;
+            margin-bottom: 2rem;
+            border-bottom: 4px solid var(--primary-color);
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .page-header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            color: white;
+        }
+
+        section {
+            background: var(--bg-primary);
+            padding: 2rem 2.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--primary-color);
+            letter-spacing: -0.01em;
+        }
+
+        h3 {
+            font-size: 1.375rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 2rem 0 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 1.5rem 0 1rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        ul, ol {
+            margin: 1rem 0 1rem 1.5rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        code {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            border: 1px solid var(--border-color);
+            font-family: 'Courier New', monospace;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        thead {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        th {
+            padding: 0.875rem 1rem;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.813rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody tr:hover {
+            background: #FAFAFA;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .info-box {
+            background: #FEF9E7;
+            border-left: 4px solid var(--primary-color);
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .warning-box {
+            background: #FFF3CD;
+            border-left: 4px solid #FFC107;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .success-box {
+            background: #D1F2EB;
+            border-left: 4px solid #00A65A;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .error-box {
+            background: #FFEBEE;
+            border-left: 4px solid #C62828;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .step-box {
+            background: var(--bg-tertiary);
+            padding: 1.25rem 1.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .step-box h4 {
+            margin-top: 0;
+            color: var(--accent-color);
+        }
+
+        .flow-diagram {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .flow-diagram pre {
+            background: transparent;
+            color: var(--text-primary);
+            box-shadow: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            font-family: 'Courier New', monospace;
+        }
+
+        .checkmark {
+            color: #00A65A;
+            font-weight: bold;
+        }
+
+        .crossmark {
+            color: #C62828;
+            font-weight: bold;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @media print {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>Provider Journey Guide</h1>
+                <p>IHSS CMIPS System</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#overview">Overview</a></li>
+                <li class="nav-section-header">Part 1: Enrollment</li>
+                <li><a href="#step1">Step 1: Express Interest</a></li>
+                <li><a href="#step2">Step 2: County Creates Record</a></li>
+                <li><a href="#step3">Step 3: Complete Requirements</a></li>
+                <li><a href="#step4">Step 4: SSN Verification</a></li>
+                <li><a href="#step5">Step 5: County Approval</a></li>
+                <li class="nav-section-header">Part 2: Assignment</li>
+                <li><a href="#pathway-a">Pathway A: County Assigns</a></li>
+                <li><a href="#pathway-b">Pathway B: Recipient Hires</a></li>
+                <li class="nav-section-header">Part 3: ESP Registration</li>
+                <li><a href="#esp-step1">Step 1: Go to Website</a></li>
+                <li><a href="#esp-step2">Step 2: Complete Registration</a></li>
+                <li><a href="#esp-step3">Step 3: Registration Complete</a></li>
+                <li class="nav-section-header">Part 4: Using ESP</li>
+                <li><a href="#using-esp">Using ESP as Provider</a></li>
+                <li class="nav-section-header">Additional Info</li>
+                <li><a href="#summary">Journey Summary</a></li>
+                <li><a href="#comparison">Provider vs Recipient</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="#data-storage">Data Storage</a></li>
+                <li><a href="#reminders">Important Reminders</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1>📋 Provider Journey Guide</h1>
+                <p>Complete step-by-step guide from initial interest to serving recipients</p>
+            </div>
+
+            <section id="overview">
+                <h2>Overview</h2>
+                
+                <div class="warning-box">
+                    <h4>IMPORTANT</h4>
+                    <p><strong>Providers CANNOT self-enroll or search for recipients themselves. The process is managed by county workers.</strong></p>
+                </div>
+
+                <p>This guide walks you through the complete journey as an IHSS provider, from expressing initial interest to successfully serving recipients.</p>
+            </section>
+
+            <section id="step1">
+                <h2>PART 1: Provider Enrollment (County-Initiated)</h2>
+
+                <h3>Step 1: Provider Expresses Interest</h3>
+
+                <div class="step-box">
+                    <h4>What You Do:</h4>
+                    <ul>
+                        <li>Contact your local county IHSS office (phone/walk-in)</li>
+                        <li>Express interest in becoming an IHSS provider</li>
+                        <li>Provide basic information (name, phone, email)</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h4>What Happens Behind the Scenes:</h4>
+                    <ul>
+                        <li>County worker gathers your information</li>
+                        <li>County worker will create your provider record in CMIPS</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="step2">
+                <h3>Step 2: County Worker Creates Your Provider Record</h3>
+
+                <div class="warning-box">
+                    <p><strong>This is NOT self-service</strong> - County worker does this:</p>
+                </div>
+
+                <ol>
+                    <li><strong>County Worker logs into CMIPS</strong> (county worker dashboard)</li>
+                    <li><strong>County Worker navigates to:</strong> My Workspace → Register a Provider</li>
+                    <li><strong>County Worker searches for you</strong> (to see if you already exist in system)</li>
+                    <li><strong>If not found:</strong> County Worker creates new provider record</li>
+                </ol>
+
+                <h4>System Actions:</h4>
+                <ul>
+                    <li>Provider number generated (9-digit number, e.g., "123456789")</li>
+                    <li>Initial status: <code>eligible = 'PENDING'</code></li>
+                    <li>SSN verification status: <code>'NOT_YET_VERIFIED'</code></li>
+                    <li>Provider status: <code>'ACTIVE'</code></li>
+                </ul>
+
+                <div class="info-box">
+                    <h4>Where Stored:</h4>
+                    <ul>
+                        <li><strong>PostgreSQL Database:</strong> <code>providers</code> table</li>
+                        <li>Record created with your basic information</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="step3">
+                <h3>Step 3: You Complete Enrollment Requirements</h3>
+
+                <p><strong>County worker gives you forms and instructions:</strong></p>
+
+                <div class="step-box">
+                    <h4>3A. SOC 426 - Provider Enrollment Form</h4>
+                    <ul>
+                        <li>Fill out and return to county</li>
+                        <li>County worker marks this complete in CMIPS</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>3B. Provider Orientation</h4>
+                    <ul>
+                        <li>Attend orientation session (county arranges)</li>
+                        <li>County worker marks this complete in CMIPS</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>3C. DOJ Background Check</h4>
+                    <ul>
+                        <li>Submit fingerprints to Department of Justice</li>
+                        <li>Wait for clearance</li>
+                        <li>County worker marks this complete in CMIPS when cleared</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>3D. SOC 846 - Provider Enrollment Agreement</h4>
+                    <ul>
+                        <li>Sign provider agreement (required)</li>
+                        <li>Sign overtime agreement (required after FLSA date)</li>
+                        <li>Return to county</li>
+                        <li>County worker marks this complete in CMIPS</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>3E. CORI Check (if applicable)</h4>
+                    <p>If background check finds convictions:</p>
+                    <ul>
+                        <li><strong>Tier 1:</strong> Cannot serve (automatically ineligible)</li>
+                        <li><strong>Tier 2:</strong> Can serve with waiver (county processes)</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h4>Where Stored:</h4>
+                    <p>Each requirement completion updates the <code>providers</code> table:</p>
+                    <ul>
+                        <li><code>soc426_completed = true</code>, <code>soc426_date = '2025-01-16'</code></li>
+                        <li><code>orientation_completed = true</code>, <code>orientation_date = '2025-01-17'</code></li>
+                        <li><code>background_check_completed = true</code>, <code>background_check_date = '2025-01-20'</code></li>
+                        <li><code>soc846_completed = true</code>, <code>provider_agreement_signed = true</code>, etc.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="step4">
+                <h3>Step 4: SSN Verification (Automated - Weekly Batch)</h3>
+
+                <div class="info-box">
+                    <p><strong>You don't do anything</strong> - System processes automatically:</p>
+                </div>
+
+                <ul>
+                    <li>Weekly batch job sends your SSN to Social Security Administration</li>
+                    <li>SSA verifies your SSN</li>
+                    <li>System updates your record:
+                        <ul>
+                            <li><code>ssn_verification_status = 'VERIFIED'</code> (if valid)</li>
+                            <li>OR: <code>'DECEASED'</code>, <code>'DUPLICATE_SSN'</code>, <code>'SUSPECT_SSN'</code> (if issues found)</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <div class="info-box">
+                    <h4>Where Stored:</h4>
+                    <p><code>providers</code> table: <code>ssn_verification_status</code> field updated</p>
+                </div>
+            </section>
+
+            <section id="step5">
+                <h3>Step 5: County Approves Your Enrollment</h3>
+
+                <p><strong>County worker clicks "Approve Enrollment" button:</strong></p>
+
+                <h4>System Validates:</h4>
+                <ul class="checkmark">
+                    <li>✅ SOC 426 completed</li>
+                    <li>✅ Orientation completed</li>
+                    <li>✅ SOC 846 completed</li>
+                    <li>✅ Background check completed</li>
+                    <li>✅ Provider Agreement signed</li>
+                    <li>✅ Overtime Agreement signed (if after FLSA)</li>
+                    <li>✅ No active Tier 1 CORI</li>
+                    <li>✅ Tier 2 CORI has waiver (if applicable)</li>
+                </ul>
+
+                <div class="success-box">
+                    <h4>If all requirements met:</h4>
+                    <ul>
+                        <li>Your status changes: <code>eligible = 'PENDING'</code> → <code>eligible = 'YES'</code></li>
+                        <li><code>effective_date = Today's date</code></li>
+                        <li><code>original_hire_date = Today's date</code></li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h4>Where Stored:</h4>
+                    <p><code>providers</code> table updated: <code>eligible = 'YES'</code></p>
+                </div>
+
+                <div class="success-box">
+                    <h4 style="margin-top: 0;">🎉 You are now ELIGIBLE to serve!</h4>
+                </div>
+            </section>
+
+            <section id="pathway-a">
+                <h2>PART 2: Getting Assigned to Recipients</h2>
+
+                <div class="warning-box">
+                    <p><strong>IMPORTANT:</strong> You <strong>CANNOT</strong> search for or apply to recipients yourself. There are <strong>TWO WAYS</strong> you get assigned:</p>
+                </div>
+
+                <h3>Pathway A: County Assigns You (Traditional)</h3>
+
+                <h4>How It Works:</h4>
+
+                <ol>
+                    <li>
+                        <strong>County worker assigns you to a recipient case</strong>
+                        <ul>
+                            <li>County worker selects a recipient who needs services</li>
+                            <li>County worker searches for providers (including you)</li>
+                            <li>County worker assigns you to the case</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>You receive notification</strong>
+                        <ul>
+                            <li>Email or phone call from county</li>
+                            <li>Information about recipient and case</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>System creates provider assignment</strong>
+                        <ul>
+                            <li>Record created in <code>provider_assignments</code> table</li>
+                            <li>Links you (provider_id) to recipient (recipient_id) and case (case_id)</li>
+                            <li>Status: <code>'ACTIVE'</code></li>
+                            <li>Begin date set</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <div class="info-box">
+                    <h4>Where Stored:</h4>
+                    <p><code>provider_assignments</code> table:</p>
+                    <ul>
+                        <li><code>provider_id = Your Provider ID</code></li>
+                        <li><code>recipient_id = Recipient ID</code></li>
+                        <li><code>case_id = Case ID</code></li>
+                        <li><code>status = 'ACTIVE'</code></li>
+                        <li><code>begin_date = Today</code></li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="pathway-b">
+                <h3>Pathway B: Recipient Hires You (Self-Service - Recipient-Initiated)</h3>
+
+                <h4>How It Works:</h4>
+
+                <ol>
+                    <li>
+                        <strong>Recipient searches for providers</strong> (through ESP portal)
+                        <ul>
+                            <li>Recipient logs into ESP</li>
+                            <li>Recipient goes to "Hire Provider"</li>
+                            <li>Recipient searches by: Provider Name, Provider Number, or Last 4 of SSN</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Recipient finds and selects you</strong>
+                        <ul>
+                            <li>Your provider information appears in search results</li>
+                            <li>Recipient reviews your eligibility status</li>
+                            <li>Recipient selects "Hire Provider"</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Recipient completes hire process</strong>
+                        <ul>
+                            <li>Recipient confirms details</li>
+                            <li>Recipient submits electronic signature</li>
+                            <li>System creates provider assignment</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>You receive notification</strong>
+                        <ul>
+                            <li>Email notification sent to you</li>
+                            <li>Assignment information provided</li>
+                            <li>County processes within 1-2 business days</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <div class="info-box">
+                    <h4>Where Stored:</h4>
+                    <ul>
+                        <li>Same as Pathway A: <code>provider_assignments</code> table created</li>
+                        <li>System also updates <code>providers</code> table: <code>numberOfActiveCases</code> incremented</li>
+                    </ul>
+                </div>
+
+                <div class="error-box">
+                    <p><strong>You CANNOT initiate this process</strong> - only recipients can hire providers through ESP.</p>
+                </div>
+            </section>
+
+            <section id="esp-step1">
+                <h2>PART 3: ESP Registration (Self-Service - Optional but Recommended)</h2>
+
+                <p><strong>Once you're enrolled and eligible, you can register for ESP to submit timesheets electronically.</strong></p>
+
+                <h3>Step 1: Go to ESP Website</h3>
+                <ul>
+                    <li>URL: <a href="https://www.etimesheets.ihss.ca.gov" target="_blank">https://www.etimesheets.ihss.ca.gov</a></li>
+                    <li>Click <strong>"Register as New User"</strong></li>
+                </ul>
+            </section>
+
+            <section id="esp-step2">
+                <h3>Step 2: Complete 5-Step ESP Registration</h3>
+
+                <div class="step-box">
+                    <h4>Step 2.1: Validate Identity</h4>
+                    
+                    <p><strong>You Enter:</strong></p>
+                    <ul>
+                        <li>Select "I am a Provider"</li>
+                        <li>Provider Number: <strong>Your 9-digit provider number</strong> (from county)</li>
+                        <li>Last Name, First Name, Date of Birth</li>
+                        <li>Last 4 digits of SSN</li>
+                    </ul>
+
+                    <p><strong>System Validates:</strong></p>
+                    <ul>
+                        <li>All fields must match your CMIPS record exactly</li>
+                        <li>You must be eligible (<code>eligible = 'YES'</code>)</li>
+                        <li>You cannot already be registered (unless inactive)</li>
+                    </ul>
+
+                    <p><strong>If validation fails:</strong></p>
+                    <ul>
+                        <li>Error: "Provider information does not match our records"</li>
+                        <li>Contact county for help</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Step 2.2: Verify Email</h4>
+                    
+                    <p><strong>You Enter:</strong></p>
+                    <ul>
+                        <li>Email address (twice for confirmation)</li>
+                    </ul>
+
+                    <p><strong>System Actions:</strong></p>
+                    <ul>
+                        <li>Sends 6-digit verification code to your email</li>
+                        <li>Code expires in 15 minutes</li>
+                    </ul>
+
+                    <p><strong>You Enter:</strong></p>
+                    <ul>
+                        <li>Verification code</li>
+                    </ul>
+
+                    <p><strong>System Validates:</strong></p>
+                    <ul>
+                        <li>Code must match and not be expired</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Step 2.3: Create Username</h4>
+                    
+                    <p><strong>You Enter:</strong></p>
+                    <ul>
+                        <li>Username (6-20 characters, letters/numbers/underscores/hyphens only)</li>
+                        <li>Confirm username</li>
+                    </ul>
+
+                    <p><strong>System Validates:</strong></p>
+                    <ul>
+                        <li>Username must be unique</li>
+                        <li>Real-time validation shows ✓ or ✗</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Step 2.4: Create Password</h4>
+                    
+                    <p><strong>You Enter:</strong></p>
+                    <ul>
+                        <li>Password (must meet requirements):
+                            <ul>
+                                <li>Minimum 8 characters, maximum 50</li>
+                                <li>At least one uppercase letter</li>
+                                <li>At least one lowercase letter</li>
+                                <li>At least one number</li>
+                                <li>At least one special character (!@#$%^&*)</li>
+                            </ul>
+                        </li>
+                        <li>Confirm password</li>
+                    </ul>
+
+                    <p><strong>System Validates:</strong></p>
+                    <ul>
+                        <li>Password strength indicator (weak/medium/strong)</li>
+                        <li>Cannot contain username</li>
+                        <li>Cannot match last 5 passwords</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Step 2.5: Security Questions</h4>
+                    
+                    <p><strong>You Select & Answer:</strong></p>
+                    <ul>
+                        <li>3 different security questions from dropdown</li>
+                        <li>Answers (minimum 3 characters each)</li>
+                        <li>Answers are case-insensitive</li>
+                        <li>Cannot be username or password</li>
+                    </ul>
+
+                    <p><strong>Examples:</strong></p>
+                    <ul>
+                        <li>What is your mother's maiden name?</li>
+                        <li>What city were you born in?</li>
+                        <li>What is your favorite color?</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="esp-step3">
+                <h3>Step 3: Registration Complete</h3>
+
+                <div class="success-box">
+                    <h4>Success!</h4>
+                    <ul>
+                        <li>Welcome email sent</li>
+                        <li>Username reminder provided</li>
+                        <li>You can now log in to ESP</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h4>System Updates:</h4>
+                    <p><code>providers</code> table: <code>esp_registered = true</code></p>
+                </div>
+            </section>
+
+            <section id="using-esp">
+                <h2>PART 4: Using ESP as a Provider</h2>
+
+                <h3>After Logging In to ESP</h3>
+
+                <h4>You Can:</h4>
+
+                <ol>
+                    <li>
+                        <strong>View Your Recipients</strong>
+                        <ul>
+                            <li>See list of all recipients you're assigned to</li>
+                            <li>View recipient names, case numbers, authorized hours</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Submit Timesheets</strong>
+                        <ul>
+                            <li>Enter time worked for each recipient</li>
+                            <li>Daily or weekly entry format</li>
+                            <li>Submit electronically</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>View Payment History</strong>
+                        <ul>
+                            <li>See last 3 months of payments</li>
+                            <li>Download pay stubs</li>
+                            <li>View W-2 forms</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Submit Sick Leave Claims</strong>
+                        <ul>
+                            <li>Claim accrued sick leave hours</li>
+                            <li>View available sick leave balance</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Manage Direct Deposit</strong>
+                        <ul>
+                            <li>Enroll in direct deposit</li>
+                            <li>Update bank information</li>
+                            <li>Cancel direct deposit</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Submit Travel Claims</strong>
+                        <ul>
+                            <li>Claim travel time (up to 7 hours/week)</li>
+                            <li>Must have workweek agreement with travel</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Career Pathways</strong>
+                        <ul>
+                            <li>Submit training time</li>
+                            <li>Claim incentives</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <div class="error-box">
+                    <h4>You CANNOT:</h4>
+                    <ul class="crossmark">
+                        <li>❌ Search for recipients to serve</li>
+                        <li>❌ Apply to recipients</li>
+                        <li>❌ See recipients who haven't hired you</li>
+                        <li>❌ Hire yourself to recipients</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="summary">
+                <h2>Summary: Provider Journey</h2>
+
+                <div class="flow-diagram">
+                    <pre>YOUR JOURNEY AS A PROVIDER:
+
+1. CONTACT COUNTY (Phone/Walk-in)
+   ↓
+2. COUNTY CREATES YOUR PROVIDER RECORD (Not self-service)
+   ↓
+3. YOU COMPLETE ENROLLMENT REQUIREMENTS:
+   - SOC 426 Form
+   - Orientation
+   - DOJ Background Check
+   - SOC 846 Agreement
+   - CORI (if applicable)
+   ↓
+4. SSN VERIFICATION (Automated weekly batch)
+   ↓
+5. COUNTY APPROVES ENROLLMENT
+   ↓
+6. YOU BECOME ELIGIBLE (eligible = 'YES')
+   ↓
+7. GET ASSIGNED TO RECIPIENTS (TWO WAYS):
+   └─► PATHWAY A: County assigns you
+       OR
+   └─► PATHWAY B: Recipient hires you through ESP
+   ↓
+8. REGISTER FOR ESP (Self-Service - 5 Steps)
+   ↓
+9. LOGIN TO ESP
+   ↓
+10. SUBMIT TIMESHEETS FOR YOUR ASSIGNED RECIPIENTS</pre>
+                </div>
+            </section>
+
+            <section id="comparison">
+                <h2>Key Differences: Provider vs Recipient</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Recipient</th>
+                            <th>Provider</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Initial Enrollment</strong></td>
+                            <td>County creates referral/application</td>
+                            <td>County creates provider record</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Can Self-Enroll Initially?</strong></td>
+                            <td><span class="crossmark">❌ No</span></td>
+                            <td><span class="crossmark">❌ No</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>ESP Registration</strong></td>
+                            <td><span class="checkmark">✅ Yes</span> (after case approved)</td>
+                            <td><span class="checkmark">✅ Yes</span> (after enrollment approved)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Can Search for Others?</strong></td>
+                            <td><span class="checkmark">✅ Yes</span> - Can search & hire providers (age 18+)</td>
+                            <td><span class="crossmark">❌ No</span> - Cannot search for recipients</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Assignment Process</strong></td>
+                            <td>County assigns OR Recipient hires provider</td>
+                            <td>County assigns OR Recipient hires provider</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Who Initiates?</strong></td>
+                            <td>Recipient can initiate (hire provider)</td>
+                            <td>Provider CANNOT initiate (only recipient can hire)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="faq">
+                <h2>Frequently Asked Questions</h2>
+
+                <h4>Q: Can I search for recipients who need providers?</h4>
+                <div class="error-box">
+                    <p><strong>A:</strong> No. Providers cannot search for or apply to recipients. Recipients search for and hire providers, or county workers assign providers to cases.</p>
+                </div>
+
+                <h4>Q: How do I get assigned to a recipient?</h4>
+                <div class="info-box">
+                    <p><strong>A:</strong> Two ways:</p>
+                    <ol>
+                        <li><strong>County assigns you</strong> - County worker selects you for a recipient case</li>
+                        <li><strong>Recipient hires you</strong> - Recipient finds you through ESP and hires you</li>
+                    </ol>
+                </div>
+
+                <h4>Q: Can I register for ESP before being assigned to a recipient?</h4>
+                <div class="success-box">
+                    <p><strong>A:</strong> Yes! You can register for ESP as soon as you're eligible (<code>eligible = 'YES'</code>). You don't need to wait for an assignment.</p>
+                </div>
+
+                <h4>Q: What if I want to serve a specific recipient I know?</h4>
+                <div class="info-box">
+                    <p><strong>A:</strong> You can:</p>
+                    <ol>
+                        <li>Tell the recipient to search for you in ESP and hire you</li>
+                        <li>Contact your county worker to request assignment</li>
+                        <li>Have the recipient contact their case worker to request you</li>
+                    </ol>
+                </div>
+
+                <h4>Q: How do I see my assigned recipients?</h4>
+                <div class="info-box">
+                    <p><strong>A:</strong> After logging into ESP, you'll see a list of all recipients you're assigned to. You can submit timesheets for each recipient.</p>
+                </div>
+
+                <h4>Q: Can I see recipients who haven't hired me yet?</h4>
+                <div class="error-box">
+                    <p><strong>A:</strong> No. You can only see recipients you're already assigned to through provider assignments.</p>
+                </div>
+            </section>
+
+            <section id="data-storage">
+                <h2>Data Storage - Where Your Information Is</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Information</th>
+                            <th>Storage Location</th>
+                            <th>Table Name</th>
+                            <th>Key Identifier</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Provider Record</strong></td>
+                            <td>PostgreSQL</td>
+                            <td><code>providers</code></td>
+                            <td><code>id</code>, <code>provider_number</code> (9-digit)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Your Assignments</strong></td>
+                            <td>PostgreSQL</td>
+                            <td><code>provider_assignments</code></td>
+                            <td><code>provider_id</code> links to <code>case_id</code> and <code>recipient_id</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>ESP Login</strong></td>
+                            <td>Keycloak</td>
+                            <td><code>users</code></td>
+                            <td>Your ESP username</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Your Timesheets</strong></td>
+                            <td>PostgreSQL</td>
+                            <td><code>timesheets</code></td>
+                            <td>Linked by <code>provider_id</code> and <code>recipient_id</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="reminders">
+                <h2>Important Reminders</h2>
+
+                <div class="success-box">
+                    <ul class="checkmark">
+                        <li>✅ <strong>You CAN register for ESP</strong> once eligible</li>
+                        <li>✅ <strong>You CAN submit timesheets</strong> for assigned recipients</li>
+                        <li>✅ <strong>You CAN view payments</strong> and manage account</li>
+                    </ul>
+                </div>
+
+                <div class="error-box">
+                    <ul class="crossmark">
+                        <li>❌ <strong>You CANNOT search for recipients</strong></li>
+                        <li>❌ <strong>You CANNOT apply to recipients</strong></li>
+                        <li>❌ <strong>You CANNOT self-enroll initially</strong> (county must create your record)</li>
+                    </ul>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-menu a');
+
+        function updateActiveNav() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= (sectionTop - 100)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveNav);
+        updateActiveNav();
+    </script>
+</body>
+</html>

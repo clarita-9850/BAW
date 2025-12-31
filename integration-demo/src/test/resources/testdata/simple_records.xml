@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<records>
+  <record>
+    <id>1</id>
+    <name>Alice Johnson</name>
+    <amount>1500.50</amount>
+    <date>2024-01-15</date>
+  </record>
+  <record>
+    <id>2</id>
+    <name>Bob Smith</name>
+    <amount>2300.75</amount>
+    <date>2024-02-20</date>
+  </record>
+  <record>
+    <id>3</id>
+    <name>Carol Williams</name>
+    <amount>1800.00</amount>
+    <date>2024-03-10</date>
+  </record>
+  <record>
+    <id>4</id>
+    <name>David Brown</name>
+    <amount>3200.25</amount>
+    <date>2024-04-05</date>
+  </record>
+  <record>
+    <id>5</id>
+    <name>Eve Davis</name>
+    <amount>2750.00</amount>
+    <date>2024-05-12</date>
+  </record>
+</records>

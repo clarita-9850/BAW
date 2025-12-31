@@ -1,0 +1,60 @@
+# Integration Hub Framework Default Configuration
+# These values can be overridden in the application's configuration
+
+integration:
+  enabled: true
+  scan-packages: []
+
+  # Retry configuration
+  retry:
+    max-attempts: 3
+    initial-delay: 1000
+    max-delay: 30000
+    multiplier: 2.0
+    jitter: true
+
+  # Circuit breaker configuration
+  circuit-breaker:
+    enabled: true
+    failure-threshold: 5
+    reset-timeout: 30000
+    success-threshold: 3
+
+  # Async execution configuration
+  async:
+    core-pool-size: 10
+    max-pool-size: 50
+    queue-capacity: 100
+    keep-alive-seconds: 60
+    thread-name-prefix: integration-async-
+
+  # SFTP configuration defaults
+  sftp:
+    connection-timeout: 30000
+    read-timeout: 60000
+    strict-host-key-checking: false
+    default-port: 22
+    temp-directory: ${java.io.tmpdir}
+
+  # REST client configuration defaults
+  rest:
+    connection-timeout: 10000
+    read-timeout: 30000
+    max-connections-per-route: 20
+    max-total-connections: 100
+    follow-redirects: true
+    user-agent: IntegrationHub/1.0
+
+  # File processing configuration
+  file:
+    encoding: UTF-8
+    buffer-size: 8192
+    archive-directory: archive
+    error-directory: error
+    delete-after-process: false
+    watch-poll-interval: 10s
+
+# Logging configuration for the framework
+logging:
+  level:
+    com.cmips.integration.framework: INFO

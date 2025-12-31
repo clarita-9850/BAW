@@ -3,7 +3,6 @@ package com.cmips.controller;
 import com.cmips.entity.Task;
 import com.cmips.service.TaskService;
 import com.cmips.service.WorkQueueSubscriptionService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,11 +13,15 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/tasks")
 @CrossOrigin(origins = "*")
-@RequiredArgsConstructor
 public class TaskController {
-    
+
     private final TaskService taskService;
     private final WorkQueueSubscriptionService subscriptionService;
+
+    public TaskController(TaskService taskService, WorkQueueSubscriptionService subscriptionService) {
+        this.taskService = taskService;
+        this.subscriptionService = subscriptionService;
+    }
     
     @GetMapping
     public ResponseEntity<List<Task>> getUserTasks(

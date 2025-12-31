@@ -1,0 +1,97 @@
+services:
+  spring-app:
+    image: mythreya9850/timesheet-app:latest
+    container_name: spring-app
+    ports: [ "8080:8080" ]
+    environment:
+      AWS_SECRETS_MANAGER_SECRET_NAME: rds!db-1feddbab-53e9-444c-a6bc-cf17b014e58d
+      USE_SECRETS_MANAGER: "true"
+      DB_HOST: database-1.cqn2wg0syn5v.us-east-1.rds.amazonaws.com
+      DB_PORT: "5432"
+      DB_NAME: "database1"
+      # Dynamic infra hostname - set via .env file or environment variable
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${INFRA_HOSTNAME}:9092
+      EXTERNAL_VALIDATION_URL: http://localhost:8082/api/validation/validate
+      MAIL_HOST: ${INFRA_HOSTNAME}
+      MAIL_PORT: 1025
+      KEYCLOAK_AUTH_SERVER_URL: http://${INFRA_HOSTNAME}:8083
+      KEYCLOAK_ISSUER_URI: http://${INFRA_HOSTNAME}:8083/realms/reporting-realm
+      SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING: "true"
+      AWS_REGION: us-east-1
+      NOTIFICATION_EMAIL_ENABLED: true
+      NOTIFICATION_EMAIL_SMTP_HOST: mailhog
+      NOTIFICATION_EMAIL_SMTP_PORT: 1025
+      NOTIFICATION_EMAIL_FROM: reports@system.com
+      NOTIFICATION_EMAIL_TO: mythreya9944@gmail.com
+      SFTP_HOST: localhost
+      SFTP_PORT: "2222"
+      SFTP_USERNAME: sftpuser
+      SFTP_PASSWORD: password
+      JAVA_OPTS: "-Xmx512m -Xms256m -XX:+UseG1GC -XX:+UseContainerSupport"
+    depends_on:
+      external-validation-api:
+        condition: service_started
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+    deploy:
+      resources:
+        limits:
+          memory: 768m
+
+  notification-service:
+    image: mythreya9850/notification-service:latest
+    container_name: notification-service
+    ports: [ "8081:8081" ]
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${INFRA_HOSTNAME}:9092
+      JAVA_OPTS: "-Xmx256m -Xms128m -XX:+UseG1GC -XX:+UseContainerSupport"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 384m
+
+  external-validation-api:
+    image: mythreya9850/external-validation-api:latest
+    container_name: external-validation-api
+    ports: [ "8082:8082" ]
+    environment:
+      SERVER_PORT: 8082
+      EXTERNAL_SERVICE_MODE: "true"
+      JAVA_OPTS: "-Xmx128m -Xms64m -XX:+UseG1GC -XX:+UseContainerSupport"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8082/api/validation/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+
+  mock-sftp-server:
+    image: mythreya9850/mock-sftp-server:latest
+    container_name: mock-sftp-server
+    ports: [ "2222:22" ]
+    environment:
+      - SFTP_USERNAME=sftpuser
+      - SFTP_PASSWORD=password
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
