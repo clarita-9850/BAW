@@ -58,6 +58,9 @@ data/
 !**/src/test/resources/**/*.csv
 !**/src/test/resources/**/*.json
 !**/src/test/resources/**/*.xml
+!integration-demo/data/input/**/*.csv
+!integration-demo/data/input/**/*.json
+!integration-demo/data/input/**/*.xml
 
 # Test reports
 test-results/
